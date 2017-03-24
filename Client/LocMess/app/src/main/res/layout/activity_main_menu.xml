@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="pt.ulisboa.tecnico.cmu.locmess.MainMenuActivity"
+    tools:layout_editor_absoluteY="81dp"
+    tools:layout_editor_absoluteX="0dp">
+
+    <ImageButton
+        android:id="@+id/ibListLocations"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@android:drawable/ic_menu_sort_by_size"
+        app:layout_constraintRight_toLeftOf="@+id/ibCreateLocations"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="21dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ibCreateLocations"
+        android:layout_marginEnd="21dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toTopOf="@+id/ibCreateLocations"
+        android:layout_marginLeft="21dp"
+        android:layout_marginRight="21dp" />
+
+    <TextView
+        android:id="@+id/tvListLocations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="List\nLocations"
+        android:textAlignment="center"
+        app:layout_constraintRight_toLeftOf="@+id/tvCreateLocations"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
+        tools:layout_constraintTop_creator="1"
+        android:layout_marginTop="13dp"
+        app:layout_constraintTop_toBottomOf="@+id/ibListLocations" />
+
+    <ImageButton
+        android:id="@+id/ibCreateLocations"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@android:drawable/ic_menu_compass"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginTop="83dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvCreateLocations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create\nLocations"
+        android:textAlignment="center"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginTop="13dp"
+        app:layout_constraintTop_toBottomOf="@+id/ibCreateLocations"
+        tools:layout_constraintLeft_creator="1" />
+
+    <ImageButton
+        android:id="@+id/ibRemoveLocations"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@android:drawable/ic_menu_delete"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/ibCreateLocations"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="21dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ibCreateLocations"
+        android:layout_marginEnd="21dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toTopOf="@+id/ibCreateLocations"
+        android:layout_marginLeft="21dp"
+        android:layout_marginRight="21dp" />
+
+    <TextView
+        android:id="@+id/tvRemoveLocations"
+        android:layout_width="64dp"
+        android:layout_height="38dp"
+        android:text="Remove\nLocations"
+        android:textAlignment="center"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/tvCreateLocations"
+        app:layout_constraintHorizontal_bias="0.607"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="@+id/tvReadMessages"
+        android:layout_marginTop="196dp"
+        android:layout_marginBottom="195dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/ibPostMessage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="+"
+        android:textSize="30sp"
+        app:layout_constraintRight_toLeftOf="@+id/ibUnpostMessages"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="21dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ibUnpostMessages"
+        android:layout_marginEnd="21dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toTopOf="@+id/ibUnpostMessages"
+        android:layout_marginLeft="21dp"
+        android:layout_marginRight="21dp" />
+
+    <TextView
+        android:id="@+id/tvPostMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post\nMessage"
+        android:textAlignment="center"
+        app:layout_constraintRight_toLeftOf="@+id/tvUnpostMessages"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
+        tools:layout_constraintTop_creator="1"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@+id/ibPostMessage" />
+
+    <ImageButton
+        android:id="@+id/ibUnpostMessages"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@android:drawable/ic_notification_clear_all"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginTop="98dp"
+        app:layout_constraintTop_toBottomOf="@+id/ibCreateLocations"
+        tools:layout_constraintLeft_creator="1" />
+
+    <TextView
+        android:id="@+id/tvUnpostMessages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unpost\nMessages"
+        android:textAlignment="center"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@+id/ibUnpostMessages"
+        tools:layout_constraintLeft_creator="1" />
+
+    <ImageButton
+        android:id="@+id/ibReadMessages"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@android:drawable/sym_action_email"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/ibUnpostMessages"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginStart="21dp"
+        android:layout_marginEnd="21dp"
+        android:layout_marginTop="98dp"
+        app:layout_constraintTop_toBottomOf="@+id/ibRemoveLocations"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginLeft="21dp"
+        android:layout_marginRight="21dp" />
+
+    <TextView
+        android:id="@+id/tvReadMessages"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Read\nMessages"
+        android:textAlignment="center"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/tvUnpostMessages"
+        app:layout_constraintHorizontal_bias="0.6"
+        tools:layout_constraintTop_creator="1"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@+id/ibReadMessages" />
+
+
+</android.support.constraint.ConstraintLayout>

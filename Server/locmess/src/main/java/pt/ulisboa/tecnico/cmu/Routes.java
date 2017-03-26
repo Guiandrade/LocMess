@@ -23,6 +23,7 @@ public class Routes
 
     });
   }
+  
   public static void Put(String endpoint){
     put(endpoint, (request, response) -> {
       System.out.println("PUT "+endpoint);

@@ -1,5 +1,17 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
+import android.os.Bundle;
+import android.app.Activity;
+import android.widget.ListView;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.widget.AbsListView.MultiChoiceModeListener;
+
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
 
         bLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v){
                 Intent loginIntent = new Intent(LoginActivity.this, UserAreaActivity.class);
                 LoginActivity.this.startActivity(loginIntent);
             }

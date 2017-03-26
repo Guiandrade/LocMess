@@ -18,7 +18,10 @@
         </activity>
         <activity android:name=".RegisterActivity" />
         <activity android:name=".UserAreaActivity" />
-        <activity android:name=".MainMenuActivity"></activity>
+        <activity android:name=".MainMenuActivity" />
+        <activity android:name=".RemovableItemListActivity" />
+        <activity android:name=".ListLocationsActivity" />
+        <activity android:name=".CreateLocationActivity"></activity>
     </application>
 
 </manifest>

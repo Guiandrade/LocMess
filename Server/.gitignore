@@ -5,6 +5,8 @@
 ### Java ###
 # Compiled class file
 *.class
+.classpath
+effective.pom
 
 # Log file
 *.log

@@ -2,7 +2,6 @@ package pt.ulisboa.tecnico.cmu;
 import static spark.Spark.*;
 import org.json.JSONObject;
 
-
 public class Routes
 {
   public static void Post(String endpoint){
@@ -14,6 +13,7 @@ public class Routes
 
     });
   }
+
   public static void Get(String endpoint){
     get(endpoint, (request, response) -> {
       System.out.println("GET "+endpoint);

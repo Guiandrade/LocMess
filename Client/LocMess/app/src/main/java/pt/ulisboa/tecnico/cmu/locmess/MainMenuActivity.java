@@ -80,7 +80,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
         else if (requestCode == REMOVE_LOCATIONS_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK){
-                //do stuff
+                ArrayList<Location> locationsRemoved = (ArrayList<Location>) data.getSerializableExtra("locationsRemoved");
+                locations = locationsRemoved;
             }
         }
     }

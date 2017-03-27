@@ -1,87 +1,110 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckedTextView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.SimpleAdapter;
+
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class RemovableItemListActivity extends AppCompatActivity {
-    ArrayList<String> names = new ArrayList<String>();
-    ArrayAdapter<String> adapter;
+    ArrayList<Location> locations = new ArrayList<Location>();
     ListView listView;
-    //private SparseBooleanArray mSelectedItemsIds;
-    ArrayList<String> selectedItems = new ArrayList<String>();
+    HashMap<String,Boolean> checkedStatus = new HashMap<String,Boolean>();
+    SimpleAdapter adapter;
+    List<HashMap<String, String>> listItems;
+    int bColor = Color.TRANSPARENT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_removable_item_list);
 
-        names.add("Arco do Cego");
-        names.add("Estadio da Luz");
-        names.add("Instituto Superior Tecnico");
-        
+        locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+
         listView = (ListView) findViewById(R.id.lvRemovableItemList);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        listView.setItemsCanFocus(false);
-        adapter = new ArrayAdapter<String>(this, R.layout.delete_row_layout,R.id.ctvDeleteItem, names);
+
+        Drawable background = listView.getBackground();
+        if (background instanceof ColorDrawable)
+            bColor = ((ColorDrawable) background).getColor();
+
+        listItems = new ArrayList<>();
+        adapter = new SimpleAdapter(this, listItems, R.layout.delete_row_layout,
+                new String[]{"First Line", "Second Line"},
+                new int[]{R.id.tvLocationName,R.id.tvCoordinates});
+
+        for(Location loc : locations){
+            HashMap<String, String> resultsMap = new HashMap<>();
+            checkedStatus.put(loc.getName(),false);
+            resultsMap.put("First Line", loc.getName());
+            String coordinates = loc.getCoordinates().getLatitude() + ", " +
+                    loc.getCoordinates().getLongitude() + ", " +
+                    loc.getCoordinates().getRadius();
+            resultsMap.put("Second Line", coordinates);
+            listItems.add(resultsMap);
+        }
+
         listView.setAdapter(adapter);
         final Button bDeleteItems = (Button) findViewById(R.id.bDeleteItems);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("CHECKED", "Checked " + ((CheckedTextView) view).isChecked());
-                if(((CheckedTextView) view).isChecked()){
-                    ((CheckedTextView) view).setChecked(false);
-                }else{
-                    ((CheckedTextView) view).setChecked(true);
-                }
-                String selectedItem = ((TextView) view).getText().toString();
-                if (selectedItems.contains(selectedItem))
-                    selectedItems.remove(selectedItem); //remove deselected item from the list of selected items
-                else
-                    selectedItems.add(selectedItem); //add selected item to the list of selected items
+                HashMap<String, String> item = (HashMap<String, String>) parent.getItemAtPosition(position);
+                String locName = item.get("First Line");
 
+                if (checkedStatus.get(locName).equals(true)){
+                    parent.getChildAt(position).setBackgroundColor(bColor);
+                    checkedStatus.put(locName,false);
+                }
+                else{
+                    parent.getChildAt(position).setBackgroundColor(Color.RED);
+                    checkedStatus.put(locName,true);
+                }
             }
         });
 
         bDeleteItems.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showSelectedItems(v);
-                deleteSelectedItems(v);
+                deleteSelectedItems();
             }
         });
     }
 
-    public void deleteSelectedItems(View view) {
-        ArrayList<String> itemsToDelete = new ArrayList<String>();
-        for (String item : selectedItems) {
-            names.remove(item);
+    public void deleteSelectedItems() {
+        int i = checkedStatus.size()-1;
+        for (HashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
+            if(entry.getValue().equals(true)){
+                listItems.remove(i);
+                listView.getChildAt(i).setBackgroundColor(bColor);
+                locations.remove(i);
+            }
+            i--;
         }
-        selectedItems.clear();
+        checkedStatus.values().removeAll(Collections.singleton(true));
         adapter.notifyDataSetChanged();
     }
 
-    public void showSelectedItems(View view) {
-        String selItems = "";
-        for (String item : selectedItems) {
-            if (selItems == "")
-                selItems = item;
-            else
-                selItems += "/" + item;
-        }
-        Toast.makeText(this, selItems, Toast.LENGTH_LONG).show();
+    @Override
+    public void onBackPressed() {
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("locationsRemoved",locations);
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
     }
 }

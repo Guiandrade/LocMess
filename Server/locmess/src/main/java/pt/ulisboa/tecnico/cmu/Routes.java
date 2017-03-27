@@ -17,17 +17,10 @@ public class Routes
     get(endpoint, (request, response) -> {
       System.out.println("GET "+endpoint);
       System.out.println(request.queryParams() );
-
-
       return "json";
 
     });
   }
-
-
-
-
-  
   public static void Put(String endpoint){
     put(endpoint, (request, response) -> {
       System.out.println("PUT "+endpoint);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import java.util.ArrayList;
 
@@ -12,34 +13,19 @@ public class MainMenuActivity extends AppCompatActivity {
 
     int CREATE_LOCATIONS_REQUEST_CODE = 1;
     int REMOVE_LOCATIONS_REQUEST_CODE = 2;
+    int POST_MESSAGE_REQUEST_CODE = 3;
     ArrayList<Location> locations = new ArrayList<Location>();
-
-    public ArrayList<Location> populateLocations (){
-        Coordinates coordinates1 = new Coordinates("123","456","10m");
-        Location location1 = new Location("Arco do Cego", coordinates1);
-
-        Coordinates coordinates2 = new Coordinates("789","987","20m");
-        Location location2 = new Location("Taguspark", coordinates2);
-
-        Coordinates coordinates3 = new Coordinates("654","321","30m");
-        Location location3 = new Location("Estádio da Luz", coordinates3);
-
-        locations.add(location1);
-        locations.add(location2);
-        locations.add(location3);
-
-        return locations;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-        populateLocations();
+        locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
 
         final ImageButton bRemoveLocations = (ImageButton) findViewById(R.id.ibRemoveLocations);
         final ImageButton bListLocations = (ImageButton) findViewById(R.id.ibListLocations);
         final ImageButton bCreateLocations = (ImageButton) findViewById(R.id.ibCreateLocations);
+        final Button bPostMessage = (Button) findViewById(R.id.ibPostMessage);
 
         bRemoveLocations.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +52,15 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivityForResult(createLocationsIntent,CREATE_LOCATIONS_REQUEST_CODE);
             }
         });
+
+        bPostMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent postMessageIntent = new Intent(MainMenuActivity.this, PostMessageActivity.class);
+                //postMessageIntent.putExtra("locations", locations);
+                startActivityForResult(postMessageIntent,POST_MESSAGE_REQUEST_CODE);
+            }
+        });
     }
 
     @Override
@@ -84,5 +79,14 @@ public class MainMenuActivity extends AppCompatActivity {
                 locations = locationsRemoved;
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("locationsUpdated",locations);
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
     }
 }

@@ -22,6 +22,7 @@
         <activity android:name=".RemovableItemListActivity" />
         <activity android:name=".ListLocationsActivity" />
         <activity android:name=".CreateLocationActivity" />
+        <activity android:name=".PostMessageActivity"></activity>
     </application>
 
 </manifest>

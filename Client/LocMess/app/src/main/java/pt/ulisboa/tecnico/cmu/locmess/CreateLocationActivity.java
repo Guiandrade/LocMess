@@ -23,7 +23,7 @@ public class CreateLocationActivity extends AppCompatActivity {
 
         bAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Coordinates coordinates = new Coordinates(etLatitude.getText().toString(),
                         etLongitude.getText().toString(),
                         etRadius.getText().toString());

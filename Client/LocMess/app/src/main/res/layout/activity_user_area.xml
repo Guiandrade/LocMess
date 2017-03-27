@@ -26,7 +26,7 @@
         android:layout_marginRight="51dp" />
 
     <Button
-        android:id="@+id/bPostMessage"
+        android:id="@+id/btPostMessage"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:text="+"

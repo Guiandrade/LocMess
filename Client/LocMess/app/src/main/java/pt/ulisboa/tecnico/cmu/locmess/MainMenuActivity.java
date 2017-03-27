@@ -57,7 +57,7 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent postMessageIntent = new Intent(MainMenuActivity.this, PostMessageActivity.class);
-                //postMessageIntent.putExtra("locations", locations);
+                postMessageIntent.putExtra("locations", locations);
                 startActivityForResult(postMessageIntent,POST_MESSAGE_REQUEST_CODE);
             }
         });

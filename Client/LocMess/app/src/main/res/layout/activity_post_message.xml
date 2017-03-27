@@ -34,41 +34,23 @@
         android:inputType="textPersonName"
         android:hint="Title" />
 
-    <TextView
-        android:id="@+id/tvSelectLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/etMessage"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
-        android:text="Select Location" />
-
     <Spinner
         android:id="@+id/sSelectLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/etMessage"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/tvSelectLocation"
-        android:layout_marginTop="14dp" />
-
-    <TextView
-        android:id="@+id/tvSelectPolicy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="19dp"
-        android:text="Select Policy"
-        android:layout_below="@+id/sSelectLocation"
-        android:layout_alignLeft="@+id/tvSelectLocation"
-        android:layout_alignStart="@+id/tvSelectLocation" />
+        android:layout_alignParentStart="true" />
 
     <Spinner
         android:id="@+id/sSelectPolicy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/sSelectLocation"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:id="@+id/etKeyPairs"
@@ -93,7 +75,7 @@
         android:layout_below="@+id/etKeyPairs"
         android:layout_marginTop="30dp"
         android:ems="10"
-        android:hint="Date"
+        android:hint="Date (dd/mm/yyyy)"
         android:inputType="date"
         android:layout_alignLeft="@+id/tvSelectPolicy"
         android:layout_alignStart="@+id/tvSelectPolicy" />
@@ -106,7 +88,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/etDate"
         android:ems="10"
-        android:hint="Time"
+        android:hint="Time (hh/mm)"
         android:inputType="time"
         android:layout_toLeftOf="@+id/etDate"
         android:layout_toStartOf="@+id/etDate" />

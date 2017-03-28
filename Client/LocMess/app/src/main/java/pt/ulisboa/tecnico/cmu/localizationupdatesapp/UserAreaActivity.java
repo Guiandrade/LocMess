@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.localizationupdatesapp;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,17 +11,12 @@ import android.widget.ImageButton;
 import java.util.ArrayList;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import com.google.android.gms.location.LocationListener;
-import android.support.annotation.NonNull;
+
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -39,12 +34,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DateFormat;
 import java.util.Date;
-import static android.R.attr.data;
 
 public class UserAreaActivity extends AppCompatActivity implements LocationListener,OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
@@ -321,7 +314,7 @@ public class UserAreaActivity extends AppCompatActivity implements LocationListe
      * Updates all UI fields.
      */
     private void updateUI() {
-        if (mCurrentLocation != null) {
+        if (mCurrentLocation != null && mMap != null) {
             LatLng myCoordinates =new LatLng(mCurrentLocation.getLatitude(),mCurrentLocation.getLongitude());
             // Clear any other marker (if exists) and add actual marker
             mMap.clear();

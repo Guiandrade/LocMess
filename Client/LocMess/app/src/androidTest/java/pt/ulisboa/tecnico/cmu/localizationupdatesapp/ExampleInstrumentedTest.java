@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.localizationupdatesapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

@@ -1,21 +1,12 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.localizationupdatesapp;
 
 import android.os.Bundle;
-import android.app.Activity;
-import android.widget.ListView;
-import android.util.SparseBooleanArray;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuItem;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import android.widget.AbsListView.MultiChoiceModeListener;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;

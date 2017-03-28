@@ -1,7 +1,10 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -19,6 +22,11 @@ public class ListLocationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_locations);
         locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         ListView locationsListView = (ListView) findViewById(R.id.lvListLocations);
 
@@ -38,5 +46,11 @@ public class ListLocationsActivity extends AppCompatActivity {
         }
 
         locationsListView.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return super.onOptionsItemSelected(item);
     }
 }

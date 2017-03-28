@@ -6,6 +6,57 @@
     tools:context="pt.ulisboa.tecnico.cmu.locmess.PostMessageActivity">
 
 
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginStart="45dp"
+        android:text="Check pairs"
+        android:textSize="9dp"
+        android:layout_alignTop="@+id/button4"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="18dp"
+        android:text="Add pair"
+        android:textSize="9dp"
+        android:layout_below="@+id/editText3"
+        android:layout_toRightOf="@+id/editText4"
+        android:layout_toEndOf="@+id/editText4" />
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Pair"
+        android:layout_alignBaseline="@+id/editText4"
+        android:layout_alignBottom="@+id/editText4"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/editText4"
+        android:layout_toRightOf="@+id/editText4" />
+
+    <EditText
+        android:id="@+id/editText4"
+        android:layout_width="190dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Key"
+        android:layout_below="@+id/sSelectPolicy"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <EditText
         android:id="@+id/etMessage"
         android:layout_width="wrap_content"
@@ -38,7 +89,7 @@
         android:id="@+id/sSelectLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="19dp"
         android:layout_below="@+id/etMessage"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -47,59 +98,66 @@
         android:id="@+id/sSelectPolicy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/sSelectLocation"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <EditText
-        android:id="@+id/etKeyPairs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="Key Pairs"
-        android:layout_below="@+id/sSelectPolicy"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <EditText
-        android:id="@+id/etDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/etKeyPairs"
-        android:layout_marginTop="30dp"
-        android:ems="10"
-        android:hint="Date (dd/mm/yyyy)"
-        android:inputType="date"
-        android:layout_alignLeft="@+id/tvSelectPolicy"
-        android:layout_alignStart="@+id/tvSelectPolicy" />
-
-    <EditText
-        android:id="@+id/etTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignTop="@+id/etDate"
-        android:ems="10"
-        android:hint="Time (hh/mm)"
-        android:inputType="time"
-        android:layout_toLeftOf="@+id/etDate"
-        android:layout_toStartOf="@+id/etDate" />
+    <Button
+        android:id="@+id/button"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:text="Time"
+        android:textSize="9dp"
+        android:layout_alignBaseline="@+id/button2"
+        android:layout_alignBottom="@+id/button2"
+        android:layout_alignLeft="@+id/button3"
+        android:layout_alignStart="@+id/button3" />
 
     <Button
-        android:id="@+id/bPostMessage"
+        android:id="@+id/button2"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:textSize="9dp"
+        android:layout_marginTop="24dp"
+        android:text="Date"
+        android:layout_below="@+id/button4"
+        android:layout_alignLeft="@+id/button4"
+        android:layout_alignStart="@+id/button4" />
+
+    <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="27dp"
-        android:text="Post Message"
-        android:layout_below="@+id/etDate"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:layout_alignBaseline="@+id/textView3"
+        android:layout_alignBottom="@+id/textView3"
+        android:layout_alignLeft="@+id/button2"
+        android:layout_alignStart="@+id/button2"
+        android:layout_alignRight="@+id/button2"
+        android:layout_alignEnd="@+id/button2" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:textAlignment="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/button"
+        android:layout_alignLeft="@+id/button"
+        android:layout_alignRight="@+id/button"
+        android:layout_alignStart="@+id/button"
+        android:layout_below="@+id/button2"
+        android:layout_marginTop="15dp"
+        android:text="TextView" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="Post message"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -21,6 +23,11 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         final ImageButton bRemoveLocations = (ImageButton) findViewById(R.id.ibRemoveLocations);
         final ImageButton bListLocations = (ImageButton) findViewById(R.id.ibListLocations);
@@ -89,4 +96,15 @@ public class MainMenuActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK,returnIntent);
         finish();
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("locationsUpdated",locations);
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
+        return super.onOptionsItemSelected(item);
+    }
+
 }

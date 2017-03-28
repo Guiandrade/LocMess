@@ -30,10 +30,10 @@ public class PostMessageActivity extends AppCompatActivity {
         final EditText etMessage = (EditText) findViewById(R.id.etMessage);
         final Spinner sSelectLocation = (Spinner) findViewById(R.id.sSelectLocation);
         final Spinner sSelectPolicy = (Spinner) findViewById(R.id.sSelectPolicy);
-        final EditText etKeyPairs = (EditText) findViewById(R.id.etKeyPairs);
-        final EditText etTime = (EditText) findViewById(R.id.etTime);
-        final EditText etDate = (EditText) findViewById(R.id.etDate);
-        final Button bPostMessage = (Button) findViewById(R.id.bPostMessage);
+        //final EditText etKeyPairs = (EditText) findViewById(R.id.etKeyPairs);
+        //final EditText etTime = (EditText) findViewById(R.id.etTime);
+        //final EditText etDate = (EditText) findViewById(R.id.etDate);
+        //final Button bPostMessage = (Button) findViewById(R.id.bPostMessage);
 
         List<String> spinnerPolicyArray =  new ArrayList<String>();
         spinnerPolicyArray.add("SELECT POLICY");
@@ -55,7 +55,7 @@ public class PostMessageActivity extends AppCompatActivity {
         locationsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sSelectLocation.setAdapter(locationsAdapter);
 
-        bPostMessage.setOnClickListener(new View.OnClickListener() {
+        /*bPostMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("TEST", etTitle.getText().toString());
@@ -63,7 +63,7 @@ public class PostMessageActivity extends AppCompatActivity {
                 Log.d("TEST", etTime.getText().toString());
                 Log.d("TEST", etDate.getText().toString());
             }
-        });
+        });*/
 
     }
 }

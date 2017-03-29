@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,12 @@ public class CreateLocationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_location);
+        this.setTitle("Create location");
+
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         final EditText etLocationName = (EditText) findViewById(R.id.etLocationName);
         final EditText etLatitude = (EditText) findViewById(R.id.etLatitude);
@@ -23,7 +30,7 @@ public class CreateLocationActivity extends AppCompatActivity {
 
         bAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Coordinates coordinates = new Coordinates(etLatitude.getText().toString(),
                         etLongitude.getText().toString(),
                         etRadius.getText().toString());
@@ -35,5 +42,13 @@ public class CreateLocationActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId()==android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

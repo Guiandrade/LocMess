@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmu.locmess;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -32,6 +33,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_removable_item_list);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         this.setTitle("Select locations to remove");
 
         locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");

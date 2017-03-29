@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -31,8 +32,14 @@ public class RemovableItemListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_removable_item_list);
+        this.setTitle("Select locations to remove");
 
         locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         listView = (ListView) findViewById(R.id.lvRemovableItemList);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -106,5 +113,17 @@ public class RemovableItemListActivity extends AppCompatActivity {
         returnIntent.putExtra("locationsRemoved",locations);
         setResult(Activity.RESULT_OK,returnIntent);
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId()==android.R.id.home){
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("locationsRemoved",locations);
+            setResult(Activity.RESULT_OK,returnIntent);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

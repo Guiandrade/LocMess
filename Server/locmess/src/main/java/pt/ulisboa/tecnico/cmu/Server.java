@@ -9,20 +9,23 @@ public class Server{
     secure("deploy/keystore.jks", "password", null, null);
     port(Integer.parseInt(args[0]));
     //curl -sS -k 'https://localhost:8080/login?username=3&month=1'
+    Routes routes= new Routes();
+
+    routes.Post("/login","login");
+    routes.Post("/signup","signup");
+    routes.Put("/profile","addKey");
+    routes.Get("/profile","getUserKeys");
+    routes.Delete("/profile","removeKey");
+    routes.Get("/keypairs","getAllKeys");
+    /*
 
 
-    Routes.Get("/login");
-    Routes.Get("/signup");
-    Routes.Post("/signup");
-    Routes.Get("/keypairs");
-    Routes.Get("/profile");
-    Routes.Put("/profile");
-    Routes.Post("/locations");
-    Routes.Get("/locations");
-    Routes.Delete("/locations");
-    Routes.Post("/messages");
-    Routes.Get("/messages");
-    Routes.Delete("/messages");
+    routes.Post("/locations");
+    routes.Get("/locations");
+    routes.Delete("/locations");
+    routes.Post("/messages");
+    routes.Get("/messages");
+    routes.Delete("/messages");*/
 
   }
 }

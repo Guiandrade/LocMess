@@ -4,13 +4,18 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -24,12 +29,19 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class PostMessageActivity extends AppCompatActivity {
 
     ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayAdapter<String> adapterList;
+    ArrayAdapter<String> adapterAutoComplete;
+    HashMap<String,Boolean> checkedStatus = new HashMap<String,Boolean>();
+    int bColor = Color.TRANSPARENT;
     private String time = "";
     private String date = "";
 
@@ -148,16 +160,80 @@ public class PostMessageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final Dialog keyPairsDialog = new Dialog(PostMessageActivity.this);
-                final EditText etKey = (EditText) keyPairsDialog.findViewById(R.id.etKey);
+                keyPairsDialog.setContentView(R.layout.keypairs_dialog_layout);
+                keyPairsDialog.show();
+
+                final AutoCompleteTextView acKey = (AutoCompleteTextView) keyPairsDialog.findViewById(R.id.acKey);
                 final EditText etPair = (EditText) keyPairsDialog.findViewById(R.id.etPair);
                 final Button bAddPair = (Button) keyPairsDialog.findViewById(R.id.bAddPair);
                 final Button bDeletePair = (Button) keyPairsDialog.findViewById(R.id.bDeletePair);
-                final Button bCheckPairs = (Button) keyPairsDialog.findViewById(R.id.bCheckPairs);
                 final ListView lvPairs = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
+                final ArrayList<String> keyPairsList = new ArrayList<String>();
 
-                //keyPairsDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                keyPairsDialog.setContentView(R.layout.keypairs_dialog_layout);
-                keyPairsDialog.show();
+                ArrayList<String> keys = new ArrayList<String>();
+                keys.add("Club");
+                keys.add("Favourite Colour");
+                keys.add("Relationship Status");
+
+                adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, keys);
+                acKey.setAdapter(adapterAutoComplete);
+
+                adapterList = new ArrayAdapter<String>(v.getContext(),android.R.layout.simple_list_item_1, keyPairsList);
+                lvPairs.setAdapter(adapterList);
+
+                acKey.setOnTouchListener(new View.OnTouchListener(){
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event){
+                        acKey.showDropDown();
+                        return false;
+                    }
+                });
+
+                bAddPair.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String pair = acKey.getText().toString() + " = " + etPair.getText().toString();
+                        keyPairsList.add(pair);
+                        checkedStatus.put(pair,false);
+                        adapterList.notifyDataSetChanged();
+                    }
+                });
+
+                lvPairs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String keyPair = (String) parent.getItemAtPosition(position);
+
+                        if (checkedStatus.get(keyPair).equals(true)){
+                            parent.getChildAt(position).setBackgroundColor(bColor);
+                            checkedStatus.put(keyPair,false);
+                        }
+                        else{
+                            parent.getChildAt(position).setBackgroundColor(Color.RED);
+                            checkedStatus.put(keyPair,true);
+                        }
+                    }
+                });
+                /*
+                bDeletePair.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int i = checkedStatus.size()-1;
+                        for (HashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
+                            if(entry.getValue().equals(true)){
+                                keyPairsList.remove(i);
+                                lvPairs.getChildAt(i).setBackgroundColor(bColor);
+                                Log.d("CONA","i = " + i);
+                                Log.d("CONA","size = " + (checkedStatus.size()-1));
+                            }
+                            i--;
+                        }
+                        checkedStatus.values().removeAll(Collections.singleton(true));
+                        adapterList.notifyDataSetChanged();
+                    }
+                });*/
+
+
             }
         });
     }

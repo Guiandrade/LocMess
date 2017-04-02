@@ -43,12 +43,16 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <Spinner
-        android:id="@+id/sSelectPolicy2"
+    <TextView
+        android:id="@+id/tvBlacklist"
+        android:text="- - - - - - - - - - - - -  Blacklist Policy  - - - - - - - - - - - - -"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="17dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="13dp"
-        android:layout_below="@+id/bKeyPairs1"
+        android:layout_below="@+id/bKeyPairsWhiteList"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -59,8 +63,8 @@
         android:textSize="10dp"
         android:text="SET DATE"
         android:layout_above="@+id/tvDate"
-        android:layout_toRightOf="@+id/bKeyPairs2"
-        android:layout_toEndOf="@+id/bKeyPairs2" />
+        android:layout_toRightOf="@+id/bKeyPairsBlackList"
+        android:layout_toEndOf="@+id/bKeyPairsBlackList" />
 
     <Button
         android:id="@+id/bSetTime"
@@ -68,21 +72,21 @@
         android:layout_height="40dp"
         android:text="SET TIME"
         android:textSize="10dp"
-        android:layout_below="@+id/bKeyPairs2"
-        android:layout_toLeftOf="@+id/bKeyPairs2"
-        android:layout_toStartOf="@+id/bKeyPairs2"
+        android:layout_below="@+id/bKeyPairsBlackList"
+        android:layout_toLeftOf="@+id/bKeyPairsBlackList"
+        android:layout_toStartOf="@+id/bKeyPairsBlackList"
         android:layout_marginTop="13dp" />
 
     <Button
-        android:id="@+id/bKeyPairs2"
+        android:id="@+id/bKeyPairsBlackList"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
         android:layout_marginTop="13dp"
         android:text="Add/edit key pairs"
         android:textSize="10dp"
-        android:layout_below="@+id/sSelectPolicy2"
-        android:layout_alignLeft="@+id/bKeyPairs1"
-        android:layout_alignStart="@+id/bKeyPairs1" />
+        android:layout_below="@+id/tvBlacklist"
+        android:layout_alignLeft="@+id/bKeyPairsWhiteList"
+        android:layout_alignStart="@+id/bKeyPairsWhiteList" />
 
     <TextView
         android:id="@+id/tvTime"
@@ -118,8 +122,12 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
-    <Spinner
-        android:id="@+id/sSelectPolicy1"
+    <TextView
+        android:id="@+id/tvWhitelist"
+        android:text="- - - - - - - - - - - - -  Whitelist Policy  - - - - - - - - - - - - -"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="17dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -128,12 +136,12 @@
         android:layout_marginTop="22dp" />
 
     <Button
-        android:id="@+id/bKeyPairs1"
+        android:id="@+id/bKeyPairsWhiteList"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
         android:textSize="10dp"
         android:text="Add/edit key pairs"
-        android:layout_below="@+id/sSelectPolicy1"
+        android:layout_below="@+id/tvWhitelist"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp" />
 

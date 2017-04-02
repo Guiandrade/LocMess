@@ -4,13 +4,16 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class Database {
   private Profiles profiles;
+  private Locations locations;
   public Database(){
     profiles=new Profiles ();
-
+    locations=new Locations();
   }
 
   public JSONObject login(JSONObject req){
@@ -89,6 +92,7 @@ public class Database {
     res.put("status","error");
     return res;
   }
+
 
 
 }

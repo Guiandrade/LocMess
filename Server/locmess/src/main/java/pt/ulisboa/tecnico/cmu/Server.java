@@ -13,17 +13,19 @@ public class Server{
     port(Integer.parseInt(args[0]));
     //curl -sS -k 'https://localhost:8080/login?username=3&month=1'
     Routes routes= new Routes();
-
+    routes.verification();
     routes.Post("/login","login");
     routes.Post("/signup","signup");
     routes.Put("/profile","addKey");
     routes.Get("/profile","getUserKeys");
     routes.Delete("/profile","removeKey");
     routes.Get("/keys","getAllKeys");
+    routes.Put("/locations","addLocation");
+    routes.Get("/locations","getLocations");
     /*
 
 
-    routes.Post("/locations");
+    ;
     routes.Get("/locations");
     routes.Delete("/locations");
     routes.Post("/messages");

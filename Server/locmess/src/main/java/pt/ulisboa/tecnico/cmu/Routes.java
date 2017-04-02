@@ -9,6 +9,19 @@ public class Routes
 {
   private Database dataObj =new Database();
   private Class dataClass=dataObj.getClass();
+  public void verification(){
+    before((request, response) -> {
+    boolean authenticated=true;
+    System.out.println("before");
+    System.out.println(request.session().id() );
+
+    System.out.println(request.session().isNew()    );
+    // ... check if authenticated
+    if (!authenticated) {
+        halt(401, "You are not welcome here");
+    }
+});
+  }
   public void Post(String endpoint,String func){
     post(endpoint, (request, response) -> {
       System.out.println("POST "+endpoint);
@@ -54,6 +67,7 @@ public class Routes
       return res;
 
     } catch(Exception exception_name) {
+        System.out.println(exception_name);
         res = new JSONObject();
         res.put("status","error");
         return res;

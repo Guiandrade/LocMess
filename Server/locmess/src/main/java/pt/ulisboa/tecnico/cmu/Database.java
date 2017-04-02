@@ -92,6 +92,24 @@ public class Database {
     res.put("status","error");
     return res;
   }
+  public JSONObject getLocations(JSONObject req){
+    JSONObject res= new JSONObject();
+    res.put("locations",locations.getLocationsJson());
+    return res;
+
+  }
+
+  public JSONObject addLocation(JSONObject req){
+    String location=req.get("location").toString();
+    double latitude=req.getDouble("latitude");
+    double longitude=req.getDouble("longitude");
+    int radius=Integer.parseInt(req.get("radius").toString());
+    JSONObject res= new JSONObject();
+    locations.addLocation(location, latitude, longitude, radius);
+    res.put("status","ok");
+    return res;
+  }
+
 
 
 

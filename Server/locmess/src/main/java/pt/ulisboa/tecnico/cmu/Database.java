@@ -53,6 +53,7 @@ public class Database {
 
   public JSONObject getUserKeys(JSONObject req){
     String username=req.get("username").toString();
+    System.out.println(username);
     JSONObject res= new JSONObject();
     HashMap<String,Set<String>> keys=profiles.getUserKeys(username);
     if (keys !=null){

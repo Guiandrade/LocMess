@@ -11,9 +11,11 @@ import java.util.Set;
 public class Database {
   private Profiles profiles;
   private Locations locations;
+  private Messages messages;
   public Database(){
     profiles=new Profiles ();
     locations=new Locations();
+    messages=new Messages();
   }
 
   public JSONObject login(JSONObject req){
@@ -106,6 +108,44 @@ public class Database {
     int radius=Integer.parseInt(req.get("radius").toString());
     JSONObject res= new JSONObject();
     locations.addLocation(location, latitude, longitude, radius);
+    res.put("status","ok");
+    return res;
+  }
+
+  public JSONObject deleteMessage(JSONObject req){
+    String id=req.get("id").toString();
+    messages.deleteMessage(id);
+    JSONObject res= new JSONObject();
+    res.put("status","ok");
+    return res;
+  }
+  public  JSONObject getMessages(JSONObject req){
+    JSONObject res= new JSONObject();
+    String username=req.get("username").toString();
+    double latitude=req.getDouble("latitude");
+    double longitude=req.getDouble("longitude");
+    Set<String> location=locations.getUserLocation(latitude,longitude);
+    HashMap<String,Set<String>> userKeys=profiles.getUserKeys(username);
+    for (String l : location) {
+      Set<JSONObject> message=messages.getMessages(l,userKeys);
+      if(message.size()!=0){
+        res.put(l,message);
+      }
+    }
+    res.put("status","ok");
+    return res;
+  }
+
+  public JSONObject createMessage(JSONObject req){
+    String username=req.get("username").toString();
+    String location=req.get("location").toString();
+    String time=req.get("time").toString();
+    String body=req.get("body").toString();
+    HashMap<String,Set<String>> whitelist=null;
+    HashMap<String,Set<String>> backlist=null;
+
+    messages.createMessage(username,location , time, body, whitelist, backlist);
+    JSONObject res= new JSONObject();
     res.put("status","ok");
     return res;
   }

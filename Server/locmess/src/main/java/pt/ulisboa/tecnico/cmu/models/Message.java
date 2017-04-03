@@ -3,15 +3,21 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
+import org.json.JSONObject;
+
 
 public class Message {
+  private String id;
+  private String username;
   private String location;
   private String time;
   private String body;
   private HashMap<String,Set<String>> whitelist= new HashMap<String,Set<String>>(); //vao so para users com estes keypairs
   private HashMap<String,Set<String>> backlist= new HashMap<String,Set<String>>(); //nao vao para users com estes keypairs
 
-  public Message (String location , String time, String body, HashMap<String,Set<String>> whitelist,  HashMap<String,Set<String>> backlist) {
+  public Message (String id,String username,String location , String time, String body, HashMap<String,Set<String>> whitelist,  HashMap<String,Set<String>> backlist) {
+    this.id=id;
+    this.username=username;
     this.location=location;
     this.time=time;
     this.body=body;
@@ -28,6 +34,15 @@ public class Message {
   public String getBody(){
     return this.body;
   }
+  public JSONObject toJson(){
+    JSONObject message= new JSONObject();
+    message.put("id",this.id);
+    message.put("username",this.username);
+    message.put("location",this.location);
+    message.put("time",this.time);
+    message.put("body",this.body);
+    return message;
+  }
 
   public boolean isInWhiteList(HashMap<String,Set<String>> userKeys){
     for(Map.Entry<String,Set<String>> e : userKeys.entrySet()) {
@@ -40,7 +55,6 @@ public class Message {
            }
          }
        }
-
      }
     return false;
   }

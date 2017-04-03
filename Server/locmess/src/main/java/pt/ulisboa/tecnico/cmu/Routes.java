@@ -11,6 +11,7 @@ public class Routes
   private Class dataClass=dataObj.getClass();
   public void verification(){
     before((request, response) -> {
+
     boolean authenticated=true;
     System.out.println("before");
     System.out.println(request.session().id() );
@@ -60,7 +61,9 @@ public class Routes
     try {
       Method method = dataClass.getMethod(func, new Class[] { JSONObject.class });
       JSONObject reqObj = new JSONObject();
+      System.out.println(request.queryParams("password"));
       for (String s : request.queryParams()) {
+
         reqObj.put(s,request.queryParams(s));
       }
       res = (JSONObject) method.invoke(dataObj, new Object[] {reqObj});

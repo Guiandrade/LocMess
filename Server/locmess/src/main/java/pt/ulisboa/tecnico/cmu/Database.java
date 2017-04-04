@@ -117,10 +117,20 @@ public class Database {
   }
 
   public JSONObject deleteMessage(JSONObject req){
-    String id=req.get("id").toString();
-    messages.deleteMessage(id);
     JSONObject res= new JSONObject();
-    res.put("status","ok");
+    String username=req.get("username").toString();
+    String id=req.get("id").toString();
+    Set<String> lisId = new HashSet<String>();
+    int i=0;
+    while(req.has("id"+i)!=false){
+      boolean check=messages.deleteMessage(username,req.get("id"+i).toString());
+      if(check){
+        lisId.add("id"+i);
+      }
+    }
+        res.put("deleted",lisId);
+        res.put("status","ok");
+
     return res;
   }
   public  JSONObject getMessages(JSONObject req){

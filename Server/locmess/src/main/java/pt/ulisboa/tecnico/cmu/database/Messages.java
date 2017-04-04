@@ -38,8 +38,13 @@ public class Messages {
 
   }
 
-  public void deleteMessage(String id){
-    messages.remove(id);
+  public boolean deleteMessage(String username,String id){
+    if(messages.get(id).getUsername().equals(username)) {
+      messages.remove(id);
+      return true;
+    }
+    return false;
+
   }
 
 }

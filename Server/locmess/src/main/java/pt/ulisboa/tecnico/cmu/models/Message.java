@@ -30,7 +30,9 @@ public class Message {
   public boolean isTime(String time){
     return this.time.equals(time);
   }
-
+  public String getUsername(){
+    return this.username;
+  }
   public String getBody(){
     return this.body;
   }

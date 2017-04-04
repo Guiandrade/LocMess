@@ -45,6 +45,8 @@ public class Message {
   }
 
   public boolean isInWhiteList(HashMap<String,Set<String>> userKeys){
+    System.out.println(this.whitelist);
+    if(this.whitelist==null) return true;
     for(Map.Entry<String,Set<String>> e : userKeys.entrySet()) {
        String key = e.getKey();
        if (whitelist.containsKey(key)){
@@ -60,6 +62,7 @@ public class Message {
   }
 
   public boolean isInBackList(HashMap<String,Set<String>> userKeys){
+    if(this.backlist==null) return false;
     for(Map.Entry<String,Set<String>> e : userKeys.entrySet()) {
        String key = e.getKey();
        if (backlist.containsKey(key)){

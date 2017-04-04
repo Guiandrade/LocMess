@@ -22,6 +22,8 @@ public class Server{
     routes.Get("/keys","getAllKeys");
     routes.Put("/locations","addLocation");
     routes.Get("/locations","getLocations");
+    routes.Post("/messages","createMessage");
+    routes.Get("/messages","getMessages");
     /*
 
 

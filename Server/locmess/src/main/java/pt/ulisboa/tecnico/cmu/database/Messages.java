@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Iterator;
 import org.json.JSONObject;
+import java.util.Map;
+
 
 public class Messages {
 
@@ -17,8 +19,9 @@ public class Messages {
   public Set<JSONObject> getMessages(String location,HashMap<String,Set<String>> userKeys){
     System.out.println("getMessages");
     Set<JSONObject> userMessages= new HashSet<JSONObject>();
-    for (int i = 0; i < lastID+1; i++) {
-      Message m=messages.get(i+"");
+    for(Map.Entry<String,Message> e : messages.entrySet()) {
+      String key = e.getKey();
+      Message m=messages.get(key);
       System.out.println(m.toJson());
       if(m.isInLocation(location)){
         System.out.println("is in location");

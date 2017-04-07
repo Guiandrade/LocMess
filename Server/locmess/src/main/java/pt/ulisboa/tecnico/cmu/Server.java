@@ -24,6 +24,7 @@ public class Server{
     routes.Get("/locations","getLocations");
     routes.Post("/messages","createMessage");
     routes.Get("/messages","getMessages");
+    routes.Delete("/messages","deleteMessage");
     /*
 
 

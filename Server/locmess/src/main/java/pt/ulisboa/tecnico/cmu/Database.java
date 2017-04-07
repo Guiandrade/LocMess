@@ -119,14 +119,16 @@ public class Database {
   public JSONObject deleteMessage(JSONObject req){
     JSONObject res= new JSONObject();
     String username=req.get("username").toString();
-    String id=req.get("id").toString();
     Set<String> lisId = new HashSet<String>();
     int i=0;
     while(req.has("id"+i)!=false){
+      System.out.println(req.get("id"+i).toString());
       boolean check=messages.deleteMessage(username,req.get("id"+i).toString());
+
       if(check){
         lisId.add("id"+i);
       }
+      i++;
     }
         res.put("deleted",lisId);
         res.put("status","ok");

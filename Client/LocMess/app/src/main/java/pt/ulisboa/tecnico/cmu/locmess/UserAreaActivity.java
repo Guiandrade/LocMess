@@ -15,8 +15,10 @@ import static android.R.attr.data;
 public class UserAreaActivity extends AppCompatActivity {
 
     ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayList<Message> messages = new ArrayList<Message>();
     int MAIN_ACTIVITY_REQUEST_CODE = 1;
     int POST_MESSAGE_REQUEST_CODE = 2;
+    int USER_PROFILE_REQUEST_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,7 @@ public class UserAreaActivity extends AppCompatActivity {
         locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
         final ImageButton ibGridMenu = (ImageButton) findViewById(R.id.ibGridMenu);
         final Button btPostMessage = (Button) findViewById(R.id.btPostMessage);
+        final ImageButton ibUserProfile = (ImageButton) findViewById(R.id.ibUserProfile);
 
         ibGridMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,6 +46,15 @@ public class UserAreaActivity extends AppCompatActivity {
                 startActivityForResult(postMessageIntent,POST_MESSAGE_REQUEST_CODE);
             }
         });
+
+        ibUserProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent userProfileIntent = new Intent(UserAreaActivity.this, UserProfileActivity.class);
+                userProfileIntent.putExtra("locations", locations);
+                startActivityForResult(userProfileIntent,USER_PROFILE_REQUEST_CODE);
+            }
+        });
     }
 
     @Override
@@ -56,7 +68,8 @@ public class UserAreaActivity extends AppCompatActivity {
         }
         else if (requestCode == POST_MESSAGE_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK){
-                // DO SOMETHING
+                Message message = (Message) data.getSerializableExtra("messagePosted");
+                messages.add(message);
             }
         }
     }

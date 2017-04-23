@@ -16,7 +16,9 @@ public class MainMenuActivity extends AppCompatActivity {
     int CREATE_LOCATIONS_REQUEST_CODE = 1;
     int REMOVE_LOCATIONS_REQUEST_CODE = 2;
     int POST_MESSAGE_REQUEST_CODE = 3;
+    int UNPOST_MESSAGE_REQUEST_CODE = 4;
     ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayList<Message> messages = new ArrayList<Message>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class MainMenuActivity extends AppCompatActivity {
         final ImageButton bListLocations = (ImageButton) findViewById(R.id.ibListLocations);
         final ImageButton bCreateLocations = (ImageButton) findViewById(R.id.ibCreateLocations);
         final Button bPostMessage = (Button) findViewById(R.id.ibPostMessage);
+        final ImageButton bUnpostMessage = (ImageButton) findViewById(R.id.ibUnpostMessages);
 
         bRemoveLocations.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +73,15 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivityForResult(postMessageIntent,POST_MESSAGE_REQUEST_CODE);
             }
         });
+
+        bUnpostMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent unpostMessageIntent = new Intent(MainMenuActivity.this, UnpostMessageActivity.class);
+                unpostMessageIntent.putExtra("messages", messages);
+                startActivityForResult(unpostMessageIntent,UNPOST_MESSAGE_REQUEST_CODE);
+            }
+        });
     }
 
     @Override
@@ -86,6 +98,20 @@ public class MainMenuActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 ArrayList<Location> locationsRemoved = (ArrayList<Location>) data.getSerializableExtra("locationsRemoved");
                 locations = locationsRemoved;
+            }
+        }
+
+        else if (requestCode == POST_MESSAGE_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                Message message = (Message) data.getSerializableExtra("messagePosted");
+                messages.add(message);
+            }
+        }
+
+        else if (requestCode == UNPOST_MESSAGE_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                ArrayList<Message> messagesRemoved = (ArrayList<Message>) data.getSerializableExtra("messagesRemoved");
+                messages = messagesRemoved;
             }
         }
     }

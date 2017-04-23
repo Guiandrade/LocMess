@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -77,7 +78,9 @@ public class PostMessageActivity extends AppCompatActivity {
         final TextView tvDate = (TextView) findViewById(R.id.tvDate);
 
         tvTime.setText(setDefaultTime());
+        time = setDefaultTime();
         tvDate.setText(setDefaultDate());
+        date = setDefaultDate();
 
         List<String> spinnerLocationsArray =  new ArrayList<String>();
         spinnerLocationsArray.clear();
@@ -93,9 +96,53 @@ public class PostMessageActivity extends AppCompatActivity {
         bPostMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("TEST", etTitle.getText().toString());
-                Log.d("TEST", "" + time);
-                Log.d("TEST", "" + date);
+                String title = etTitle.getText().toString();
+                String message = etMessage.getText().toString();
+                String locationSelected = sSelectLocation.getSelectedItem().toString();
+                Location location = null;
+                for(Location loc : locations){
+                    if(loc.getName().equals(locationSelected)){
+                        location = loc;
+                    }
+                }
+
+                String owner = "not done yet";
+                HashMap<String, Set<String>> whitelistKeyPairs = new HashMap<String, Set<String>>();
+                HashMap<String, Set<String>> blacklistKeyPairs = new HashMap<String, Set<String>>();
+                for (String entry: keyPairsWhitelist) {
+                    if(whitelistKeyPairs.containsKey(entry.split("=")[0])){
+                        whitelistKeyPairs.get(entry.split("=")[0]).add(entry.split("=")[1]);
+                    }
+                    else{
+                        Set<String> val = new HashSet<String>();
+                        val.add(entry.split("=")[1]);
+                        whitelistKeyPairs.put(entry.split("=")[0],val);
+                    }
+                }
+
+                for (String entry: keyPairsBlacklist) {
+                    if(blacklistKeyPairs.containsKey(entry.split("=")[0])){
+                        blacklistKeyPairs.get(entry.split("=")[0]).add(entry.split("=")[1]);
+                    }
+                    else{
+                        Set<String> val = new HashSet<String>();
+                        val.add(entry.split("=")[1]);
+                        blacklistKeyPairs.put(entry.split("=")[0],val);
+                    }
+                }
+                TimeWindow timeWindow = new TimeWindow(Integer.parseInt(time.split(":")[0]),
+                        Integer.parseInt(time.split(":")[1]),
+                        Integer.parseInt(date.split("/")[0]),
+                        Integer.parseInt(date.split("/")[1]),
+                        Integer.parseInt(date.split("/")[2]));
+
+                Message msg = new Message(title,message,owner,location,whitelistKeyPairs,
+                        blacklistKeyPairs,timeWindow);
+
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("messagePosted",msg);
+                setResult(Activity.RESULT_OK,returnIntent);
+                finish();
             }
         });
 

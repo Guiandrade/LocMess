@@ -1,12 +1,15 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 /**
  * Created by wazamaisers on 27-03-2017.
  */
 
-public class TimeWindow {
+public class TimeWindow implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     int startingHour;
     int startingMinute;

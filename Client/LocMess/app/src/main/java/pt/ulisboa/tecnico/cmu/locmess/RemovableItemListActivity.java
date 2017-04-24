@@ -19,12 +19,14 @@ import android.widget.SimpleAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RemovableItemListActivity extends AppCompatActivity {
     ArrayList<Location> locations = new ArrayList<Location>();
     ListView listView;
-    HashMap<String,Boolean> checkedStatus = new HashMap<String,Boolean>();
+    Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     SimpleAdapter adapter;
     List<HashMap<String, String>> listItems;
     int bColor = Color.TRANSPARENT;
@@ -95,14 +97,15 @@ public class RemovableItemListActivity extends AppCompatActivity {
     }
 
     public void deleteSelectedItems() {
-        int i = checkedStatus.size()-1;
-        for (HashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
+        int i = 0;
+        int e = 0;
+        for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
             if(entry.getValue().equals(true)){
-                listItems.remove(i);
+                listItems.remove(i-e);
                 listView.getChildAt(i).setBackgroundColor(bColor);
-                locations.remove(i);
+                e++;
             }
-            i--;
+            i++;
         }
         checkedStatus.values().removeAll(Collections.singleton(true));
         adapter.notifyDataSetChanged();

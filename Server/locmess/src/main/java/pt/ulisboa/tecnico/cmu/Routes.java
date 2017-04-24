@@ -11,6 +11,10 @@ public class Routes
   private Class dataClass=dataObj.getClass();
   public void verification(){
     before((request, response) -> {
+
+
+      System.out.println(request.body().toString());
+
       boolean authenticated=true;
       if (!(request.pathInfo().equals("/login")||request.pathInfo().equals("/signup"))){
         if((String)request.session().attribute("username")==null){
@@ -61,12 +65,8 @@ public class Routes
     JSONObject res;
     try {
       Method method = dataClass.getMethod(func, new Class[] { JSONObject.class });
-      JSONObject reqObj = new JSONObject();
-      for (String s : request.queryParams()) {
-        System.out.println(s + " : "+ request.queryParams(s));
-
-        reqObj.put(s,request.queryParams(s));
-      }
+      
+      JSONObject reqObj = new JSONObject(request.body().toString());
       if (!(request.pathInfo().equals("/login")||request.pathInfo().equals("/signup"))){
         reqObj.put("username",(String)request.session().attribute("username"));
       }

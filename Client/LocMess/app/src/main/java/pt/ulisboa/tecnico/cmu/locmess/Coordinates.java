@@ -20,6 +20,11 @@ public class Coordinates implements Serializable{
         this.radius = radius;
     }
 
+    public Coordinates(String latitude, String longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public String getLatitude() {
         return latitude;
     }

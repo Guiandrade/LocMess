@@ -41,9 +41,8 @@ public class ListLocationsActivity extends AppCompatActivity {
         for(Location loc : locations){
             HashMap<String, String> resultsMap = new HashMap<>();
             resultsMap.put("First Line", loc.getName());
-            String coordinates = loc.getCoordinates().getLatitude() + ", " +
-                    loc.getCoordinates().getLongitude() + ", " +
-                    loc.getCoordinates().getRadius();
+            String coordinates = "Lat: " + loc.getCoordinates().getLatitude() + ", Lon: " +
+                    loc.getCoordinates().getLongitude();
             resultsMap.put("Second Line", coordinates);
             listItems.add(resultsMap);
         }

@@ -1,7 +1,10 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Activity;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -22,19 +25,33 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
-    String SERVER_IP = "192.168.2.17:8080";
+    String SERVER_IP = "193.136.167.154:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         this.setTitle("LocMess - Login");
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("token","");
+        if(!(token.equals(""))){
+            Intent loginIntent = new Intent(LoginActivity.this, UserAreaActivity.class);
+            loginIntent.putExtra("serverIP", SERVER_IP);
+            startActivity(loginIntent);
+        }
 
         final EditText etUsername = (EditText) findViewById(R.id.etUsername);
         final EditText etPassword = (EditText) findViewById(R.id.etPassword);
@@ -55,35 +72,64 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
-                login(username,password,v);
+                login(username,password);
             }
         });
     }
 
-    public void login(final String username, String password, View v){
-        JsonObject json = new JsonObject();
-        json.addProperty("username", username);
-        json.addProperty("password", password);
-        Ion.with(v.getContext())
-        .load("http://" + SERVER_IP + "/login")
-        .setJsonObjectBody(json)
-        .asJsonObject()
-        .setCallback(new FutureCallback<JsonObject>() {
+    public void login(final String username, String password){
+
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(this);
+        String url = "http://" + SERVER_IP + "/login";
+        JSONObject jsonBody = new JSONObject();
+        try{
+            jsonBody.put("username",username);
+            jsonBody.put("password",password);
+        }catch (Exception e){
+
+        }
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+
             @Override
-            public void onCompleted(Exception e, JsonObject result) {
-                if(result.get("status").toString().equals("\"ok\"")){
-                    Intent loginIntent = new Intent(LoginActivity.this, UserAreaActivity.class);
-                    //loginIntent.putExtra("locations", locations);
-                    //loginIntent.putExtra("users", users);
-                    loginIntent.putExtra("username", username);
-                    loginIntent.putExtra("serverIP", SERVER_IP);
-                    startActivity(loginIntent);
-                }
-                else{
-                    Toast.makeText(LoginActivity.this, "Username or password incorrect", Toast.LENGTH_LONG).show();
+            public void onResponse(JSONObject response) {
+                try{
+                    if(response.get("status").toString().equals("ok")){
+                        SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("token",response.getString("token"));
+                        editor.putString("username",username);
+                        editor.apply();
+                        Intent loginIntent = new Intent(LoginActivity.this, UserAreaActivity.class);
+                        loginIntent.putExtra("serverIP", SERVER_IP);
+                        startActivity(loginIntent);
+                    }
+                    else{
+                        try{
+                            Toast.makeText(LoginActivity.this, "Status: "+ response.get("status"), Toast.LENGTH_LONG).show();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
                 }
 
             }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try{
+                    Toast.makeText(LoginActivity.this, "Error: "+ new String(error.networkResponse.data,"UTF-8"), Toast.LENGTH_LONG).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                    Toast.makeText(LoginActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
+                }
+            }
         });
+        queue.add(jsObjRequest);
     }
 }

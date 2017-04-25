@@ -1,6 +1,10 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -10,6 +14,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -31,7 +36,12 @@ import java.util.Set;
 
 public class UserProfileActivity extends AppCompatActivity {
 
+    String SERVER_IP;
+    String username;
     HashMap<String, Set<String>> keyPairs = new HashMap<String, Set<String>>();
+    HashMap<String, Set<String>> addedKeyPairs = new HashMap<String, Set<String>>();
+    HashMap<String, Set<String>> deletedKeyPairs = new HashMap<String, Set<String>>();
+    ArrayList<String> allKeys = new ArrayList<String>();
     List<String> pairs = new ArrayList<String>();
     ListView lvKeyPairs;
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
@@ -45,14 +55,12 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         this.setTitle("User Profile");
+        SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
+        keyPairs = (HashMap<String, Set<String>>) getIntent().getSerializableExtra("keys");
+        allKeys = (ArrayList<String>) getIntent().getSerializableExtra("allKeys");
 
-
-        Set<String> setClubs = new HashSet<String>(Arrays.asList("Benfica", "Real Madrid"));
-        keyPairs.put("Club", setClubs);
-        Set<String> setColors = new HashSet<String>(Arrays.asList("Red"));
-        keyPairs.put("Color", setColors);
-        Set<String> setPet = new HashSet<String>(Arrays.asList("Dog"));
-        keyPairs.put("Pet", setPet);
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        username = sharedPreferences.getString("username","");
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -65,11 +73,12 @@ public class UserProfileActivity extends AppCompatActivity {
         lvKeyPairs = (ListView) findViewById(R.id.lvKeyPairs);
         lvKeyPairs.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        tvUsername.setText("Tiago");
+        tvUsername.setText(username);
 
         Drawable background = lvKeyPairs.getBackground();
-        if (background instanceof ColorDrawable)
+        if (background instanceof ColorDrawable){
             bColor = ((ColorDrawable) background).getColor();
+        }
 
         for (Map.Entry<String, Set<String>> entry : keyPairs.entrySet()) {
             for (String str : entry.getValue()) {
@@ -95,6 +104,9 @@ public class UserProfileActivity extends AppCompatActivity {
                     parent.getChildAt(position).setBackgroundColor(Color.RED);
                     checkedStatus.put(pair, true);
                 }
+                /*for(Map.Entry<String,Boolean> entry : checkedStatus.entrySet()){
+                    System.out.println(entry.getKey() + " -> " + entry.getValue());
+                }*/
             }
         });
 
@@ -109,12 +121,9 @@ public class UserProfileActivity extends AppCompatActivity {
                 final EditText etPair = (EditText) keyPairsDialog.findViewById(R.id.etPair);
                 final Button bAddPair = (Button) keyPairsDialog.findViewById(R.id.bAddPair);
 
-                ArrayList<String> keys = new ArrayList<String>();
-                keys.add("Club");
-                keys.add("Favourite Colour");
-                keys.add("Relationship Status");
 
-                adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, keys);
+                adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, allKeys);
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                 acKey.setAdapter(adapterAutoComplete);
 
                 acKey.setOnTouchListener(new View.OnTouchListener(){
@@ -157,6 +166,7 @@ public class UserProfileActivity extends AppCompatActivity {
         for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
             if(entry.getValue().equals(true)){
                 lvKeyPairs.getChildAt(i).setBackgroundColor(bColor);
+                addToDeletedPairs(pairs.get(i-e));
                 pairs.remove(i-e);
                 e++;
             }
@@ -170,6 +180,10 @@ public class UserProfileActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if(item.getItemId()==android.R.id.home){
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("addedKeys",addedKeyPairs);
+            returnIntent.putExtra("deletedKeys",deletedKeyPairs);
+            setResult(Activity.RESULT_OK,returnIntent);
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -184,5 +198,32 @@ public class UserProfileActivity extends AppCompatActivity {
             val.add(value);
             keyPairs.put(key,val);
         }
+
+        if(addedKeyPairs.containsKey(key)){
+            addedKeyPairs.get(key).add(value);
+        }
+        else{
+            Set<String> val = new HashSet<String>();
+            val.add(value);
+            addedKeyPairs.put(key,val);
+        }
+    }
+
+    public void addToDeletedPairs(String pair){
+        String key = pair.split(" =")[0];
+        String value = pair.split("= ")[1];
+
+        if(deletedKeyPairs.containsKey(key)){
+            deletedKeyPairs.get(key).add(value);
+        }
+        else{
+            Set<String> val = new HashSet<String>();
+            val.add(value);
+            deletedKeyPairs.put(key,val);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 }

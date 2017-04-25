@@ -1,7 +1,9 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -10,9 +12,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.JsonObject;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -48,28 +55,60 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void register(final String username, String password, View v){
-        JsonObject json = new JsonObject();
-        json.addProperty("username", username);
-        json.addProperty("password", password);
-        Ion.with(v.getContext())
-        .load("http://" + SERVER_IP + "/signup")
-        .setJsonObjectBody(json)
-        .asJsonObject()
-        .setCallback(new FutureCallback<JsonObject>() {
-            @Override
-            public void onCompleted(Exception e, JsonObject result) {
-                if(result.get("status").toString().equals("\"ok\"")){
-                    Intent registerIntent = new Intent(RegisterActivity.this, UserAreaActivity.class);
-                    registerIntent.putExtra("username", username);
-                    registerIntent.putExtra("serverIP", SERVER_IP);
-                    startActivity(registerIntent);
-                }
-                else{
-                    Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_LONG).show();
-                }
 
-            }
-        });
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(this);
+        String url = "http://" + SERVER_IP + "/signup";
+        JSONObject jsonBody = new JSONObject();
+        try{
+            jsonBody.put("username",username);
+            jsonBody.put("password",password);
+        }catch (Exception e){
+
+        }
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                    try{
+                        if(response.get("status").toString().equals("ok")){
+                            SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString("token",response.getString("token"));
+                            editor.putString("username",username);
+                            editor.apply();
+                            //Toast.makeText(RegisterActivity.this, "Status: "+ response.toString(), Toast.LENGTH_LONG).show();
+                            Intent loginIntent = new Intent(RegisterActivity.this, UserAreaActivity.class);
+                            loginIntent.putExtra("serverIP", SERVER_IP);
+                            startActivity(loginIntent);
+                        }
+                        else{
+                            try{
+                                Toast.makeText(RegisterActivity.this, "Status: "+ response.get("status"), Toast.LENGTH_LONG).show();
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try{
+                            Toast.makeText(RegisterActivity.this, "Error: "+ new String(error.networkResponse.data,"UTF-8"), Toast.LENGTH_LONG).show();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            Toast.makeText(RegisterActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        queue.add(jsObjRequest);
     }
 
     @Override

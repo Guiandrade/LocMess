@@ -10,9 +10,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainMenuActivity extends AppCompatActivity {
 
+    String SERVER_IP;
+    String username;
     int CREATE_LOCATIONS_REQUEST_CODE = 1;
     int REMOVE_LOCATIONS_REQUEST_CODE = 2;
     int POST_MESSAGE_REQUEST_CODE = 3;
@@ -25,13 +28,9 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+        SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
+        username = (String) getIntent().getSerializableExtra("username");
         this.setTitle("Main Menu");
-
-        if(getSupportActionBar()!=null){
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 
         final ImageButton bRemoveLocations = (ImageButton) findViewById(R.id.ibRemoveLocations);
         final ImageButton bListLocations = (ImageButton) findViewById(R.id.ibListLocations);
@@ -39,11 +38,18 @@ public class MainMenuActivity extends AppCompatActivity {
         final Button bPostMessage = (Button) findViewById(R.id.ibPostMessage);
         final ImageButton bUnpostMessage = (ImageButton) findViewById(R.id.ibUnpostMessages);
 
+        //Display back button on top
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         bRemoveLocations.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent removeLocationsIntent = new Intent(MainMenuActivity.this, RemovableItemListActivity.class);
-                removeLocationsIntent.putExtra("locations", locations);
+                removeLocationsIntent.putExtra("username", username);
+                removeLocationsIntent.putExtra("serverIP", SERVER_IP);
                 startActivityForResult(removeLocationsIntent,REMOVE_LOCATIONS_REQUEST_CODE);
             }
         });
@@ -52,7 +58,8 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent listLocationsIntent = new Intent(MainMenuActivity.this, ListLocationsActivity.class);
-                listLocationsIntent.putExtra("locations", locations);
+                listLocationsIntent.putExtra("username", username);
+                listLocationsIntent.putExtra("serverIP", SERVER_IP);
                 startActivity(listLocationsIntent);
             }
         });
@@ -61,6 +68,8 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent createLocationsIntent = new Intent(MainMenuActivity.this, CreateLocationActivity.class);
+                createLocationsIntent.putExtra("username", username);
+                createLocationsIntent.putExtra("serverIP", SERVER_IP);
                 startActivityForResult(createLocationsIntent,CREATE_LOCATIONS_REQUEST_CODE);
             }
         });
@@ -69,7 +78,8 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent postMessageIntent = new Intent(MainMenuActivity.this, PostMessageActivity.class);
-                postMessageIntent.putExtra("locations", locations);
+                postMessageIntent.putExtra("username", username);
+                postMessageIntent.putExtra("serverIP", SERVER_IP);
                 startActivityForResult(postMessageIntent,POST_MESSAGE_REQUEST_CODE);
             }
         });
@@ -78,7 +88,8 @@ public class MainMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent unpostMessageIntent = new Intent(MainMenuActivity.this, UnpostMessageActivity.class);
-                unpostMessageIntent.putExtra("messages", messages);
+                unpostMessageIntent.putExtra("username", username);
+                unpostMessageIntent.putExtra("serverIP", SERVER_IP);
                 startActivityForResult(unpostMessageIntent,UNPOST_MESSAGE_REQUEST_CODE);
             }
         });
@@ -90,39 +101,58 @@ public class MainMenuActivity extends AppCompatActivity {
         if (requestCode == CREATE_LOCATIONS_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK){
                 Location location = (Location) data.getSerializableExtra("locationCreated");
-                locations.add(location);
+                SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
+                username = (String) getIntent().getSerializableExtra("username");
+                createLocation(location);
             }
         }
 
         else if (requestCode == REMOVE_LOCATIONS_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK){
-                ArrayList<Location> locationsRemoved = (ArrayList<Location>) data.getSerializableExtra("locationsRemoved");
-                locations = locationsRemoved;
+                ArrayList<Location> locations = (ArrayList<Location>) data.getSerializableExtra("locationsRemoved");
+                SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
+                username = (String) getIntent().getSerializableExtra("username");
+                removeLocations(locations);
             }
         }
 
         else if (requestCode == POST_MESSAGE_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK){
                 Message message = (Message) data.getSerializableExtra("messagePosted");
-                messages.add(message);
+                SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
+                username = (String) getIntent().getSerializableExtra("username");
+                postMessage(message);
             }
         }
 
         else if (requestCode == UNPOST_MESSAGE_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK){
-                ArrayList<Message> messagesRemoved = (ArrayList<Message>) data.getSerializableExtra("messagesRemoved");
-                messages = messagesRemoved;
+                ArrayList<Message> messages = (ArrayList<Message>) data.getSerializableExtra("messagesRemoved");
+                SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
+                username = (String) getIntent().getSerializableExtra("username");
+                removeMessages(messages);
             }
         }
     }
 
+    public void createLocation(Location location){
+        //to do
+    }
+
+    public void removeLocations(ArrayList<Location> locations){
+        //to do
+    }
+
+    public void postMessage(Message message){
+        //to do
+    }
+
+    public void removeMessages(ArrayList<Message> messages){
+
+    }
+
     @Override
     public void onBackPressed() {
-
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("locationsUpdated",locations);
-        setResult(Activity.RESULT_OK,returnIntent);
-        finish();
     }
 
     @Override

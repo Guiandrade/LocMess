@@ -6,6 +6,11 @@ public class Server{
   public static void main( String[] args ){
     GpsLocation gps=new GpsLocation( "LARANJEIRAS",  38.755997,  -9.176876, 800);
     boolean dist=gps.inRadius(38.755936,-9.171843);
+    SessionsID s=new SessionsID();
+    s.addSession("toni","123");
+    System.out.println(s.exists("dG9uaToxMjM="));
+    System.out.println(s.getUsername("dG9uaToxMjM="));
+
     System.out.println(dist);
     System.out.println( "Hello World!" );
     System.out.println( "Server address: http://localhost:" + args[0]);
@@ -18,7 +23,7 @@ public class Server{
     routes.Post("/signup","signup");
     routes.Put("/profile","addKey");
     routes.Get("/profile","getUserKeys");
-    routes.Delete("/profile","removeKey");
+    routes.Post("/removeKey","removeKey");
     routes.Get("/keys","getAllKeys");
     routes.Put("/locations","addLocation");
     routes.Get("/locations","getLocations");

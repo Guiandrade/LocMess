@@ -7,7 +7,7 @@ public class User {
   private String username;
   private String password;
   private HashMap<String,Set<String>> keys= new HashMap<String,Set<String>>(); //key-value
-  
+
   public User (String username , String password ) {
     this.username=username;
     this.password=password;
@@ -25,7 +25,11 @@ public class User {
   }
   public boolean removeKey(String key, String value){
     if (keys.containsKey(key)){
-      return keys.get(key).remove(value);
+      keys.get(key).remove(value);
+      if(keys.get(key).isEmpty()){
+        keys.remove(key);
+      }
+      return true;
     }else{
       return false;
     }

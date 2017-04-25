@@ -10,7 +10,7 @@ import org.json.JSONObject;
 public class Locations {
   private Set<GpsLocation> locations = new HashSet<GpsLocation>();
 
-  
+
   public void addLocation(String location, double latitude, double longitude, int radius){
     GpsLocation loc =new GpsLocation(location, latitude, longitude, radius);
     locations.add(loc);
@@ -38,7 +38,6 @@ public class Locations {
   }
   public Set<JSONObject> getLocationsJson(){
     Set<JSONObject> locationsJson = new HashSet<JSONObject>();
-
     for (GpsLocation l : locations) {
       locationsJson.add(l.toJson());
     }

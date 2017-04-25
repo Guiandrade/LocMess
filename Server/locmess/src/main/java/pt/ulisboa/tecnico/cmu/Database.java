@@ -1,11 +1,13 @@
 package pt.ulisboa.tecnico.cmu;
 import pt.ulisboa.tecnico.cmu.database.*;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Iterator;
 
 
 public class Database {
@@ -61,7 +63,9 @@ public class Database {
          String key = e.getKey();
          Set<String> value = e.getValue();
          res.put(key,value);
+
      }
+     res.put("status","ok");
    }else{
      res.put("status","authentication failed");
    }
@@ -72,7 +76,7 @@ public class Database {
     String username=req.get("username").toString();
     JSONObject res= new JSONObject();
     HashMap<String,Set<String>> keys=new HashMap<String,Set<String>>();
-    getKeyValue(req,"",keys);
+    getKeyValue(req,"keys",keys);
     for(Map.Entry<String,Set<String>> e : keys.entrySet()) {
        String key = e.getKey();
        for(String value : keys.get(key)){
@@ -87,20 +91,22 @@ public class Database {
 
   public JSONObject removeKey(JSONObject req ){
     String username=req.get("username").toString();
-    String key=req.get("key").toString();
-    String value=req.get("value").toString();
     JSONObject res= new JSONObject();
-    if (profiles.removeKey(username, key,value)){
-
-      res.put("status","ok");
-      return res;
-    }
-    res.put("status","error");
+    HashMap<String,Set<String>> keys=new HashMap<String,Set<String>>();
+    getKeyValue(req,"keys",keys);
+    for(Map.Entry<String,Set<String>> e : keys.entrySet()) {
+       String key = e.getKey();
+       for(String value : keys.get(key)){
+         profiles.removeKey(username, key,value);
+       }
+     }
+    res.put("status","ok");
     return res;
   }
   public JSONObject getLocations(JSONObject req){
     JSONObject res= new JSONObject();
     res.put("locations",locations.getLocationsJson());
+    res.put("status","ok");
     return res;
 
   }
@@ -179,36 +185,31 @@ public class Database {
   }
 
   public void getKeyValue(JSONObject req,String nameParams,HashMap<String,Set<String>> list){
-    int i=0;
-    if(req.has(nameParams+"Key0")!=false){
-      System.out.println("primeiroif");
-      while(req.has(nameParams+"Key"+i)!=false){
-        System.out.println("startWhile");
-        String key=req.get(nameParams+"Key"+i).toString();
-        System.out.println(key);
-        String value=req.get(nameParams+"Value"+i).toString();
-        System.out.println(value);
-        if(list.get(key)==null){
-          System.out.println("create val set");
-          Set<String> val = new HashSet<String>();
-          val.add(value);
-          list.put(key,val);
-        }else{
-          System.out.println("adiciona ja ao existente");
-          list.get(key).add(value);
-          System.out.println("depois");
+    req=req.getJSONObject(nameParams);
 
+    Iterator<String> iter = req.keys();
+    while (iter.hasNext()) {
+      String key = iter.next();
+      try {
+            JSONArray array=req.getJSONArray(key);
+           for (int i = 0 ; i < array.length(); i++) {
+             String value = array.getString(i);
+             if(list.containsKey(key)){
+               list.get(key).add(value);
+               System.out.println("cona");
+             }else{
+                Set<String> val = new HashSet<String>();
+                val.add(value);
+                list.put(key,val);
+             }
 
-        }
+           }
 
-        i++;
-        System.out.println(req.has(nameParams+"Key"+i));
+      } catch (Exception e) {
+          e.printStackTrace();
+          // Something went wrong!
       }
-    }else{
-      list=null;
-
     }
-
 
 
   }

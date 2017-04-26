@@ -27,8 +27,8 @@
 
     <Button
         android:id="@+id/btPostMessage"
-        android:layout_width="88dp"
-        android:layout_height="60dp"
+        android:layout_width="64dp"
+        android:layout_height="59dp"
         android:text="+"
         android:textSize="30sp"
         tools:layout_constraintBottom_creator="1"
@@ -37,7 +37,8 @@
         tools:layout_constraintLeft_creator="1"
         android:layout_marginBottom="25dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="25dp" />
+        android:layout_marginLeft="25dp"
+        tools:layout_editor_absoluteY="427dp" />
 
     <ImageButton
         android:id="@+id/ibGridMenu"
@@ -67,15 +68,17 @@
 
     <Button
         android:id="@+id/btLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="72dp"
+        android:layout_height="39dp"
         android:text="Logout"
+        android:textSize="12dp"
         tools:layout_constraintTop_creator="1"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="17dp"
         tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="16dp" />
+        android:layout_marginLeft="14dp"
+        tools:layout_editor_absoluteY="31dp" />
 
 </android.support.constraint.ConstraintLayout>

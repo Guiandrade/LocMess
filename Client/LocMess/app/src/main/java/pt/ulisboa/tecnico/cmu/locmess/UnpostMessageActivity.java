@@ -25,6 +25,7 @@ import java.util.Map;
 public class UnpostMessageActivity extends AppCompatActivity {
 
     ArrayList<Message> messages = new ArrayList<Message>();
+    ArrayList<String> idsToRemove = new ArrayList<String>();
     ListView listView;
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     SimpleAdapter adapter;
@@ -59,14 +60,14 @@ public class UnpostMessageActivity extends AppCompatActivity {
 
         for(Message msg : messages){
             HashMap<String, String> resultsMap = new HashMap<>();
-            checkedStatus.put(msg.getTitle(),false);
+            checkedStatus.put(msg.getId(),false);
             resultsMap.put("First Line", msg.getTitle());
-            String coordinates = msg.getLocation().getName() + ", " +
+            String coordinates = "Loc: " + msg.getLocation().getName() + ", Eding Date/Time: " +
                     msg.getTimeWindow().getEndingDay() + "/" +
                     msg.getTimeWindow().getEndingMonth() + "/" +
                     msg.getTimeWindow().getEndingYear() + " " +
                     msg.getTimeWindow().getEndingHour() + ":" +
-                    msg.getTimeWindow().getEndingMinutes();
+                    msg.getTimeWindow().getEndingMinutes() + ", Id: " + msg.getId();
             resultsMap.put("Second Line", coordinates);
             listItems.add(resultsMap);
         }
@@ -78,14 +79,20 @@ public class UnpostMessageActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 HashMap<String, String> item = (HashMap<String, String>) parent.getItemAtPosition(position);
-                String locName = item.get("First Line");
+                String locName = item.get("Second Line").split("Id: ")[1];
 
                 if (checkedStatus.get(locName).equals(true)){
                     parent.getChildAt(position).setBackgroundColor(bColor);
+                    for(int i = 0; i<idsToRemove.size();i++){
+                        if(idsToRemove.get(i).equals(locName)){
+                            idsToRemove.remove(i);
+                        }
+                    }
                     checkedStatus.put(locName,false);
                 }
                 else{
                     parent.getChildAt(position).setBackgroundColor(Color.RED);
+                    idsToRemove.add(locName);
                     checkedStatus.put(locName,true);
                 }
             }
@@ -117,10 +124,6 @@ public class UnpostMessageActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("messagesRemoved",messages);
-        setResult(Activity.RESULT_OK,returnIntent);
-        finish();
     }
 
     @Override
@@ -128,7 +131,7 @@ public class UnpostMessageActivity extends AppCompatActivity {
 
         if(item.getItemId()==android.R.id.home){
             Intent returnIntent = new Intent();
-            returnIntent.putExtra("messagesRemoved",messages);
+            returnIntent.putExtra("ids",idsToRemove);
             setResult(Activity.RESULT_OK,returnIntent);
             finish();
         }

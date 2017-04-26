@@ -66,6 +66,7 @@ public class UserAreaActivity extends AppCompatActivity {
                 editor.putString("token","");
                 editor.apply();
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);
+                logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(logoutIntent);
             }
         });

@@ -12,6 +12,7 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String id;
     private String title;
     private String message;
     private String owner;
@@ -23,6 +24,19 @@ public class Message implements Serializable {
     public Message(String title, String message, String owner, Location location,
                    HashMap<String, Set<String>> whitelistKeyPairs,
                    HashMap<String, Set<String>> blacklistKeyPairs, TimeWindow timeWindow) {
+        this.title = title;
+        this.message = message;
+        this.owner = owner;
+        this.location = location;
+        this.whitelistKeyPairs = whitelistKeyPairs;
+        this.blacklistKeyPairs = blacklistKeyPairs;
+        this.timeWindow = timeWindow;
+    }
+
+    public Message(String id, String title, String message, String owner, Location location,
+                   HashMap<String, Set<String>> whitelistKeyPairs,
+                   HashMap<String, Set<String>> blacklistKeyPairs, TimeWindow timeWindow) {
+        this.id = id;
         this.title = title;
         this.message = message;
         this.owner = owner;
@@ -86,5 +100,9 @@ public class Message implements Serializable {
 
     public void setTimeWindow(TimeWindow timeWindow) {
         this.timeWindow = timeWindow;
+    }
+
+    public String getId() {
+        return id;
     }
 }

@@ -63,10 +63,11 @@ public class Message {
        if (whitelist.containsKey(key)){
          Set<String> value = e.getValue();
          for (String s : value) {
-           if(whitelist.get(key).contains(s)){
-             return true;
+           if(!whitelist.get(key).contains(s)){
+             return false;
            }
          }
+         return true;
        }
      }
     return false;

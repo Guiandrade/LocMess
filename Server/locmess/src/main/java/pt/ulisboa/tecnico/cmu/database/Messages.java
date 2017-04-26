@@ -17,7 +17,7 @@ public class Messages {
     messages.put(lastID+"",new Message(lastID+"",title,username,location , initTime,endTime, body, whitelist,  blacklist));
   }
   public Set<JSONObject> getMessages(String location,HashMap<String,Set<String>> userKeys){
-    System.out.println("getMessages");
+    
     Set<JSONObject> userMessages= new HashSet<JSONObject>();
     for(Map.Entry<String,Message> e : messages.entrySet()) {
       String key = e.getKey();

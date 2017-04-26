@@ -112,12 +112,20 @@ public class Database {
   }
 
   public JSONObject addLocation(JSONObject req){
-    String location=req.get("location").toString();
-    double latitude=req.getDouble("latitude");
-    double longitude=req.getDouble("longitude");
-    int radius=Integer.parseInt(req.get("radius").toString());
     JSONObject res= new JSONObject();
-    locations.addLocation(location, latitude, longitude, radius);
+    if(req.has("ssid")){
+      String ssid=req.getString("ssid");
+
+      locations.addLocation(ssid);
+
+    }else{
+      String location=req.getString("location");
+      double latitude=req.getDouble("latitude");
+      double longitude=req.getDouble("longitude");
+      int radius=Integer.parseInt(req.get("radius").toString());
+      locations.addLocation(location, latitude, longitude, radius);
+    }
+
     res.put("status","ok");
     return res;
   }
@@ -150,15 +158,24 @@ public class Database {
   }
   public  JSONObject getMessages(JSONObject req){
     JSONObject res= new JSONObject();
+    Set<String> location=new HashSet<String>() ;
 
     String username=req.get("username").toString();
 
+    int i=0;
+    while(req.has("ssid"+i)){
+        location.add( req.getString("ssid"+i));
+        i++;
+    }
+    if(req.has("latitude")){
+      double latitude=Double.parseDouble(req.getString("latitude"));
+      double longitude=Double.parseDouble(req.getString("longitude"));
+      location.addAll(locations.getUserLocation(latitude,longitude));
+    }
 
-    double latitude=Double.parseDouble(req.getString("latitude"));
-    double longitude=Double.parseDouble(req.getString("longitude"));
-    Set<String> location=locations.getUserLocation(latitude,longitude);
     HashMap<String,Set<String>> userKeys=profiles.getUserKeys(username);
     for (String l : location) {
+      System.out.println("location");
       System.out.println(l);
       Set<JSONObject> message=messages.getMessages(l,userKeys);
       if(message.size()!=0){

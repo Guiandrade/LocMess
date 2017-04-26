@@ -2,7 +2,9 @@ package pt.ulisboa.tecnico.cmu.locmess;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -49,9 +51,11 @@ public class PostMessageActivity extends AppCompatActivity {
     private ArrayList<String> keyPairsBlacklist = new ArrayList<String>();
     int bColor = Color.TRANSPARENT;
     ListView lvPairs;
-    private String time = "";
-    private String date = "";
-
+    private String endTime = "";
+    private String endDate = "";
+    private String beginTime = "";
+    private String beginDate = "";
+    String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,28 +69,44 @@ public class PostMessageActivity extends AppCompatActivity {
         }
 
         locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        username = sharedPreferences.getString("username","");
 
         final EditText etTitle = (EditText) findViewById(R.id.etTitle);
         final EditText etMessage = (EditText) findViewById(R.id.etMessage);
         final Spinner sSelectLocation = (Spinner) findViewById(R.id.sSelectLocation);
-        final Button bSetTime = (Button) findViewById(R.id.bSetTime);
-        final Button bSetDate = (Button) findViewById(R.id.bSetDate);
+        final Button bSetTimeEnd = (Button) findViewById(R.id.bSetTimeEnd);
+        final Button bSetDateEnd = (Button) findViewById(R.id.bSetDateEnd);
+        final Button bSetTimeBegin = (Button) findViewById(R.id.bSetTimeBegin);
+        final Button bSetDateBegin = (Button) findViewById(R.id.bSetDateBegin);
         final Button bKeyPairsWhiteList = (Button) findViewById(R.id.bKeyPairsWhiteList);
         final Button bKeyPairsBlackList = (Button) findViewById(R.id.bKeyPairsBlackList);
         final Button bPostMessage = (Button) findViewById(R.id.bPostMessage);
-        final TextView tvTime = (TextView) findViewById(R.id.tvTime);
-        final TextView tvDate = (TextView) findViewById(R.id.tvDate);
+        final TextView tvTimeEnd = (TextView) findViewById(R.id.tvTimeEnd);
+        final TextView tvDateEnd = (TextView) findViewById(R.id.tvDateEnd);
+        final TextView tvTimeBegin = (TextView) findViewById(R.id.tvTimeBegin);
+        final TextView tvDateBegin = (TextView) findViewById(R.id.tvDateBegin);
 
-        tvTime.setText(setDefaultTime());
-        time = setDefaultTime();
-        tvDate.setText(setDefaultDate());
-        date = setDefaultDate();
+        tvTimeEnd.setText(setDefaultTime());
+        endTime = setDefaultTime();
+        tvDateEnd.setText(setDefaultDate("End"));
+        endDate = setDefaultDate("End");
+
+        tvTimeBegin.setText(setDefaultTime());
+        beginTime = setDefaultTime();
+        tvDateBegin.setText(setDefaultDate("Begin"));
+        beginDate = setDefaultDate("Begin");
 
         List<String> spinnerLocationsArray =  new ArrayList<String>();
         spinnerLocationsArray.clear();
         spinnerLocationsArray.add("SELECT LOCATION");
         for(Location loc : locations){
-            spinnerLocationsArray.add(loc.getName());
+            if(!(loc.getSSID() == null)){
+                spinnerLocationsArray.add(loc.getSSID()+"-"+loc.getMac());
+            }
+            else{
+                spinnerLocationsArray.add(loc.getName());
+            }
         }
 
         ArrayAdapter<String> locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerLocationsArray);
@@ -101,40 +121,52 @@ public class PostMessageActivity extends AppCompatActivity {
                 String locationSelected = sSelectLocation.getSelectedItem().toString();
                 Location location = null;
                 for(Location loc : locations){
-                    if(loc.getName().equals(locationSelected)){
-                        location = loc;
+                    if(!(loc.getSSID() == null)) {
+                        if ((loc.getSSID()+"-"+loc.getMac()).equals(locationSelected)) {
+                            location = loc;
+                        }
+                    }
+                    else{
+                        if(loc.getName().equals(locationSelected)){
+                            location = loc;
+                        }
                     }
                 }
 
-                String owner = "not done yet";
+                String owner = username;
                 HashMap<String, Set<String>> whitelistKeyPairs = new HashMap<String, Set<String>>();
                 HashMap<String, Set<String>> blacklistKeyPairs = new HashMap<String, Set<String>>();
                 for (String entry: keyPairsWhitelist) {
                     if(whitelistKeyPairs.containsKey(entry.split("=")[0])){
-                        whitelistKeyPairs.get(entry.split("=")[0]).add(entry.split("=")[1]);
+                        whitelistKeyPairs.get(entry.split(" =")[0]).add(entry.split("= ")[1]);
                     }
                     else{
                         Set<String> val = new HashSet<String>();
-                        val.add(entry.split("=")[1]);
-                        whitelistKeyPairs.put(entry.split("=")[0],val);
+                        val.add(entry.split("= ")[1]);
+                        whitelistKeyPairs.put(entry.split(" =")[0],val);
                     }
                 }
 
                 for (String entry: keyPairsBlacklist) {
-                    if(blacklistKeyPairs.containsKey(entry.split("=")[0])){
-                        blacklistKeyPairs.get(entry.split("=")[0]).add(entry.split("=")[1]);
+                    if(blacklistKeyPairs.containsKey(entry.split(" =")[0])){
+                        blacklistKeyPairs.get(entry.split(" =")[0]).add(entry.split("= ")[1]);
                     }
                     else{
                         Set<String> val = new HashSet<String>();
-                        val.add(entry.split("=")[1]);
-                        blacklistKeyPairs.put(entry.split("=")[0],val);
+                        val.add(entry.split("= ")[1]);
+                        blacklistKeyPairs.put(entry.split(" =")[0],val);
                     }
                 }
-                TimeWindow timeWindow = new TimeWindow(Integer.parseInt(time.split(":")[0]),
-                        Integer.parseInt(time.split(":")[1]),
-                        Integer.parseInt(date.split("/")[0]),
-                        Integer.parseInt(date.split("/")[1]),
-                        Integer.parseInt(date.split("/")[2]));
+                TimeWindow timeWindow = new TimeWindow(Integer.parseInt(beginTime.split(":")[0]),
+                        Integer.parseInt(beginTime.split(":")[1]),
+                        Integer.parseInt(beginDate.split("/")[0]),
+                        Integer.parseInt(beginDate.split("/")[1]),
+                        Integer.parseInt(beginDate.split("/")[2]),
+                        Integer.parseInt(endTime.split(":")[0]),
+                        Integer.parseInt(endTime.split(":")[1]),
+                        Integer.parseInt(endDate.split("/")[0]),
+                        Integer.parseInt(endDate.split("/")[1]),
+                        Integer.parseInt(endDate.split("/")[2]));
 
                 Message msg = new Message(title,message,owner,location,whitelistKeyPairs,
                         blacklistKeyPairs,timeWindow);
@@ -146,7 +178,7 @@ public class PostMessageActivity extends AppCompatActivity {
             }
         });
 
-        bSetTime.setOnClickListener(new View.OnClickListener() {
+        bSetTimeEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Dialog timeDialog = new Dialog(PostMessageActivity.this);
@@ -160,16 +192,39 @@ public class PostMessageActivity extends AppCompatActivity {
                 btpSetTime.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        tvTime.setText(setTime(tpSetTime.getCurrentHour(),
+                        tvTimeEnd.setText(setTime(tpSetTime.getCurrentHour(),
                                 tpSetTime.getCurrentMinute()));
-                        time = tpSetTime.getCurrentHour() + ":" + tpSetTime.getCurrentMinute();
+                        endTime = tpSetTime.getCurrentHour() + ":" + tpSetTime.getCurrentMinute();
                         timeDialog.cancel();
                     }
                 });
             }
         });
 
-        bSetDate.setOnClickListener(new View.OnClickListener() {
+        bSetTimeBegin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog timeDialog = new Dialog(PostMessageActivity.this);
+                timeDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                timeDialog.setContentView(R.layout.time_dialog_layout);
+                timeDialog.show();
+
+                final Button btpSetTime = (Button) timeDialog.findViewById(R.id.btpSetTime);
+                final TimePicker tpSetTime = (TimePicker) timeDialog.findViewById(R.id.tpSetTime);
+
+                btpSetTime.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tvTimeBegin.setText(setTime(tpSetTime.getCurrentHour(),
+                                tpSetTime.getCurrentMinute()));
+                        beginTime = tpSetTime.getCurrentHour() + ":" + tpSetTime.getCurrentMinute();
+                        timeDialog.cancel();
+                    }
+                });
+            }
+        });
+
+        bSetDateEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Dialog dateDialog = new Dialog(PostMessageActivity.this);
@@ -186,9 +241,37 @@ public class PostMessageActivity extends AppCompatActivity {
                 bdpSetDate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        tvDate.setText(setDate(dpSetDate.getDayOfMonth(),dpSetDate.getMonth(),
+                        tvDateEnd.setText(setDate(dpSetDate.getDayOfMonth(),dpSetDate.getMonth(),
                                 dpSetDate.getYear()));
-                        date = dpSetDate.getDayOfMonth() + "/" +
+                        endDate = dpSetDate.getDayOfMonth() + "/" +
+                                dpSetDate.getMonth() + "/" +
+                                dpSetDate.getYear();
+                        dateDialog.cancel();
+                    }
+                });
+            }
+        });
+
+        bSetDateBegin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dateDialog = new Dialog(PostMessageActivity.this);
+                dateDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dateDialog.setContentView(R.layout.date_dialog_layout);
+                dateDialog.show();
+
+                final Button bdpSetDate = (Button) dateDialog.findViewById(R.id.bdpSetDate);
+                final DatePicker dpSetDate = (DatePicker) dateDialog.findViewById(R.id.dpSetDate);
+
+                Date dateNow = new Date();
+                dpSetDate.setMinDate(System.currentTimeMillis());
+
+                bdpSetDate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tvDateBegin.setText(setDate(dpSetDate.getDayOfMonth(),dpSetDate.getMonth(),
+                                dpSetDate.getYear()));
+                        beginDate = dpSetDate.getDayOfMonth() + "/" +
                                 dpSetDate.getMonth() + "/" +
                                 dpSetDate.getYear();
                         dateDialog.cancel();
@@ -421,13 +504,20 @@ public class PostMessageActivity extends AppCompatActivity {
         return finalHour + ":" + finalMinutes;
     }
 
-    public String setDefaultDate(){
+    public String setDefaultDate(String name){
         Date date = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.MONTH,1);
         int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH) + 1;
+        int month;
+        if (name.equals("End")){
+            month = cal.get(Calendar.MONTH) + 1;
+        }
+        else{
+            month = cal.get(Calendar.MONTH);
+        }
+
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
         return "" + day + "/" + month + "/" + year;

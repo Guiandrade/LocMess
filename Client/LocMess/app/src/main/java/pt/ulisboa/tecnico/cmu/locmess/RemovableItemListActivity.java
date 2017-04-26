@@ -25,6 +25,7 @@ import java.util.Map;
 
 public class RemovableItemListActivity extends AppCompatActivity {
     ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayList<String> locationsToRemove= new ArrayList<String>();
     ListView listView;
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     SimpleAdapter adapter;
@@ -59,13 +60,21 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
         for(Location loc : locations){
             HashMap<String, String> resultsMap = new HashMap<>();
-            checkedStatus.put(loc.getName(),false);
-            resultsMap.put("First Line", loc.getName());
-            String coordinates = loc.getCoordinates().getLatitude() + ", " +
-                    loc.getCoordinates().getLongitude() + ", " +
-                    loc.getCoordinates().getRadius();
-            resultsMap.put("Second Line", coordinates);
-            listItems.add(resultsMap);
+            if(!(loc.getSSID() == null)){
+                checkedStatus.put(loc.getSSID()+"-"+loc.getMac(),false);
+                resultsMap.put("First Line", loc.getSSID()+"-"+loc.getMac());
+                String coordinates = "";
+                resultsMap.put("Second Line", coordinates);
+                listItems.add(resultsMap);
+            }
+            else{
+                checkedStatus.put(loc.getName(),false);
+                resultsMap.put("First Line", loc.getName());
+                String coordinates = "Lat: " + loc.getCoordinates().getLatitude() + ", Lon: " +
+                        loc.getCoordinates().getLongitude();
+                resultsMap.put("Second Line", coordinates);
+                listItems.add(resultsMap);
+            }
         }
 
         listView.setAdapter(adapter);
@@ -79,10 +88,16 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
                 if (checkedStatus.get(locName).equals(true)){
                     parent.getChildAt(position).setBackgroundColor(bColor);
+                    for(int i = 0; i<locationsToRemove.size();i++){
+                        if(locationsToRemove.get(i).equals(locName)){
+                            locationsToRemove.remove(i);
+                        }
+                    }
                     checkedStatus.put(locName,false);
                 }
                 else{
                     parent.getChildAt(position).setBackgroundColor(Color.RED);
+                    locationsToRemove.add(locName);
                     checkedStatus.put(locName,true);
                 }
             }
@@ -113,11 +128,6 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("locationsRemoved",locations);
-        setResult(Activity.RESULT_OK,returnIntent);
-        finish();
     }
 
     @Override
@@ -125,7 +135,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
         if(item.getItemId()==android.R.id.home){
             Intent returnIntent = new Intent();
-            returnIntent.putExtra("locationsRemoved",locations);
+            returnIntent.putExtra("locationsRemoved",locationsToRemove);
             setResult(Activity.RESULT_OK,returnIntent);
             finish();
         }

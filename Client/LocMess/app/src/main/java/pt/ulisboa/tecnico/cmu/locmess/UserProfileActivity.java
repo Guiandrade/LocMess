@@ -89,7 +89,6 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, pairs);
-
         lvKeyPairs.setAdapter(adapter);
 
         lvKeyPairs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -101,12 +100,13 @@ public class UserProfileActivity extends AppCompatActivity {
                     parent.getChildAt(position).setBackgroundColor(bColor);
                     checkedStatus.put(pair, false);
                 } else {
+                    System.out.println(position);
                     parent.getChildAt(position).setBackgroundColor(Color.RED);
                     checkedStatus.put(pair, true);
                 }
-                /*for(Map.Entry<String,Boolean> entry : checkedStatus.entrySet()){
+                for(Map.Entry<String,Boolean> entry : checkedStatus.entrySet()){
                     System.out.println(entry.getKey() + " -> " + entry.getValue());
-                }*/
+                }
             }
         });
 

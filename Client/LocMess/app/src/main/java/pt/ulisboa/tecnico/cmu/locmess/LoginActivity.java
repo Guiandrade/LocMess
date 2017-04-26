@@ -45,6 +45,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         this.setTitle("LocMess - Login");
 
+        //Display back button on top
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("token","");
         if(!(token.equals(""))){
@@ -75,6 +81,22 @@ public class LoginActivity extends AppCompatActivity {
                 login(username,password);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent loginActivityIntent = new Intent(LoginActivity.this, LoginActivity.class);
+        loginActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(loginActivityIntent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if(item.getItemId()==android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void login(final String username, String password){

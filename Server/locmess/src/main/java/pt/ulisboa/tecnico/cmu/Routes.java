@@ -72,13 +72,16 @@ public class Routes
     try {
       Method method = dataClass.getMethod(func, new Class[] { JSONObject.class });
       JSONObject reqObj = new JSONObject();
+      System.out.println("start process");
       if(request.body().length()==0){
+          System.out.println("start if");
         for (String s : request.queryParams()) {
           System.out.println(s + " : "+ request.queryParams(s));
 
           reqObj.put(s,request.queryParams(s));
         }
       }else{
+        System.out.println("start else");
         reqObj = new JSONObject(request.body().toString());
       }
 

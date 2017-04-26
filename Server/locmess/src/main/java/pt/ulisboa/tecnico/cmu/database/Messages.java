@@ -12,9 +12,9 @@ public class Messages {
 
   private int lastID=-1;
   private HashMap<String,Message> messages= new HashMap<String,Message>(); //nao vao para users com estes keypairs
-  public void createMessage(String username,String location , String time, String body, HashMap<String,Set<String>> whitelist,  HashMap<String,Set<String>> backlist){
+  public void createMessage(String title,String username,String location , String initTime,String endTime, String body, HashMap<String,Set<String>> whitelist,  HashMap<String,Set<String>> blacklist) {
     lastID+=1;
-    messages.put(lastID+"",new Message(lastID+"",username,location , time, body, whitelist,  backlist));
+    messages.put(lastID+"",new Message(lastID+"",title,username,location , initTime,endTime, body, whitelist,  blacklist));
   }
   public Set<JSONObject> getMessages(String location,HashMap<String,Set<String>> userKeys){
     System.out.println("getMessages");
@@ -26,15 +26,31 @@ public class Messages {
       if(m.isInLocation(location)){
         System.out.println("is in location");
         //falta o if do tempo TODO
-        //falta ver para o caso de nao haver white nem backlist TODO
+        //falta ver para o caso de nao haver white nem blacklist TODO
         if(m.isInWhiteList(userKeys)){
           System.out.println("is in whitelist");
           if(!m.isInBackList(userKeys)){
-            System.out.println("is not  in backlist");
+            System.out.println("is not  in blacklist");
 
             userMessages.add(m.toJson());
           }
         }
+      }
+    }
+    return userMessages;
+
+  }
+
+
+  public Set<JSONObject> getUserMessages(String username){
+    System.out.println("getUserMessages");
+    Set<JSONObject> userMessages= new HashSet<JSONObject>();
+    for(Map.Entry<String,Message> e : messages.entrySet()) {
+      String key = e.getKey();
+      Message m=messages.get(key);
+      System.out.println(m.toJson());
+      if(m.isUsername(username)){
+        userMessages.add(m.toJson());
       }
     }
     return userMessages;

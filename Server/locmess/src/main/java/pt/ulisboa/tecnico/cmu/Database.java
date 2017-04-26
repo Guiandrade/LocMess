@@ -125,19 +125,26 @@ public class Database {
   public JSONObject deleteMessage(JSONObject req){
     JSONObject res= new JSONObject();
     String username=req.get("username").toString();
-    Set<String> lisId = new HashSet<String>();
-    int i=0;
-    while(req.has("id"+i)!=false){
-      System.out.println(req.get("id"+i).toString());
-      boolean check=messages.deleteMessage(username,req.get("id"+i).toString());
 
-      if(check){
-        lisId.add("id"+i);
-      }
-      i++;
+      JSONArray array=req.getJSONArray("ids");
+     for (int i = 0 ; i < array.length(); i++) {
+      messages.deleteMessage(username,array.getString(i));
     }
-        res.put("deleted",lisId);
-        res.put("status","ok");
+
+      res.put("status","ok");
+
+    return res;
+  }
+
+  public JSONObject deleteLocation(JSONObject req){
+    JSONObject res= new JSONObject();
+    JSONArray array=req.getJSONArray("locations");
+    for (int i = 0 ; i < array.length(); i++) {
+      locations.deleteLocation(array.getString(i));
+    }
+
+
+    res.put("status","ok");
 
     return res;
   }
@@ -147,10 +154,9 @@ public class Database {
     String username=req.get("username").toString();
 
 
-    double latitude=req.getDouble("latitude");
-    double longitude=req.getDouble("longitude");
+    double latitude=Double.parseDouble(req.getString("latitude"));
+    double longitude=Double.parseDouble(req.getString("longitude"));
     Set<String> location=locations.getUserLocation(latitude,longitude);
-    location.add("sintra");
     HashMap<String,Set<String>> userKeys=profiles.getUserKeys(username);
     for (String l : location) {
       System.out.println(l);
@@ -163,22 +169,33 @@ public class Database {
     return res;
   }
 
+  public  JSONObject getUserMessages(JSONObject req){
+    JSONObject res= new JSONObject();
+
+    String username=req.get("username").toString();
+    res.put("messages",messages.getUserMessages(username));
+    res.put("status","ok");
+    return res;
+  }
+
   public JSONObject createMessage(JSONObject req){
+    String title=req.get("title").toString();
     String username=req.get("username").toString();
     String location=req.get("location").toString();
-    String time=req.get("time").toString();
+    String initTime=req.get("initTime").toString();
+    String endTime=req.get("endTime").toString();
     String body=req.get("body").toString();
     HashMap<String,Set<String>> whitelist=new HashMap<String,Set<String>>();
-    HashMap<String,Set<String>> backlist=new HashMap<String,Set<String>>();
+    HashMap<String,Set<String>> blacklist=new HashMap<String,Set<String>>();
 
     getKeyValue(req,"whitelist",whitelist);
     System.out.println(whitelist.get("carros"));
 
-    getKeyValue(req,"backlist",backlist);
-      System.out.println(backlist);
+    getKeyValue(req,"blacklist",blacklist);
+      System.out.println(blacklist);
 
 
-    messages.createMessage(username,location , time, body, whitelist, backlist);
+    messages.createMessage(title,username,location ,initTime ,endTime, body, whitelist, blacklist);
     JSONObject res= new JSONObject();
     res.put("status","ok");
     return res;

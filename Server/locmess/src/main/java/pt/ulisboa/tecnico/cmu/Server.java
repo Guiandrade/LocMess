@@ -27,9 +27,11 @@ public class Server{
     routes.Get("/keys","getAllKeys");
     routes.Put("/locations","addLocation");
     routes.Get("/locations","getLocations");
+    routes.Post("/deleteLocation","deleteLocation");
     routes.Post("/messages","createMessage");
     routes.Get("/messages","getMessages");
-    routes.Delete("/messages","deleteMessage");
+    routes.Get("/userMessages","getUserMessages");
+    routes.Post("/deleteMessages","deleteMessage");
     /*
 
 

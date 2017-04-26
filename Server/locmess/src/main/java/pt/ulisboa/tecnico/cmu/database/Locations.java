@@ -12,16 +12,28 @@ public class Locations {
 
 
   public void addLocation(String location, double latitude, double longitude, int radius){
-    GpsLocation loc =new GpsLocation(location, latitude, longitude, radius);
-    locations.add(loc);
+
+    boolean check=false;
+    for (GpsLocation l : locations) {
+      if(l.getLocation().equals(location)){
+        check=true;
+      }
+    }
+    if(!check){
+      GpsLocation loc =new GpsLocation(location, latitude, longitude, radius);
+      locations.add(loc);
+    }
+
   }
   public Set<GpsLocation> getLocations(){
     return locations;
   }
   public Set<String> getUserLocation(double latitude, double longitude){
+
     Set<String> locationUser = new HashSet<String>();
     for (GpsLocation l : locations) {
       if(l.inRadius(latitude,longitude)){
+        System.out.println(l.getLocation());
         locationUser.add(l.getLocation());
       }
     }

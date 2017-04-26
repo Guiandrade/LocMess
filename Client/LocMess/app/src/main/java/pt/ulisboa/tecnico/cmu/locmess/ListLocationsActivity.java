@@ -40,11 +40,19 @@ public class ListLocationsActivity extends AppCompatActivity {
 
         for(Location loc : locations){
             HashMap<String, String> resultsMap = new HashMap<>();
-            resultsMap.put("First Line", loc.getName());
-            String coordinates = "Lat: " + loc.getCoordinates().getLatitude() + ", Lon: " +
-                    loc.getCoordinates().getLongitude();
-            resultsMap.put("Second Line", coordinates);
-            listItems.add(resultsMap);
+            if(!(loc.getSSID() == null)){
+                resultsMap.put("First Line", loc.getSSID());
+                String coordinates = "Mac: " + loc.getMac();
+                resultsMap.put("Second Line", coordinates);
+                listItems.add(resultsMap);
+            }
+            else{
+                resultsMap.put("First Line", loc.getName());
+                String coordinates = "Lat: " + loc.getCoordinates().getLatitude() + ", Lon: " +
+                        loc.getCoordinates().getLongitude();
+                resultsMap.put("Second Line", coordinates);
+                listItems.add(resultsMap);
+            }
         }
 
         locationsListView.setAdapter(adapter);

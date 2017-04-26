@@ -1,10 +1,13 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -77,9 +80,25 @@ public class MainMenuActivity extends AppCompatActivity {
         bCreateLocations.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent createLocationsIntent = new Intent(MainMenuActivity.this, CreateLocationActivity.class);
-                createLocationsIntent.putExtra("serverIP", SERVER_IP);
-                startActivityForResult(createLocationsIntent,CREATE_LOCATIONS_REQUEST_CODE);
+                CharSequence [] items = {"Coordinates","SSID"};
+                new AlertDialog.Builder(MainMenuActivity.this)
+                .setSingleChoiceItems(items, 0, null)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+                        if(selectedPosition == 0){
+                            Intent createLocationsIntent = new Intent(MainMenuActivity.this, CreateLocationActivity.class);
+                            createLocationsIntent.putExtra("serverIP", SERVER_IP);
+                            startActivityForResult(createLocationsIntent,CREATE_LOCATIONS_REQUEST_CODE);
+                        }
+                        else{
+                            Intent createLocationsSSIDIntent = new Intent(MainMenuActivity.this, SSIDActivity.class);
+                            createLocationsSSIDIntent.putExtra("serverIP", SERVER_IP);
+                            startActivityForResult(createLocationsSSIDIntent,CREATE_LOCATIONS_REQUEST_CODE);
+                        }
+                    }
+                })
+                .show();
             }
         });
 
@@ -103,8 +122,10 @@ public class MainMenuActivity extends AppCompatActivity {
                 listLocations("remove");
             }
         });
+    }
 
-
+    public void dimiss(DialogInterface dialog){
+        dialog.dismiss();
     }
 
     @Override
@@ -148,13 +169,22 @@ public class MainMenuActivity extends AppCompatActivity {
         queue = Volley.newRequestQueue(this);
         String url = "http://" + SERVER_IP + "/locations";
         JSONObject jsonBody = new JSONObject();
-        try{
-            jsonBody.put("location",location.getName());
-            jsonBody.put("latitude",Double.parseDouble(location.getCoordinates().getLatitude()));
-            jsonBody.put("longitude",Double.parseDouble(location.getCoordinates().getLongitude()));
-            jsonBody.put("radius",Integer.parseInt(location.getCoordinates().getRadius()));
-        }catch (Exception e){
+        if(location.getSSID() == null){
+            try{
+                jsonBody.put("location",location.getName());
+                jsonBody.put("latitude",Double.parseDouble(location.getCoordinates().getLatitude()));
+                jsonBody.put("longitude",Double.parseDouble(location.getCoordinates().getLongitude()));
+                jsonBody.put("radius",Integer.parseInt(location.getCoordinates().getRadius()));
+            }catch (Exception e){
 
+            }
+        }
+        else{
+            try{
+                jsonBody.put("ssid",location.getSSID()+"-"+location.getMac());
+            }catch (Exception e) {
+
+            }
         }
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
@@ -318,7 +348,13 @@ public class MainMenuActivity extends AppCompatActivity {
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("title",message.getTitle());
-            jsonBody.put("location",message.getLocation().getName());
+            if(!(message.getLocation().getSSID() == null)) {
+                jsonBody.put("location",message.getLocation().getSSID()+"-"+message.getLocation().getMac());
+            }
+            else{
+                jsonBody.put("location",message.getLocation().getName());
+            }
+
             String initHour = "" + message.getTimeWindow().getStartingHour();
             String initMinute = "" + message.getTimeWindow().getStartingMinute();
             String initDay = "" + message.getTimeWindow().getStartingDay();
@@ -429,9 +465,16 @@ public class MainMenuActivity extends AppCompatActivity {
                             if(response.get("status").toString().equals("ok")) {
                                 for (int i = 0; i < response.getJSONArray("locations").length(); i++) {
                                     JSONObject arr = (JSONObject) response.getJSONArray("locations").get(i);
-                                    Coordinates coordinates = new Coordinates(arr.get("latitude").toString().substring(0,7),arr.get("longitude").toString().substring(0,7));
-                                    Location location = new Location(arr.get("location").toString(),coordinates);
-                                    locations.add(location);
+                                    if(!arr.has("ssid")){
+                                        Coordinates coordinates = new Coordinates(arr.get("latitude").toString().substring(0,7),arr.get("longitude").toString().substring(0,7));
+                                        Location location = new Location(arr.get("location").toString(),coordinates);
+                                        locations.add(location);
+                                    }
+                                    else{
+                                        Location ssid = new Location(arr.get("ssid").toString().split("-")[0],
+                                                arr.get("ssid").toString().split("-")[1]);
+                                        locations.add(ssid);
+                                    }
                                 }
                                 if(str.equals("list")){
                                     Intent listLocationsIntent = new Intent(MainMenuActivity.this, ListLocationsActivity.class);
@@ -524,7 +567,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     if(response.get("status").toString().equals("ok")){
                         for (int i = 0; i < response.getJSONArray("messages").length(); i++) {
                             JSONObject arr = (JSONObject) response.getJSONArray("messages").get(i);
-                            Location location = new Location(arr.get("location").toString(),null);
+                            Location location = new Location(arr.get("location").toString(),(Coordinates) null);
                             int initHour = Integer.parseInt(arr.get("initTime").toString().split(":")[0]);
                             int initMinute = Integer.parseInt(arr.get("initTime").toString().split(":")[1].split("-")[0]);
                             int initDay = Integer.parseInt(arr.get("initTime").toString().split("/")[0].split("-")[1]);

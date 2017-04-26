@@ -2,7 +2,9 @@ package pt.ulisboa.tecnico.cmu.locmess;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -53,6 +55,7 @@ public class PostMessageActivity extends AppCompatActivity {
     private String endDate = "";
     private String beginTime = "";
     private String beginDate = "";
+    String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,8 @@ public class PostMessageActivity extends AppCompatActivity {
         }
 
         locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        username = sharedPreferences.getString("username","");
 
         final EditText etTitle = (EditText) findViewById(R.id.etTitle);
         final EditText etMessage = (EditText) findViewById(R.id.etMessage);
@@ -96,7 +101,12 @@ public class PostMessageActivity extends AppCompatActivity {
         spinnerLocationsArray.clear();
         spinnerLocationsArray.add("SELECT LOCATION");
         for(Location loc : locations){
-            spinnerLocationsArray.add(loc.getName());
+            if(!(loc.getSSID() == null)){
+                spinnerLocationsArray.add(loc.getSSID()+"-"+loc.getMac());
+            }
+            else{
+                spinnerLocationsArray.add(loc.getName());
+            }
         }
 
         ArrayAdapter<String> locationsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerLocationsArray);
@@ -111,12 +121,19 @@ public class PostMessageActivity extends AppCompatActivity {
                 String locationSelected = sSelectLocation.getSelectedItem().toString();
                 Location location = null;
                 for(Location loc : locations){
-                    if(loc.getName().equals(locationSelected)){
-                        location = loc;
+                    if(!(loc.getSSID() == null)) {
+                        if ((loc.getSSID()+"-"+loc.getMac()).equals(locationSelected)) {
+                            location = loc;
+                        }
+                    }
+                    else{
+                        if(loc.getName().equals(locationSelected)){
+                            location = loc;
+                        }
                     }
                 }
 
-                String owner = "not done yet";
+                String owner = username;
                 HashMap<String, Set<String>> whitelistKeyPairs = new HashMap<String, Set<String>>();
                 HashMap<String, Set<String>> blacklistKeyPairs = new HashMap<String, Set<String>>();
                 for (String entry: keyPairsWhitelist) {

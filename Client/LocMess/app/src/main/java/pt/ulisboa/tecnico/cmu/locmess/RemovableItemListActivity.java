@@ -60,12 +60,21 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
         for(Location loc : locations){
             HashMap<String, String> resultsMap = new HashMap<>();
-            checkedStatus.put(loc.getName(),false);
-            resultsMap.put("First Line", loc.getName());
-            String coordinates = "Lat: " + loc.getCoordinates().getLatitude() + ", Lon: " +
-                    loc.getCoordinates().getLongitude();
-            resultsMap.put("Second Line", coordinates);
-            listItems.add(resultsMap);
+            if(!(loc.getSSID() == null)){
+                checkedStatus.put(loc.getSSID()+"-"+loc.getMac(),false);
+                resultsMap.put("First Line", loc.getSSID()+"-"+loc.getMac());
+                String coordinates = "";
+                resultsMap.put("Second Line", coordinates);
+                listItems.add(resultsMap);
+            }
+            else{
+                checkedStatus.put(loc.getName(),false);
+                resultsMap.put("First Line", loc.getName());
+                String coordinates = "Lat: " + loc.getCoordinates().getLatitude() + ", Lon: " +
+                        loc.getCoordinates().getLongitude();
+                resultsMap.put("Second Line", coordinates);
+                listItems.add(resultsMap);
+            }
         }
 
         listView.setAdapter(adapter);

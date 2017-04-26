@@ -12,10 +12,17 @@ public class Location implements Serializable{
 
     private String name;
     private Coordinates coordinates;
+    private String ssid;
+    private String mac;
 
     public Location(String name, Coordinates coordinates) {
         this.name = name;
         this.coordinates = coordinates;
+    }
+
+    public Location(String ssid, String mac){
+        this.ssid = ssid;
+        this.mac = mac;
     }
 
     public String getName() {
@@ -24,5 +31,13 @@ public class Location implements Serializable{
 
     public Coordinates getCoordinates() {
         return coordinates;
+    }
+
+    public String getSSID() {
+        return ssid;
+    }
+
+    public String getMac() {
+        return mac;
     }
 }

@@ -158,15 +158,17 @@ public class Database {
   }
   public  JSONObject getMessages(JSONObject req){
     JSONObject res= new JSONObject();
+    Set<JSONObject> mess=new HashSet<JSONObject>() ;
     Set<String> location=new HashSet<String>() ;
 
     String username=req.get("username").toString();
-
-    int i=0;
-    while(req.has("ssid"+i)){
-        location.add( req.getString("ssid"+i));
-        i++;
+    if(req.has("ssids")){
+      JSONArray array=req.getJSONArray("ssids");
+      for (int i = 0 ; i < array.length(); i++) {
+        location.add(array.getString(i));
+      }
     }
+
     if(req.has("latitude")){
       double latitude=Double.parseDouble(req.getString("latitude"));
       double longitude=Double.parseDouble(req.getString("longitude"));
@@ -179,9 +181,10 @@ public class Database {
       System.out.println(l);
       Set<JSONObject> message=messages.getMessages(l,userKeys);
       if(message.size()!=0){
-        res.put(l,message);
+        mess.addAll(message);
       }
     }
+    res.put("messages",mess);
     res.put("status","ok");
     return res;
   }

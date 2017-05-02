@@ -3,9 +3,8 @@
     package="pt.ulisboa.tecnico.cmu.locmess">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
@@ -32,7 +31,12 @@
         <activity android:name=".PostMessageActivity" />
         <activity android:name=".UnpostMessageActivity" />
         <activity android:name=".UserProfileActivity" />
-        <activity android:name=".SSIDActivity"></activity>
+        <activity android:name=".SSIDActivity" />
+
+        <service
+            android:name=".NotificationService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

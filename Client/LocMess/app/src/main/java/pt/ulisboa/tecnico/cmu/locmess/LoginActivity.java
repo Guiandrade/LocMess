@@ -37,7 +37,7 @@ import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
-    String SERVER_IP = "193.136.167.154:8080";
+    String SERVER_IP = "192.168.43.68:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

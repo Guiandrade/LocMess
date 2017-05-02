@@ -3,18 +3,23 @@ package pt.ulisboa.tecnico.cmu.locmess;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -49,8 +54,9 @@ public class PostMessageActivity extends AppCompatActivity {
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     private ArrayList<String> keyPairsWhitelist = new ArrayList<String>();
     private ArrayList<String> keyPairsBlacklist = new ArrayList<String>();
-    int bColor = Color.TRANSPARENT;
-    ListView lvPairs;
+    MyListViewAdapter adapter;
+    ListView listView;
+    List<String> myList;
     private String endTime = "";
     private String endDate = "";
     private String beginTime = "";
@@ -102,7 +108,7 @@ public class PostMessageActivity extends AppCompatActivity {
         spinnerLocationsArray.add("SELECT LOCATION");
         for(Location loc : locations){
             if(!(loc.getSSID() == null)){
-                spinnerLocationsArray.add(loc.getSSID()+"-"+loc.getMac());
+                spinnerLocationsArray.add(loc.getSSID());
             }
             else{
                 spinnerLocationsArray.add(loc.getName());
@@ -122,7 +128,7 @@ public class PostMessageActivity extends AppCompatActivity {
                 Location location = null;
                 for(Location loc : locations){
                     if(!(loc.getSSID() == null)) {
-                        if ((loc.getSSID()+"-"+loc.getMac()).equals(locationSelected)) {
+                        if ((loc.getSSID()).equals(locationSelected)) {
                             location = loc;
                         }
                     }
@@ -291,7 +297,111 @@ public class PostMessageActivity extends AppCompatActivity {
                 final EditText etPair = (EditText) keyPairsDialog.findViewById(R.id.etPair);
                 final Button bAddPair = (Button) keyPairsDialog.findViewById(R.id.bAddPair);
                 final Button bDeletePair = (Button) keyPairsDialog.findViewById(R.id.bDeletePair);
-                lvPairs = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
+
+                myList = new  ArrayList<String>();
+                listView = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
+
+                adapter = new MyListViewAdapter(v.getContext(), R.layout.list_item, myList);
+                // Binds the Adapter to the ListView
+                listView.setAdapter(adapter);
+                // define Choice mode for multiple  delete
+                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+                    @Override
+                    public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
+                        // TODO  Auto-generated method stub
+                        final int checkedCount  = listView.getCheckedItemCount();
+                        // Set the  CAB title according to total checked items
+                        mode.setTitle(checkedCount  + "  Selected");
+                        // Calls  toggleSelection method from ListViewAdapter Class
+                        adapter.toggleSelection(position);
+                    }
+
+                    @Override
+                    public boolean onCreateActionMode(android.view.ActionMode mode, Menu menu) {
+                        mode.getMenuInflater().inflate(R.menu.delete_menu, menu);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(android.view.ActionMode mode, Menu menu) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(final android.view.ActionMode mode, MenuItem item) {
+                        // TODO  Auto-generated method stub
+                        switch (item.getItemId()) {
+                            case R.id.selectAll:
+                                //
+                                final int checkedCount = myList.size();
+                                // If item  is already selected or checked then remove or
+                                // unchecked  and again select all
+                                adapter.removeSelection();
+                                for (int i = 0; i < checkedCount; i++) {
+                                    listView.setItemChecked(i, true);
+                                    //  listviewadapter.toggleSelection(i);
+                                }
+                                // Set the  CAB title according to total checked items
+
+                                // Calls  toggleSelection method from ListViewAdapter Class
+
+                                // Count no.  of selected item and print it
+                                mode.setTitle(checkedCount + "  Selected");
+                                return true;
+                            case R.id.delete:
+                                // Add  dialog for confirmation to delete selected item
+                                // record.
+                                AlertDialog.Builder builder = new AlertDialog.Builder(
+                                        PostMessageActivity.this);
+                                builder.setMessage("Do you  want to delete selected record(s)?");
+
+                                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // TODO  Auto-generated method stub
+
+                                    }
+                                });
+                                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // TODO  Auto-generated method stub
+                                        SparseBooleanArray selected = adapter
+                                                .getSelectedIds();
+                                        for (int i = (selected.size() - 1); i >= 0; i--) {
+                                            if (selected.valueAt(i)) {
+                                                String selecteditem = adapter
+                                                        .getItem(selected.keyAt(i));
+                                                // Remove  selected items following the ids
+                                                keyPairsBlacklist.remove(selecteditem);
+                                                adapter.remove(selecteditem);
+                                            }
+                                        }
+
+                                        // Close CAB
+                                        mode.finish();
+                                        selected.clear();
+
+                                    }
+                                });
+                                AlertDialog alert = builder.create();
+                                //alert.setIcon(R.drawable.questionicon);// dialog  Icon
+                                alert.setTitle("Confirmation"); // dialog  Title
+                                alert.show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(android.view.ActionMode mode) {
+
+                    }
+                });
 
                 ArrayList<String> keys = new ArrayList<String>();
                 keys.add("Club");
@@ -300,9 +410,6 @@ public class PostMessageActivity extends AppCompatActivity {
 
                 adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, keys);
                 acKey.setAdapter(adapterAutoComplete);
-
-                adapterList = new ArrayAdapter<String>(v.getContext(),android.R.layout.simple_list_item_1, keyPairsBlacklist);
-                lvPairs.setAdapter(adapterList);
 
                 acKey.setOnTouchListener(new View.OnTouchListener(){
                     @Override
@@ -317,8 +424,8 @@ public class PostMessageActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String pair = acKey.getText().toString() + " = " + etPair.getText().toString();
                         keyPairsBlacklist.add(pair);
-                        checkedStatus.put(pair,false);
-                        adapterList.notifyDataSetChanged();
+                        myList.add(pair);
+                        adapter.notifyDataSetChanged();
                         /*String res = "";
                         for(String str : keyPairsList){
                             res = res + "||" + str;
@@ -333,60 +440,6 @@ public class PostMessageActivity extends AppCompatActivity {
                         }*/
                     }
                 });
-
-                lvPairs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String keyPair = (String) parent.getItemAtPosition(position);
-
-                        if (checkedStatus.get(keyPair).equals(true)){
-                            parent.getChildAt(position).setBackgroundColor(bColor);
-                            checkedStatus.put(keyPair,false);
-                        }
-                        else{
-                            parent.getChildAt(position).setBackgroundColor(Color.RED);
-                            checkedStatus.put(keyPair,true);
-                        }
-                        String res = "";
-                        /*for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
-                            res = res + "||" + entry.getKey() + "-" + entry.getValue();
-                            Log.d("CLICK LIST",res);
-                        }*/
-                    }
-                });
-
-                bDeletePair.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        /*String res = "";
-                        for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
-                            res = res + "||" + entry.getKey() + "-" + entry.getValue();
-                            Log.d("DELETE BEGIN",res);
-                        }*/
-
-
-                        int i = 0;
-                        int e = 0;
-                        for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
-                            if(entry.getValue().equals(true)){
-                                keyPairsBlacklist.remove(i-e);
-                                lvPairs.getChildAt(i).setBackgroundColor(bColor);
-                                e++;
-                            }
-                            i++;
-                        }
-                        checkedStatus.values().removeAll(Collections.singleton(true));
-                        adapterList.notifyDataSetChanged();
-
-                        /*res = "";
-                        for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
-                            res = res + "||" + entry.getKey() + "-" + entry.getValue();
-                            Log.d("DELETE END",res);
-                        }*/
-                    }
-                });
-
-
             }
         });
 
@@ -401,7 +454,111 @@ public class PostMessageActivity extends AppCompatActivity {
                 final EditText etPair = (EditText) keyPairsDialog.findViewById(R.id.etPair);
                 final Button bAddPair = (Button) keyPairsDialog.findViewById(R.id.bAddPair);
                 final Button bDeletePair = (Button) keyPairsDialog.findViewById(R.id.bDeletePair);
-                lvPairs = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
+
+                myList = new  ArrayList<String>();
+                listView = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
+
+                adapter = new MyListViewAdapter(v.getContext(), R.layout.list_item, myList);
+                // Binds the Adapter to the ListView
+                listView.setAdapter(adapter);
+                // define Choice mode for multiple  delete
+                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+                    @Override
+                    public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
+                        // TODO  Auto-generated method stub
+                        final int checkedCount  = listView.getCheckedItemCount();
+                        // Set the  CAB title according to total checked items
+                        mode.setTitle(checkedCount  + "  Selected");
+                        // Calls  toggleSelection method from ListViewAdapter Class
+                        adapter.toggleSelection(position);
+                    }
+
+                    @Override
+                    public boolean onCreateActionMode(android.view.ActionMode mode, Menu menu) {
+                        mode.getMenuInflater().inflate(R.menu.delete_menu, menu);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(android.view.ActionMode mode, Menu menu) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(final android.view.ActionMode mode, MenuItem item) {
+                        // TODO  Auto-generated method stub
+                        switch (item.getItemId()) {
+                            case R.id.selectAll:
+                                //
+                                final int checkedCount = myList.size();
+                                // If item  is already selected or checked then remove or
+                                // unchecked  and again select all
+                                adapter.removeSelection();
+                                for (int i = 0; i < checkedCount; i++) {
+                                    listView.setItemChecked(i, true);
+                                    //  listviewadapter.toggleSelection(i);
+                                }
+                                // Set the  CAB title according to total checked items
+
+                                // Calls  toggleSelection method from ListViewAdapter Class
+
+                                // Count no.  of selected item and print it
+                                mode.setTitle(checkedCount + "  Selected");
+                                return true;
+                            case R.id.delete:
+                                // Add  dialog for confirmation to delete selected item
+                                // record.
+                                AlertDialog.Builder builder = new AlertDialog.Builder(
+                                        PostMessageActivity.this);
+                                builder.setMessage("Do you  want to delete selected record(s)?");
+
+                                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // TODO  Auto-generated method stub
+
+                                    }
+                                });
+                                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // TODO  Auto-generated method stub
+                                        SparseBooleanArray selected = adapter
+                                                .getSelectedIds();
+                                        for (int i = (selected.size() - 1); i >= 0; i--) {
+                                            if (selected.valueAt(i)) {
+                                                String selecteditem = adapter
+                                                        .getItem(selected.keyAt(i));
+                                                // Remove  selected items following the ids
+                                                keyPairsWhitelist.remove(selecteditem);
+                                                adapter.remove(selecteditem);
+                                            }
+                                        }
+
+                                        // Close CAB
+                                        mode.finish();
+                                        selected.clear();
+
+                                    }
+                                });
+                                AlertDialog alert = builder.create();
+                                //alert.setIcon(R.drawable.questionicon);// dialog  Icon
+                                alert.setTitle("Confirmation"); // dialog  Title
+                                alert.show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(android.view.ActionMode mode) {
+
+                    }
+                });
 
                 ArrayList<String> keys = new ArrayList<String>();
                 keys.add("Club");
@@ -410,9 +567,6 @@ public class PostMessageActivity extends AppCompatActivity {
 
                 adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, keys);
                 acKey.setAdapter(adapterAutoComplete);
-
-                adapterList = new ArrayAdapter<String>(v.getContext(),android.R.layout.simple_list_item_1, keyPairsWhitelist);
-                lvPairs.setAdapter(adapterList);
 
                 acKey.setOnTouchListener(new View.OnTouchListener(){
                     @Override
@@ -431,42 +585,6 @@ public class PostMessageActivity extends AppCompatActivity {
                         adapterList.notifyDataSetChanged();
                     }
                 });
-
-                lvPairs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        String keyPair = (String) parent.getItemAtPosition(position);
-
-                        if (checkedStatus.get(keyPair).equals(true)){
-                            parent.getChildAt(position).setBackgroundColor(bColor);
-                            checkedStatus.put(keyPair,false);
-                        }
-                        else{
-                            parent.getChildAt(position).setBackgroundColor(Color.RED);
-                            checkedStatus.put(keyPair,true);
-                        }
-                    }
-                });
-
-                bDeletePair.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int i = 0;
-                        int e = 0;
-                        for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
-                            if(entry.getValue().equals(true)){
-                                keyPairsWhitelist.remove(i-e);
-                                lvPairs.getChildAt(i).setBackgroundColor(bColor);
-                                e++;
-                            }
-                            i++;
-                        }
-                        checkedStatus.values().removeAll(Collections.singleton(true));
-                        adapterList.notifyDataSetChanged();
-                    }
-                });
-
-
             }
         });
     }

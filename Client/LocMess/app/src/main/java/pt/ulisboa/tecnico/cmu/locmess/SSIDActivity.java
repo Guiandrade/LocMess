@@ -50,8 +50,7 @@ public class SSIDActivity extends AppCompatActivity {
         bAddSSID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Location ssid = new Location(spSSID.getSelectedItem().toString().split(" ")[1],
-                        spSSID.getSelectedItem().toString().split(" ")[4]);
+                Location ssid = new Location(spSSID.getSelectedItem().toString());
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("locationCreated",ssid);
                 setResult(Activity.RESULT_OK,returnIntent);
@@ -79,7 +78,7 @@ public class SSIDActivity extends AppCompatActivity {
                     int size = results.size();
                     ArrayList<String> ssids = new ArrayList<String>();
                     for (int i = 0; i < size; i++) {
-                        ssids.add("SSID: " + results.get(i).SSID + " | MAC: " + results.get(i).BSSID);
+                        ssids.add("SSID: " + results.get(i).SSID);
                     }
                     showSSIDs(ssids.toArray(new String[0]));
                 }

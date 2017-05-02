@@ -42,8 +42,7 @@ public class ListLocationsActivity extends AppCompatActivity {
             HashMap<String, String> resultsMap = new HashMap<>();
             if(!(loc.getSSID() == null)){
                 resultsMap.put("First Line", loc.getSSID());
-                String coordinates = "Mac: " + loc.getMac();
-                resultsMap.put("Second Line", coordinates);
+                resultsMap.put("Second Line", "");
                 listItems.add(resultsMap);
             }
             else{

@@ -48,6 +48,10 @@ public class UserAreaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_area);
 
+        Intent serviceIntent = new Intent(UserAreaActivity.this, NotificationService.class);
+        serviceIntent.putExtra("serverIP", SERVER_IP);
+        startService(serviceIntent);
+
         SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
@@ -64,10 +68,12 @@ public class UserAreaActivity extends AppCompatActivity {
                 SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("token","");
+                editor.putStringSet("messages",null);  // ISTO E PARA SAIR
                 editor.apply();
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);
                 logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(logoutIntent);
+                stopService(new Intent(UserAreaActivity.this, NotificationService.class));
             }
         });
 
@@ -99,13 +105,11 @@ public class UserAreaActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == MAIN_ACTIVITY_REQUEST_CODE) {
-            System.out.println("pass3");
             if(resultCode == Activity.RESULT_OK){
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
             }
         }
         else if (requestCode == POST_MESSAGE_REQUEST_CODE) {
-            System.out.println("pass4");
             if(resultCode == Activity.RESULT_OK){
                 Message message = (Message) data.getSerializableExtra("messagePosted");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
@@ -113,9 +117,7 @@ public class UserAreaActivity extends AppCompatActivity {
             }
         }
         else if (requestCode == USER_PROFILE_REQUEST_CODE) {
-            System.out.println("pass1");
             if(resultCode == Activity.RESULT_OK){
-                System.out.println("pass2");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
                 HashMap<String, Set<String>> addedKeyPairs = (HashMap<String, Set<String>>) data.getSerializableExtra("addedKeys");
                 HashMap<String, Set<String>> deletedKeyPairs = (HashMap<String, Set<String>>) data.getSerializableExtra("deletedKeys");
@@ -189,8 +191,7 @@ public class UserAreaActivity extends AppCompatActivity {
                                         locations.add(location);
                                     }
                                     else{
-                                        Location ssid = new Location(arr.get("ssid").toString().split("-")[0],
-                                                arr.get("ssid").toString().split("-")[1]);
+                                        Location ssid = new Location(arr.get("ssid").toString());
                                         locations.add(ssid);
                                     }
                                 }
@@ -245,7 +246,7 @@ public class UserAreaActivity extends AppCompatActivity {
         try{
             jsonBody.put("title",message.getTitle());
             if(!(message.getLocation().getSSID() == null)) {
-                jsonBody.put("location",message.getLocation().getSSID()+"-"+message.getLocation().getMac());
+                jsonBody.put("location",message.getLocation().getSSID());
             }
             else{
                 jsonBody.put("location",message.getLocation().getName());

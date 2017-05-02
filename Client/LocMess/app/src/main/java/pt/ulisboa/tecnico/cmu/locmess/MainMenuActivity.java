@@ -181,7 +181,7 @@ public class MainMenuActivity extends AppCompatActivity {
         }
         else{
             try{
-                jsonBody.put("ssid",location.getSSID()+"-"+location.getMac());
+                jsonBody.put("ssid",location.getSSID().split(" ")[1]);
             }catch (Exception e) {
 
             }
@@ -348,8 +348,9 @@ public class MainMenuActivity extends AppCompatActivity {
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("title",message.getTitle());
+            System.out.println("asjdnaskjdnaksjnd" + message.getLocation().getSSID());
             if(!(message.getLocation().getSSID() == null)) {
-                jsonBody.put("location",message.getLocation().getSSID()+"-"+message.getLocation().getMac());
+                jsonBody.put("location",message.getLocation().getSSID());
             }
             else{
                 jsonBody.put("location",message.getLocation().getName());
@@ -471,8 +472,8 @@ public class MainMenuActivity extends AppCompatActivity {
                                         locations.add(location);
                                     }
                                     else{
-                                        Location ssid = new Location(arr.get("ssid").toString().split("-")[0],
-                                                arr.get("ssid").toString().split("-")[1]);
+                                        System.out.println(arr.get("ssid").toString());
+                                        Location ssid = new Location(arr.get("ssid").toString());
                                         locations.add(ssid);
                                     }
                                 }

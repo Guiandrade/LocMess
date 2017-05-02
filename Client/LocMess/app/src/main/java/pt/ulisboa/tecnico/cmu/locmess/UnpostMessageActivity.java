@@ -1,15 +1,20 @@
 package pt.ulisboa.tecnico.cmu.locmess;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -28,9 +33,8 @@ public class UnpostMessageActivity extends AppCompatActivity {
     ArrayList<String> idsToRemove = new ArrayList<String>();
     ListView listView;
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
-    SimpleAdapter adapter;
-    List<HashMap<String, String>> listItems;
-    int bColor = Color.TRANSPARENT;
+    MyListViewAdapter adapter;
+    List<String> myList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,84 +45,126 @@ public class UnpostMessageActivity extends AppCompatActivity {
 
         messages = (ArrayList<Message>) getIntent().getSerializableExtra("messages");
 
-        if(getSupportActionBar()!=null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        listView = (ListView) findViewById(R.id.lvRemovableItemList);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        myList = new ArrayList<String>();
 
-        Drawable background = listView.getBackground();
-        if (background instanceof ColorDrawable)
-            bColor = ((ColorDrawable) background).getColor();
-
-        listItems = new ArrayList<>();
-        adapter = new SimpleAdapter(this, listItems, R.layout.delete_row_layout,
-                new String[]{"First Line", "Second Line"},
-                new int[]{R.id.tvLocationName,R.id.tvCoordinates});
-
-        for(Message msg : messages){
-            HashMap<String, String> resultsMap = new HashMap<>();
-            checkedStatus.put(msg.getId(),false);
-            resultsMap.put("First Line", msg.getTitle());
+        for (Message msg : messages) {
             String coordinates = "Loc: " + msg.getLocation().getName() + ", Eding Date/Time: " +
                     msg.getTimeWindow().getEndingDay() + "/" +
                     msg.getTimeWindow().getEndingMonth() + "/" +
                     msg.getTimeWindow().getEndingYear() + " " +
                     msg.getTimeWindow().getEndingHour() + ":" +
                     msg.getTimeWindow().getEndingMinutes() + ", Id: " + msg.getId();
-            resultsMap.put("Second Line", coordinates);
-            listItems.add(resultsMap);
+            myList.add(msg.getTitle() + " = " + coordinates);
         }
 
+        listView = (ListView) findViewById(R.id.lvRemovableItemList);
+        // Pass value to MyListViewAdapter  Class
+        adapter = new MyListViewAdapter(this, R.layout.list_item, myList);
+        // Binds the Adapter to the ListView
         listView.setAdapter(adapter);
-        final Button bDeleteItems = (Button) findViewById(R.id.bDeleteItems);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // define Choice mode for multiple  delete
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HashMap<String, String> item = (HashMap<String, String>) parent.getItemAtPosition(position);
-                String locName = item.get("Second Line").split("Id: ")[1];
+            public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
+                // TODO  Auto-generated method stub
+                final int checkedCount = listView.getCheckedItemCount();
+                // Set the  CAB title according to total checked items
+                mode.setTitle(checkedCount + "  Selected");
+                // Calls  toggleSelection method from ListViewAdapter Class
+                adapter.toggleSelection(position);
+            }
 
-                if (checkedStatus.get(locName).equals(true)){
-                    parent.getChildAt(position).setBackgroundColor(bColor);
-                    for(int i = 0; i<idsToRemove.size();i++){
-                        if(idsToRemove.get(i).equals(locName)){
-                            idsToRemove.remove(i);
+            @Override
+            public boolean onCreateActionMode(android.view.ActionMode mode, Menu menu) {
+                mode.getMenuInflater().inflate(R.menu.delete_menu, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(android.view.ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(final android.view.ActionMode mode, MenuItem item) {
+                // TODO  Auto-generated method stub
+                switch (item.getItemId()) {
+                    case R.id.selectAll:
+                        //
+                        final int checkedCount = myList.size();
+                        // If item  is already selected or checked then remove or
+                        // unchecked  and again select all
+                        adapter.removeSelection();
+                        for (int i = 0; i < checkedCount; i++) {
+                            listView.setItemChecked(i, true);
+                            //  listviewadapter.toggleSelection(i);
                         }
-                    }
-                    checkedStatus.put(locName,false);
-                }
-                else{
-                    parent.getChildAt(position).setBackgroundColor(Color.RED);
-                    idsToRemove.add(locName);
-                    checkedStatus.put(locName,true);
+                        // Set the  CAB title according to total checked items
+
+                        // Calls  toggleSelection method from ListViewAdapter Class
+
+                        // Count no.  of selected item and print it
+                        mode.setTitle(checkedCount + "  Selected");
+                        return true;
+                    case R.id.delete:
+                        // Add  dialog for confirmation to delete selected item
+                        // record.
+                        AlertDialog.Builder builder = new AlertDialog.Builder(
+                                UnpostMessageActivity.this);
+                        builder.setMessage("Do you  want to delete selected record(s)?");
+
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO  Auto-generated method stub
+
+                            }
+                        });
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO  Auto-generated method stub
+                                SparseBooleanArray selected = adapter
+                                        .getSelectedIds();
+                                for (int i = (selected.size() - 1); i >= 0; i--) {
+                                    if (selected.valueAt(i)) {
+                                        String selecteditem = adapter
+                                                .getItem(selected.keyAt(i));
+                                        // Remove  selected items following the ids
+                                        idsToRemove.add(selecteditem.split("Id: ")[1]);
+                                        adapter.remove(selecteditem);
+                                    }
+                                }
+
+                                // Close CAB
+                                mode.finish();
+                                selected.clear();
+
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        //alert.setIcon(R.drawable.questionicon);// dialog  Icon
+                        alert.setTitle("Confirmation"); // dialog  Title
+                        alert.show();
+                        return true;
+                    default:
+                        return false;
                 }
             }
-        });
 
-        bDeleteItems.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                deleteSelectedItems();
+            public void onDestroyActionMode(android.view.ActionMode mode) {
+
             }
         });
-    }
-
-    public void deleteSelectedItems() {
-        int i = 0;
-        int e = 0;
-        for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
-            if(entry.getValue().equals(true)){
-                listItems.remove(i-e);
-                listView.getChildAt(i).setBackgroundColor(bColor);
-                e++;
-            }
-            i++;
-        }
-        checkedStatus.values().removeAll(Collections.singleton(true));
-        adapter.notifyDataSetChanged();
     }
 
     @Override

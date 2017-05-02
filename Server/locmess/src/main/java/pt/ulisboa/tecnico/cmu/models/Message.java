@@ -58,19 +58,19 @@ public class Message {
   public boolean isInWhiteList(HashMap<String,Set<String>> userKeys){
     System.out.println(this.whitelist);
     if(this.whitelist.size()==0) return true;
-    for(Map.Entry<String,Set<String>> e : userKeys.entrySet()) {
+    if(userKeys.size()==0) return false;
+    for(Map.Entry<String,Set<String>> e : this.whitelist.entrySet()) {
        String key = e.getKey();
-       if (whitelist.containsKey(key)){
+       if (userKeys.containsKey(key)){
          Set<String> value = e.getValue();
-         for (String s : value) {
-           if(!whitelist.get(key).contains(s)){
-             return false;
-           }
+         if(!userKeys.get(key).containsAll(value)){
+           return false;
          }
-         return true;
+       }else{
+         return false;
        }
      }
-    return false;
+    return true;
   }
 
   public boolean isInBackList(HashMap<String,Set<String>> userKeys){

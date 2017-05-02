@@ -19,7 +19,7 @@ public class Server{
     setUser.add("one");
     setUser.add("two");
 
-    System.out.println(setWhite.contains(setUserz));
+    System.out.println(setWhite.containsAll(setUser));
 
     System.out.println( "Server address: http://localhost:" + args[0]);
     //secure("deploy/keystore.jks", "password", null, null);

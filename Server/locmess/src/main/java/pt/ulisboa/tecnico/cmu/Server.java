@@ -9,18 +9,7 @@ public class Server{
     GpsLocation gps=new GpsLocation( "LARANJEIRAS",  38.755997,  -9.176876, 800);
     boolean dist=gps.inRadius(38.755936,-9.171843);
     System.out.println(dist);
-    Set<String>  setWhite = new HashSet<String>();
-    setWhite.add("one");
-    setWhite.add("three");
-    setWhite.add("two");
-
-    Set<String> setUser;
-    setUser = new HashSet<String>();
-    setUser.add("one");
-    setUser.add("two");
-
-    System.out.println(setWhite.containsAll(setUser));
-
+    
     System.out.println( "Server address: http://localhost:" + args[0]);
     //secure("deploy/keystore.jks", "password", null, null);
     port(Integer.parseInt(args[0]));

@@ -15,28 +15,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity">
+        <activity android:name=".Activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".UserAreaActivity" />
-        <activity android:name=".MainMenuActivity" />
-        <activity android:name=".RemovableItemListActivity" />
-        <activity android:name=".ListLocationsActivity" />
-        <activity android:name=".CreateLocationActivity" />
-        <activity android:name=".PostMessageActivity" />
-        <activity android:name=".UnpostMessageActivity" />
-        <activity android:name=".UserProfileActivity" />
-        <activity android:name=".SSIDActivity" />
+        <activity android:name=".Activities.RegisterActivity" />
+        <activity android:name=".Activities.UserAreaActivity" />
+        <activity android:name=".Activities.MainMenuActivity" />
+        <activity android:name=".Activities.RemovableItemListActivity" />
+        <activity android:name=".Activities.ListLocationsActivity" />
+        <activity android:name=".Activities.CreateLocationActivity" />
+        <activity android:name=".Activities.PostMessageActivity" />
+        <activity android:name=".Activities.UnpostMessageActivity" />
+        <activity android:name=".Activities.UserProfileActivity" />
+        <activity android:name=".Activities.SSIDActivity" />
 
         <service
             android:name=".NotificationService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".Activities.ReadMessagesActivity"></activity>
     </application>
 
 </manifest>

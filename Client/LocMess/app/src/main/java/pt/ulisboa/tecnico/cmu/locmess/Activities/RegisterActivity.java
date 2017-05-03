@@ -1,6 +1,5 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +19,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
+
+import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class RegisterActivity extends AppCompatActivity {
 

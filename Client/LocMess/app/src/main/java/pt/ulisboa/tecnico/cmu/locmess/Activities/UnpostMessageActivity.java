@@ -1,43 +1,33 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Activities;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.view.ActionMode;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AbsListView;
 import android.widget.ListView;
-import pt.ulisboa.tecnico.cmu.locmess.MyListViewAdapter;
-
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RemovableItemListActivity extends AppCompatActivity {
-    ArrayList<Location> locations = new ArrayList<Location>();
-    ArrayList<String> locationsToRemove= new ArrayList<String>();
+import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
+import pt.ulisboa.tecnico.cmu.locmess.MyListViewAdapter;
+import pt.ulisboa.tecnico.cmu.locmess.R;
+
+public class UnpostMessageActivity extends AppCompatActivity {
+
+    ArrayList<Message> messages = new ArrayList<Message>();
+    ArrayList<String> idsToRemove = new ArrayList<String>();
     ListView listView;
+    Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     MyListViewAdapter adapter;
     List<String> myList;
 
@@ -48,40 +38,39 @@ public class RemovableItemListActivity extends AppCompatActivity {
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         this.setTitle("Select locations to remove");
 
-        locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+        messages = (ArrayList<Message>) getIntent().getSerializableExtra("messages");
 
-        if(getSupportActionBar()!=null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        myList = new  ArrayList<String>();
+        myList = new ArrayList<String>();
 
-        for(Location loc : locations){
-            if(!(loc.getSSID() == null)){
-                myList.add(loc.getSSID()+" =  ");
-            }
-            else{
-                String coordinates = "Lat: " + loc.getCoordinates().getLatitude() + ", Lon: " +
-                        loc.getCoordinates().getLongitude();
-                myList.add(loc.getName()+" = "+coordinates);
-            }
+        for (Message msg : messages) {
+            String coordinates = "Loc: " + msg.getLocation().getName() + ", Eding Date/Time: " +
+                    msg.getTimeWindow().getEndingDay() + "/" +
+                    msg.getTimeWindow().getEndingMonth() + "/" +
+                    msg.getTimeWindow().getEndingYear() + " " +
+                    msg.getTimeWindow().getEndingHour() + ":" +
+                    msg.getTimeWindow().getEndingMinutes() + ", Id: " + msg.getId();
+            myList.add(msg.getTitle() + " = " + coordinates);
         }
 
-        listView = (ListView)  findViewById(R.id.lvRemovableItemList);
+        listView = (ListView) findViewById(R.id.lvRemovableItemList);
         // Pass value to MyListViewAdapter  Class
         adapter = new MyListViewAdapter(this, R.layout.list_item, myList);
         // Binds the Adapter to the ListView
         listView.setAdapter(adapter);
         // define Choice mode for multiple  delete
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        listView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
                 // TODO  Auto-generated method stub
-                final int checkedCount  = listView.getCheckedItemCount();
+                final int checkedCount = listView.getCheckedItemCount();
                 // Set the  CAB title according to total checked items
-                mode.setTitle(checkedCount  + "  Selected");
+                mode.setTitle(checkedCount + "  Selected");
                 // Calls  toggleSelection method from ListViewAdapter Class
                 adapter.toggleSelection(position);
             }
@@ -122,10 +111,10 @@ public class RemovableItemListActivity extends AppCompatActivity {
                         // Add  dialog for confirmation to delete selected item
                         // record.
                         AlertDialog.Builder builder = new AlertDialog.Builder(
-                                RemovableItemListActivity.this);
+                                UnpostMessageActivity.this);
                         builder.setMessage("Do you  want to delete selected record(s)?");
 
-                        builder.setNegativeButton("No", new OnClickListener() {
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -133,7 +122,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
                             }
                         });
-                        builder.setPositiveButton("Yes", new OnClickListener() {
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -145,7 +134,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
                                         String selecteditem = adapter
                                                 .getItem(selected.keyAt(i));
                                         // Remove  selected items following the ids
-                                        locationsToRemove.add(selecteditem.split(" = ")[0]);
+                                        idsToRemove.add(selecteditem.split("Id: ")[1]);
                                         adapter.remove(selecteditem);
                                     }
                                 }
@@ -175,6 +164,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
     }
 
     @Override
@@ -182,7 +172,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
         if(item.getItemId()==android.R.id.home){
             Intent returnIntent = new Intent();
-            returnIntent.putExtra("locationsRemoved",locationsToRemove);
+            returnIntent.putExtra("ids",idsToRemove);
             setResult(Activity.RESULT_OK,returnIntent);
             finish();
         }

@@ -1,6 +1,8 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Models;
 
 import java.io.Serializable;
+
+import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 
 /**
  * Created by wazamaisers on 25-03-2017.

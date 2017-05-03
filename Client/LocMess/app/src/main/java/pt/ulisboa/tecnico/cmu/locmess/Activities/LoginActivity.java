@@ -1,24 +1,12 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.app.Activity;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.util.SparseBooleanArray;
-import android.view.ActionMode;
-import android.view.Menu;
 import android.view.MenuItem;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import android.widget.AbsListView.MultiChoiceModeListener;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,14 +18,15 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import pt.ulisboa.tecnico.cmu.locmess.R;
+
 public class LoginActivity extends AppCompatActivity {
 
-    String SERVER_IP = "192.168.43.68:8080";
+    String SERVER_IP = "192.168.1.92:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

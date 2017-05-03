@@ -1,7 +1,6 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Activities;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -26,16 +24,18 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
+import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
+import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
+import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -63,6 +63,7 @@ public class MainMenuActivity extends AppCompatActivity {
         final ImageButton bCreateLocations = (ImageButton) findViewById(R.id.ibCreateLocations);
         final Button bPostMessage = (Button) findViewById(R.id.ibPostMessage);
         final ImageButton bUnpostMessage = (ImageButton) findViewById(R.id.ibUnpostMessages);
+        final ImageButton bReadMessages = (ImageButton) findViewById(R.id.ibReadMessages);
 
         //Display back button on top
         if(getSupportActionBar()!=null){
@@ -122,6 +123,15 @@ public class MainMenuActivity extends AppCompatActivity {
                 listLocations("remove");
             }
         });
+
+        bReadMessages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent readMessagesIntent = new Intent(MainMenuActivity.this, ReadMessagesActivity.class);
+                startActivity(readMessagesIntent);
+            }
+        });
+
     }
 
     public void dimiss(DialogInterface dialog){

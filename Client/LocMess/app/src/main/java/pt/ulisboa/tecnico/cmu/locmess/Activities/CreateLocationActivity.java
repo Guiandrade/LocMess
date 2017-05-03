@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
+import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class CreateLocationActivity extends AppCompatActivity {
 

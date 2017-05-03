@@ -13,10 +13,8 @@ import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -24,7 +22,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -34,13 +31,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import pt.ulisboa.tecnico.cmu.locmess.Activities.UserAreaActivity;
 
 public class NotificationService extends Service {
 
@@ -58,7 +56,7 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SERVER_IP = "192.168.43.68:8080";
+        SERVER_IP = "192.168.1.92:8080";
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
         timer = new Timer();
@@ -122,7 +120,6 @@ public class NotificationService extends Service {
     private void checkMessage(JSONObject obj){
         try{
             SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
-
             Set<String> messagesSet = prefs.getStringSet("messages", null);
             if(messagesSet==null){
                 messagesSet = new HashSet<String>();

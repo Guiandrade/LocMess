@@ -1,8 +1,10 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 
 /**
  * Created by wazamaisers on 27-03-2017.

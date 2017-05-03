@@ -1,7 +1,5 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Activities;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +10,9 @@ import android.widget.SimpleAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class ListLocationsActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.cmu.locmess;
+package pt.ulisboa.tecnico.cmu.locmess.Models;
 
 import java.io.Serializable;
 

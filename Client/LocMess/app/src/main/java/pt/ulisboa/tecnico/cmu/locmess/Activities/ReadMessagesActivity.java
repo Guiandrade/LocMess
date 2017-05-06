@@ -76,7 +76,7 @@ public class ReadMessagesActivity extends AppCompatActivity {
                 }
             }
         }
-        
+
         List<HashMap<String, String>> listItems = new ArrayList<>();
         SimpleAdapter adapter = new SimpleAdapter(this, listItems, R.layout.list_item,
                 new String[]{"First Line", "Second Line"},

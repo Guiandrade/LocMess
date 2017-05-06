@@ -174,13 +174,27 @@ public class PostMessageActivity extends AppCompatActivity {
                         Integer.parseInt(endDate.split("/")[1]),
                         Integer.parseInt(endDate.split("/")[2]));
 
-                Message msg = new Message(title,message,owner,location,whitelistKeyPairs,
+                final Message msg = new Message(title,message,owner,location,whitelistKeyPairs,
                         blacklistKeyPairs,timeWindow);
 
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("messagePosted",msg);
-                setResult(Activity.RESULT_OK,returnIntent);
-                finish();
+                final Intent returnIntent = new Intent();
+                CharSequence [] items = {"Centralized","Decentralized"};
+                new AlertDialog.Builder(PostMessageActivity.this)
+                        .setSingleChoiceItems(items, 0, null)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+                                if(selectedPosition == 0){
+                                    returnIntent.putExtra("messagePosted",msg);
+                                    setResult(Activity.RESULT_OK,returnIntent);
+                                    finish();
+                                }
+                                else{
+                                    // to do
+                                }
+                            }
+                        })
+                        .show();
             }
         });
 

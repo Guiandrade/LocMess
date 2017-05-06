@@ -20,19 +20,16 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import pt.ulisboa.tecnico.cmu.locmess.Http;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class RegisterActivity extends AppCompatActivity {
-
-    String SERVER_IP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         this.setTitle("LocMess - Register");
-
-        SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
 
         final EditText etUsername = (EditText) findViewById(R.id.etUsername);
         final EditText etPassword = (EditText) findViewById(R.id.etPassword);
@@ -57,10 +54,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void register(final String username, String password, View v){
 
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/signup";
         JSONObject jsonBody = new JSONObject();
+
         try{
             jsonBody.put("username",username);
             jsonBody.put("password",password);
@@ -68,48 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         }
 
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                    try{
-                        if(response.get("status").toString().equals("ok")){
-                            SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putString("token",response.getString("token"));
-                            editor.putString("username",username);
-                            editor.apply();
-                            //Toast.makeText(RegisterActivity.this, "Status: "+ response.toString(), Toast.LENGTH_LONG).show();
-                            Intent loginIntent = new Intent(RegisterActivity.this, UserAreaActivity.class);
-                            loginIntent.putExtra("serverIP", SERVER_IP);
-                            startActivity(loginIntent);
-                        }
-                        else{
-                            try{
-                                Toast.makeText(RegisterActivity.this, "Status: "+ response.get("status"), Toast.LENGTH_LONG).show();
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
-                        }
-                    }catch(Exception e){
-                        e.printStackTrace();
-                    }
-
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        try{
-                            Toast.makeText(RegisterActivity.this, "Error: "+ new String(error.networkResponse.data,"UTF-8"), Toast.LENGTH_LONG).show();
-                        }catch (Exception e){
-                            e.printStackTrace();
-                            Toast.makeText(RegisterActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-        queue.add(jsObjRequest);
+        new Http().session(jsonBody,this,"register");
     }
 
     @Override

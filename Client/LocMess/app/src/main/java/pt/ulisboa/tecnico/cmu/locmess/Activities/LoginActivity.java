@@ -22,11 +22,10 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import pt.ulisboa.tecnico.cmu.locmess.Http;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class LoginActivity extends AppCompatActivity {
-
-    String SERVER_IP = "192.168.43.143:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         String token = sharedPreferences.getString("token","");
         if(!(token.equals(""))){
             Intent loginIntent = new Intent(LoginActivity.this, UserAreaActivity.class);
-            loginIntent.putExtra("serverIP", SERVER_IP);
+            loginIntent.putExtra("serverIP", new Http().getServerIp());
             startActivity(loginIntent);
         }
 
@@ -57,7 +56,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                registerIntent.putExtra("serverIP", SERVER_IP);
                 startActivity(registerIntent);
             }
         });
@@ -90,10 +88,8 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login(final String username, String password){
 
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/login";
         JSONObject jsonBody = new JSONObject();
+
         try{
             jsonBody.put("username",username);
             jsonBody.put("password",password);
@@ -101,46 +97,6 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                try{
-                    if(response.get("status").toString().equals("ok")){
-                        SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("token",response.getString("token"));
-                        editor.putString("username",username);
-                        editor.apply();
-                        Intent loginIntent = new Intent(LoginActivity.this, UserAreaActivity.class);
-                        loginIntent.putExtra("serverIP", SERVER_IP);
-                        startActivity(loginIntent);
-                    }
-                    else{
-                        try{
-                            Toast.makeText(LoginActivity.this, "Status: "+ response.get("status"), Toast.LENGTH_LONG).show();
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                try{
-                    Toast.makeText(LoginActivity.this, "Error: "+ new String(error.networkResponse.data,"UTF-8"), Toast.LENGTH_LONG).show();
-                }catch (Exception e){
-                    e.printStackTrace();
-                    Toast.makeText(LoginActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        queue.add(jsObjRequest);
+        new Http().session(jsonBody,this,"login");
     }
 }

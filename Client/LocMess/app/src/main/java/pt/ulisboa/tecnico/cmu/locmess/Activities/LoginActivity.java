@@ -26,7 +26,7 @@ import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class LoginActivity extends AppCompatActivity {
 
-    String SERVER_IP = "192.168.1.92:8080";
+    String SERVER_IP = "192.168.43.143:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

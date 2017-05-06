@@ -74,7 +74,6 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
         final TextView tvUsername = (TextView) findViewById(R.id.tvUsername);
-        final Button bDeleteKeyPairs = (Button) findViewById(R.id.bDeleteKeyPairs);
         final Button bAddKeyPair = (Button) findViewById(R.id.bAddKeyPair);
 
         tvUsername.setText(username);
@@ -231,29 +230,6 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
 
-
-        bDeleteKeyPairs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteSelectedItems();
-            }
-        });
-    }
-
-    public void deleteSelectedItems() {
-        int i = 0;
-        int e = 0;
-        for (LinkedHashMap.Entry<String, Boolean> entry : checkedStatus.entrySet()) {
-            if(entry.getValue().equals(true)){
-                lvKeyPairs.getChildAt(i).setBackgroundColor(bColor);
-                addToDeletedPairs(pairs.get(i-e));
-                pairs.remove(i-e);
-                e++;
-            }
-            i++;
-        }
-        checkedStatus.values().removeAll(Collections.singleton(true));
-        adapter.notifyDataSetChanged();
     }
 
     @Override

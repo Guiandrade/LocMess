@@ -51,9 +51,12 @@ public class PostMessageActivity extends AppCompatActivity {
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     private ArrayList<String> keyPairsWhitelist = new ArrayList<String>();
     private ArrayList<String> keyPairsBlacklist = new ArrayList<String>();
-    MyListViewAdapter adapter;
-    ListView listView;
-    List<String> myList;
+    MyListViewAdapter adapterWhite;
+    MyListViewAdapter adapterBlack;
+    ListView listViewWhite;
+    ListView listViewBlack;
+    List<String> myListWhite = new ArrayList<String>();;
+    List<String> myListBlack = new ArrayList<String>();;
     private String endTime = "";
     private String endDate = "";
     private String beginTime = "";
@@ -293,25 +296,24 @@ public class PostMessageActivity extends AppCompatActivity {
                 final AutoCompleteTextView acKey = (AutoCompleteTextView) keyPairsDialog.findViewById(R.id.acKey);
                 final EditText etPair = (EditText) keyPairsDialog.findViewById(R.id.etPair);
                 final Button bAddPair = (Button) keyPairsDialog.findViewById(R.id.bAddPair);
-                final Button bDeletePair = (Button) keyPairsDialog.findViewById(R.id.bDeletePair);
 
-                myList = new  ArrayList<String>();
-                listView = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
 
-                adapter = new MyListViewAdapter(v.getContext(), R.layout.list_item, myList);
+                listViewBlack = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
+
+                adapterBlack = new MyListViewAdapter(v.getContext(), R.layout.list_item, myListBlack);
                 // Binds the Adapter to the ListView
-                listView.setAdapter(adapter);
+                listViewBlack.setAdapter(adapterBlack);
                 // define Choice mode for multiple  delete
-                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-                listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+                listViewBlack.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                listViewBlack.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
                     @Override
                     public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
                         // TODO  Auto-generated method stub
-                        final int checkedCount  = listView.getCheckedItemCount();
+                        final int checkedCount  = listViewBlack.getCheckedItemCount();
                         // Set the  CAB title according to total checked items
                         mode.setTitle(checkedCount  + "  Selected");
                         // Calls  toggleSelection method from ListViewAdapter Class
-                        adapter.toggleSelection(position);
+                        adapterBlack.toggleSelection(position);
                     }
 
                     @Override
@@ -331,12 +333,12 @@ public class PostMessageActivity extends AppCompatActivity {
                         switch (item.getItemId()) {
                             case R.id.selectAll:
                                 //
-                                final int checkedCount = myList.size();
+                                final int checkedCount = myListBlack.size();
                                 // If item  is already selected or checked then remove or
                                 // unchecked  and again select all
-                                adapter.removeSelection();
+                                adapterBlack.removeSelection();
                                 for (int i = 0; i < checkedCount; i++) {
-                                    listView.setItemChecked(i, true);
+                                    listViewBlack.setItemChecked(i, true);
                                     //  listviewadapter.toggleSelection(i);
                                 }
                                 // Set the  CAB title according to total checked items
@@ -366,15 +368,15 @@ public class PostMessageActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         // TODO  Auto-generated method stub
-                                        SparseBooleanArray selected = adapter
+                                        SparseBooleanArray selected = adapterBlack
                                                 .getSelectedIds();
                                         for (int i = (selected.size() - 1); i >= 0; i--) {
                                             if (selected.valueAt(i)) {
-                                                String selecteditem = adapter
+                                                String selecteditem = adapterBlack
                                                         .getItem(selected.keyAt(i));
                                                 // Remove  selected items following the ids
                                                 keyPairsBlacklist.remove(selecteditem);
-                                                adapter.remove(selecteditem);
+                                                adapterBlack.remove(selecteditem);
                                             }
                                         }
 
@@ -421,8 +423,8 @@ public class PostMessageActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String pair = acKey.getText().toString() + " = " + etPair.getText().toString();
                         keyPairsBlacklist.add(pair);
-                        myList.add(pair);
-                        adapter.notifyDataSetChanged();
+                        myListBlack.add(pair);
+                        adapterBlack.notifyDataSetChanged();
                         /*String res = "";
                         for(String str : keyPairsList){
                             res = res + "||" + str;
@@ -450,25 +452,23 @@ public class PostMessageActivity extends AppCompatActivity {
                 final AutoCompleteTextView acKey = (AutoCompleteTextView) keyPairsDialog.findViewById(R.id.acKey);
                 final EditText etPair = (EditText) keyPairsDialog.findViewById(R.id.etPair);
                 final Button bAddPair = (Button) keyPairsDialog.findViewById(R.id.bAddPair);
-                final Button bDeletePair = (Button) keyPairsDialog.findViewById(R.id.bDeletePair);
 
-                myList = new  ArrayList<String>();
-                listView = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
+                listViewWhite = (ListView) keyPairsDialog.findViewById(R.id.lvPairs);
 
-                adapter = new MyListViewAdapter(v.getContext(), R.layout.list_item, myList);
+                adapterWhite = new MyListViewAdapter(v.getContext(), R.layout.list_item, myListWhite);
                 // Binds the Adapter to the ListView
-                listView.setAdapter(adapter);
+                listViewWhite.setAdapter(adapterWhite);
                 // define Choice mode for multiple  delete
-                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-                listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+                listViewWhite.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                listViewWhite.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
                     @Override
                     public void onItemCheckedStateChanged(android.view.ActionMode mode, int position, long id, boolean checked) {
                         // TODO  Auto-generated method stub
-                        final int checkedCount  = listView.getCheckedItemCount();
+                        final int checkedCount  = listViewWhite.getCheckedItemCount();
                         // Set the  CAB title according to total checked items
                         mode.setTitle(checkedCount  + "  Selected");
                         // Calls  toggleSelection method from ListViewAdapter Class
-                        adapter.toggleSelection(position);
+                        adapterWhite.toggleSelection(position);
                     }
 
                     @Override
@@ -488,12 +488,12 @@ public class PostMessageActivity extends AppCompatActivity {
                         switch (item.getItemId()) {
                             case R.id.selectAll:
                                 //
-                                final int checkedCount = myList.size();
+                                final int checkedCount = myListWhite.size();
                                 // If item  is already selected or checked then remove or
                                 // unchecked  and again select all
-                                adapter.removeSelection();
+                                adapterWhite.removeSelection();
                                 for (int i = 0; i < checkedCount; i++) {
-                                    listView.setItemChecked(i, true);
+                                    listViewWhite.setItemChecked(i, true);
                                     //  listviewadapter.toggleSelection(i);
                                 }
                                 // Set the  CAB title according to total checked items
@@ -523,15 +523,15 @@ public class PostMessageActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         // TODO  Auto-generated method stub
-                                        SparseBooleanArray selected = adapter
+                                        SparseBooleanArray selected = adapterWhite
                                                 .getSelectedIds();
                                         for (int i = (selected.size() - 1); i >= 0; i--) {
                                             if (selected.valueAt(i)) {
-                                                String selecteditem = adapter
+                                                String selecteditem = adapterWhite
                                                         .getItem(selected.keyAt(i));
                                                 // Remove  selected items following the ids
                                                 keyPairsWhitelist.remove(selecteditem);
-                                                adapter.remove(selecteditem);
+                                                adapterWhite.remove(selecteditem);
                                             }
                                         }
 
@@ -578,8 +578,8 @@ public class PostMessageActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String pair = acKey.getText().toString() + " = " + etPair.getText().toString();
                         keyPairsWhitelist.add(pair);
-                        checkedStatus.put(pair,false);
-                        adapterList.notifyDataSetChanged();
+                        myListWhite.add(pair);
+                        adapterWhite.notifyDataSetChanged();
                     }
                 });
             }

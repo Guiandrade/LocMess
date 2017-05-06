@@ -38,7 +38,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Activities.ReadMessagesActivity"></activity>
+        <activity android:name=".Activities.ReadMessagesActivity" />
+        <activity android:name=".Activities.MessageActivity"></activity>
     </application>
 
 </manifest>

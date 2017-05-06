@@ -38,7 +38,12 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import pt.ulisboa.tecnico.cmu.locmess.Activities.MessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.UserAreaActivity;
+import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
+import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
+import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 
 public class NotificationService extends Service {
 
@@ -56,7 +61,7 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SERVER_IP = "192.168.1.92:8080";
+        SERVER_IP = "192.168.43.143:8080";
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
         timer = new Timer();
@@ -68,7 +73,6 @@ public class NotificationService extends Service {
                 ArrayList<String> locations = getLocations();
                 getSSIDs();
                 getNearbyMessages(locations, SSIDs);
-                System.out.println("CONAAAAAA");
             }
         }, 0, 5000);
         return START_STICKY;
@@ -204,13 +208,37 @@ public class NotificationService extends Service {
 
     public void launchNotification(JSONObject message){
         String username = new String();
+        Message mssg = null;
         try{
             username = message.get("username").toString();
+
+            Location location = new Location(message.get("location").toString(),(Coordinates) null);
+            int initHour = Integer.parseInt(message.get("initTime").toString().split(":")[0]);
+            int initMinute = Integer.parseInt(message.get("initTime").toString().split(":")[1].split("-")[0]);
+            int initDay = Integer.parseInt(message.get("initTime").toString().split("/")[0].split("-")[1]);
+            int initMonth = Integer.parseInt(message.get("initTime").toString().split("/")[1]);
+            int initYear = Integer.parseInt(message.get("initTime").toString().split("/")[2]);
+            int endHour = Integer.parseInt(message.get("endTime").toString().split(":")[0]);
+            int endMinute = Integer.parseInt(message.get("endTime").toString().split(":")[1].split("-")[0]);
+            int endDay = Integer.parseInt(message.get("endTime").toString().split("/")[0].split("-")[1]);
+            int endMonth = Integer.parseInt(message.get("endTime").toString().split("/")[1]);
+            int endYear = Integer.parseInt(message.get("endTime").toString().split("/")[2]);
+
+            TimeWindow timeWindow = new TimeWindow(initHour,initMinute,initDay,initMonth,
+                    initYear,endHour,endMinute,endDay,endMonth,endYear);
+
+            String id = message.get("id").toString();
+            String msg = message.get("body").toString();
+            String owner = message.get("username").toString();
+            String title = message.get("title").toString();
+
+            mssg = new Message(id,title,msg,owner,location,null,null,timeWindow);
         }catch (Exception e){
 
         }
 
-        final Intent intent = new Intent(this, UserAreaActivity.class);
+        final Intent intent = new Intent(this, MessageActivity.class);
+        intent.putExtra("Message",mssg);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)

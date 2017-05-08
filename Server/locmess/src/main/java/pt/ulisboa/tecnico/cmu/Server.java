@@ -9,9 +9,9 @@ public class Server{
     GpsLocation gps=new GpsLocation( "LARANJEIRAS",  38.755997,  -9.176876, 800);
     boolean dist=gps.inRadius(38.755936,-9.171843);
     System.out.println(dist);
-    
+
     System.out.println( "Server address: http://localhost:" + args[0]);
-    //secure("deploy/keystore.jks", "password", null, null);
+    secure("deploy/keystore.jks", "password", null, null);
     port(Integer.parseInt(args[0]));
     Routes routes= new Routes();
     routes.verification();

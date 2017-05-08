@@ -10,11 +10,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -23,12 +28,16 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +61,7 @@ public class NotificationService extends Service {
     Timer timer;
     String token;
     String SERVER_IP;
+    private Location location;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -70,17 +80,32 @@ public class NotificationService extends Service {
             @Override
             public void run()
             {
-                ArrayList<String> locations = getLocations();
+                getLocation();
                 getSSIDs();
-                getNearbyMessages(locations, SSIDs);
+                LocationModel loc = new LocationModel("",new Coordinates("0", "0"));
+                if(!(location==null)){
+                    loc = new LocationModel("",new Coordinates(String.valueOf(location.getLatitude()),
+                            String.valueOf(location.getLongitude())));
+                }
+                getNearbyMessages(loc, SSIDs);
             }
         }, 0, 5000);
         return START_STICKY;
     }
 
-    public ArrayList<String> getLocations(){
-        ArrayList<String> lst = new ArrayList<String>();
-        return lst;
+    private void getLocation(){
+        Log.d("Service","getLocation");
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this,Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            String bestProvider = String.valueOf(manager.getBestProvider(new Criteria(), true));
+            try {
+                location = manager.getLastKnownLocation(bestProvider);
+            }
+            catch (SecurityException e){ }
+        }
     }
 
     public void getSSIDs() {
@@ -143,7 +168,7 @@ public class NotificationService extends Service {
         catch (JSONException e){ }
     }
 
-    public void getNearbyMessages(ArrayList<String> locations, final ArrayList<String> ssids){
+    public void getNearbyMessages(LocationModel location, final ArrayList<String> ssids){
         for(String ssid: ssids){
             System.out.println("A VER A NET: "+ ssid);
         }
@@ -152,8 +177,8 @@ public class NotificationService extends Service {
         String url = "http://" + SERVER_IP + "/messages";
         JSONObject jsonBody = new JSONObject();
         try{
-            jsonBody.put("latitude","55.555555");
-            jsonBody.put("longitude","55.555555");
+            jsonBody.put("latitude",location.getCoordinates().getLatitude().toString());
+            jsonBody.put("longitude",location.getCoordinates().getLongitude().toString());
             jsonBody.put("ssids",new JSONArray(ssids));
         }catch (Exception e){
 

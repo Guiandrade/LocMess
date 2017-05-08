@@ -23,7 +23,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class SSIDActivity extends AppCompatActivity {
@@ -50,7 +50,7 @@ public class SSIDActivity extends AppCompatActivity {
         bAddSSID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Location ssid = new Location(spSSID.getSelectedItem().toString());
+                LocationModel ssid = new LocationModel(spSSID.getSelectedItem().toString());
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("locationCreated",ssid);
                 setResult(Activity.RESULT_OK,returnIntent);

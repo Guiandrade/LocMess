@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.MyListViewAdapter;
@@ -45,7 +45,7 @@ import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class PostMessageActivity extends AppCompatActivity {
 
-    ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
     ArrayAdapter<String> adapterList;
     ArrayAdapter<String> adapterAutoComplete;
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
@@ -74,7 +74,7 @@ public class PostMessageActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+        locations = (ArrayList<LocationModel>) getIntent().getSerializableExtra("locations");
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         username = sharedPreferences.getString("username","");
 
@@ -106,7 +106,7 @@ public class PostMessageActivity extends AppCompatActivity {
         List<String> spinnerLocationsArray =  new ArrayList<String>();
         spinnerLocationsArray.clear();
         spinnerLocationsArray.add("SELECT LOCATION");
-        for(Location loc : locations){
+        for(LocationModel loc : locations){
             if(!(loc.getSSID() == null)){
                 spinnerLocationsArray.add(loc.getSSID());
             }
@@ -125,8 +125,8 @@ public class PostMessageActivity extends AppCompatActivity {
                 String title = etTitle.getText().toString();
                 String message = etMessage.getText().toString();
                 String locationSelected = sSelectLocation.getSelectedItem().toString();
-                Location location = null;
-                for(Location loc : locations){
+                LocationModel location = null;
+                for(LocationModel loc : locations){
                     if(!(loc.getSSID() == null)) {
                         if ((loc.getSSID()).equals(locationSelected)) {
                             location = loc;

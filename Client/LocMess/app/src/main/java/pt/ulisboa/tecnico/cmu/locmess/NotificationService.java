@@ -41,7 +41,7 @@ import java.util.TimerTask;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.MessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.UserAreaActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 
@@ -61,7 +61,7 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SERVER_IP = "192.168.43.143:8080";
+        SERVER_IP = "192.168.1.183:8080";
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
         timer = new Timer();
@@ -212,7 +212,7 @@ public class NotificationService extends Service {
         try{
             username = message.get("username").toString();
 
-            Location location = new Location(message.get("location").toString(),(Coordinates) null);
+            LocationModel location = new LocationModel(message.get("location").toString(),(Coordinates) null);
             int initHour = Integer.parseInt(message.get("initTime").toString().split(":")[0]);
             int initMinute = Integer.parseInt(message.get("initTime").toString().split(":")[1].split("-")[0]);
             int initDay = Integer.parseInt(message.get("initTime").toString().split("/")[0].split("-")[1]);

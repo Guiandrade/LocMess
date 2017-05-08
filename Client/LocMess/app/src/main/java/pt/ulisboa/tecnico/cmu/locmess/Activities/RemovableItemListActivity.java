@@ -14,7 +14,7 @@ import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.widget.AbsListView.MultiChoiceModeListener;
 
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.MyListViewAdapter;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RemovableItemListActivity extends AppCompatActivity {
-    ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
     ArrayList<String> locationsToRemove= new ArrayList<String>();
     ListView listView;
     MyListViewAdapter adapter;
@@ -36,7 +36,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         this.setTitle("Select locations to remove");
 
-        locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+        locations = (ArrayList<LocationModel>) getIntent().getSerializableExtra("locations");
 
         if(getSupportActionBar()!=null){
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -45,7 +45,7 @@ public class RemovableItemListActivity extends AppCompatActivity {
 
         myList = new  ArrayList<String>();
 
-        for(Location loc : locations){
+        for(LocationModel loc : locations){
             if(!(loc.getSSID() == null)){
                 myList.add(loc.getSSID()+" =  ");
             }

@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class CreateLocationActivity extends AppCompatActivity {
@@ -40,7 +40,7 @@ public class CreateLocationActivity extends AppCompatActivity {
                 Coordinates coordinates = new Coordinates(etLatitude.getText().toString(),
                         etLongitude.getText().toString(),
                         etRadius.getText().toString());
-                Location location = new Location(etLocationName.getText().toString(),coordinates);
+                LocationModel location = new LocationModel(etLocationName.getText().toString(),coordinates);
 
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra("locationCreated",location);

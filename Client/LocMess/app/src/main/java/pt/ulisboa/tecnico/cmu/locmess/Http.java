@@ -23,7 +23,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Activities.UserAreaActivity;
 
 public class Http {
 
-    String SERVER_IP = "192.168.43.143:8080";
+    String SERVER_IP = "192.168.1.183:8080";
 
     public String getServerIp(){
         return SERVER_IP;

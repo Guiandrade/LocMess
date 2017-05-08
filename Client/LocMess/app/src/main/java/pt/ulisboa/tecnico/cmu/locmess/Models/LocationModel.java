@@ -8,7 +8,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
  * Created by wazamaisers on 25-03-2017.
  */
 
-public class Location implements Serializable{
+public class LocationModel implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -16,12 +16,12 @@ public class Location implements Serializable{
     private Coordinates coordinates;
     private String ssid;
 
-    public Location(String name, Coordinates coordinates) {
+    public LocationModel(String name, Coordinates coordinates) {
         this.name = name;
         this.coordinates = coordinates;
     }
 
-    public Location(String ssid){
+    public LocationModel(String ssid){
         this.ssid = ssid;
     }
 

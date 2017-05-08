@@ -16,12 +16,12 @@ public class Message implements Serializable {
     private String title;
     private String message;
     private String owner;
-    private Location location;
+    private LocationModel location;
     private HashMap<String, Set<String>> whitelistKeyPairs;
     private HashMap<String, Set<String>> blacklistKeyPairs;
     private TimeWindow timeWindow;
 
-    public Message(String title, String message, String owner, Location location,
+    public Message(String title, String message, String owner, LocationModel location,
                    HashMap<String, Set<String>> whitelistKeyPairs,
                    HashMap<String, Set<String>> blacklistKeyPairs, TimeWindow timeWindow) {
         this.title = title;
@@ -33,7 +33,7 @@ public class Message implements Serializable {
         this.timeWindow = timeWindow;
     }
 
-    public Message(String id, String title, String message, String owner, Location location,
+    public Message(String id, String title, String message, String owner, LocationModel location,
                    HashMap<String, Set<String>> whitelistKeyPairs,
                    HashMap<String, Set<String>> blacklistKeyPairs, TimeWindow timeWindow) {
         this.id = id;
@@ -70,11 +70,11 @@ public class Message implements Serializable {
         this.owner = owner;
     }
 
-    public Location getLocation() {
+    public LocationModel getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(LocationModel location) {
         this.location = location;
     }
 

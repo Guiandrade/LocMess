@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class ListLocationsActivity extends AppCompatActivity {
 
-    ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
 
 
     @Override
@@ -24,7 +24,7 @@ public class ListLocationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_locations);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        locations = (ArrayList<Location>) getIntent().getSerializableExtra("locations");
+        locations = (ArrayList<LocationModel>) getIntent().getSerializableExtra("locations");
         this.setTitle("List Locations");
 
         ListView locationsListView = (ListView) findViewById(R.id.lvListLocations);
@@ -39,7 +39,7 @@ public class ListLocationsActivity extends AppCompatActivity {
                 new String[]{"First Line", "Second Line"},
                 new int[]{R.id.text1,R.id.text2});
 
-        for(Location loc : locations){
+        for(LocationModel loc : locations){
             HashMap<String, String> resultsMap = new HashMap<>();
             if(!(loc.getSSID() == null)){
                 resultsMap.put("First Line", loc.getSSID());

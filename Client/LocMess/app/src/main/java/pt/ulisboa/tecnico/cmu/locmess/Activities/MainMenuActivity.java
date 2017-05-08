@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
@@ -45,7 +45,7 @@ public class MainMenuActivity extends AppCompatActivity {
     int REMOVE_LOCATIONS_REQUEST_CODE = 2;
     int POST_MESSAGE_REQUEST_CODE = 3;
     int UNPOST_MESSAGE_REQUEST_CODE = 4;
-    ArrayList<Location> locations = new ArrayList<Location>();
+    ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
     ArrayList<Message> messages = new ArrayList<Message>();
 
     @Override
@@ -143,7 +143,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
         if (requestCode == CREATE_LOCATIONS_REQUEST_CODE) {
             if(resultCode == Activity.RESULT_OK){
-                Location location = (Location) data.getSerializableExtra("locationCreated");
+                LocationModel location = (LocationModel) data.getSerializableExtra("locationCreated");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
                 createLocation(location);
             }
@@ -174,7 +174,7 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    public void createLocation(Location location){
+    public void createLocation(LocationModel location){
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
         String url = "http://" + SERVER_IP + "/locations";
@@ -460,8 +460,8 @@ public class MainMenuActivity extends AppCompatActivity {
         queue.add(jsObjRequest);
     }
 
-    public ArrayList<Location> listLocations (final String str){
-        final ArrayList<Location> locations = new ArrayList<Location>();
+    public ArrayList<LocationModel> listLocations (final String str){
+        final ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token","");
         RequestQueue queue;
@@ -478,12 +478,12 @@ public class MainMenuActivity extends AppCompatActivity {
                                     JSONObject arr = (JSONObject) response.getJSONArray("locations").get(i);
                                     if(!arr.has("ssid")){
                                         Coordinates coordinates = new Coordinates(arr.get("latitude").toString().substring(0,7),arr.get("longitude").toString().substring(0,7));
-                                        Location location = new Location(arr.get("location").toString(),coordinates);
+                                        LocationModel location = new LocationModel(arr.get("location").toString(),coordinates);
                                         locations.add(location);
                                     }
                                     else{
                                         System.out.println(arr.get("ssid").toString());
-                                        Location ssid = new Location(arr.get("ssid").toString());
+                                        LocationModel ssid = new LocationModel(arr.get("ssid").toString());
                                         locations.add(ssid);
                                     }
                                 }
@@ -542,7 +542,7 @@ public class MainMenuActivity extends AppCompatActivity {
         return locations;
     }
 
-    public ArrayList<Location> returnLocations(ArrayList<Location> locations){
+    public ArrayList<LocationModel> returnLocations(ArrayList<LocationModel> locations){
         return locations;
     }
 
@@ -578,7 +578,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     if(response.get("status").toString().equals("ok")){
                         for (int i = 0; i < response.getJSONArray("messages").length(); i++) {
                             JSONObject arr = (JSONObject) response.getJSONArray("messages").get(i);
-                            Location location = new Location(arr.get("location").toString(),(Coordinates) null);
+                            LocationModel location = new LocationModel(arr.get("location").toString(),(Coordinates) null);
                             int initHour = Integer.parseInt(arr.get("initTime").toString().split(":")[0]);
                             int initMinute = Integer.parseInt(arr.get("initTime").toString().split(":")[1].split("-")[0]);
                             int initDay = Integer.parseInt(arr.get("initTime").toString().split("/")[0].split("-")[1]);

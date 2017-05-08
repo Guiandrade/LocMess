@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
-import pt.ulisboa.tecnico.cmu.locmess.Models.Location;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
@@ -48,7 +48,7 @@ public class ReadMessagesActivity extends AppCompatActivity {
             for(String message : messagesSet){
                 try{
                     JSONObject arr = new JSONObject(message);
-                    Location location = new Location(arr.get("location").toString(),(Coordinates) null);
+                    LocationModel location = new LocationModel(arr.get("location").toString(),(Coordinates) null);
                     int initHour = Integer.parseInt(arr.get("initTime").toString().split(":")[0]);
                     int initMinute = Integer.parseInt(arr.get("initTime").toString().split(":")[1].split("-")[0]);
                     int initDay = Integer.parseInt(arr.get("initTime").toString().split("/")[0].split("-")[1]);

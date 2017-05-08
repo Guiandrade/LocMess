@@ -33,7 +33,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -42,7 +41,7 @@ import android.widget.Toast;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+
 
 
 public class MyLocationDemoActivity extends AppCompatActivity
@@ -134,6 +133,9 @@ public class MyLocationDemoActivity extends AppCompatActivity
         mMap.setOnMapLongClickListener(this);
         mMap.setOnMarkerClickListener(this);
         enableMyLocation();
+
+        //Disable Map Toolbar:
+        mMap.getUiSettings().setMapToolbarEnabled(false);
     }
 
     /**
@@ -263,7 +265,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
             LatLng myCoordinates = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLng(myCoordinates));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
-
         }
     }
 

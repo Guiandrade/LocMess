@@ -14,7 +14,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.Manifest;
 import android.app.Activity;
@@ -25,19 +29,20 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 
 public class MyLocationDemoActivity extends AppCompatActivity
@@ -45,67 +50,58 @@ public class MyLocationDemoActivity extends AppCompatActivity
         GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback, LocationListener,
         GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleMap.OnMapClickListener {
+        GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener {
 
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    public static final long ZOOM_LEVEL = 18; // Street level
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
+    // Keys for storing activity state in the Bundle.
+    protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
+    protected final static String KEY_LOCATION = "location";
+    protected final static String KEY_LAST_UPDATED_TIME_STRING = "last-updated-time-string";
+    protected static final String TAG = "MyLocationDemoActivity";
     /**
      * Request code for location permission request.
      *
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
-
-    /**
-     * Flag indicating whether a requested permission has been denied after returning in
-     * {@link #onRequestPermissionsResult(int, String[], int[])}.
-     */
-    private boolean mPermissionDenied = false;
-
-    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-    public static final long ZOOM_LEVEL = 18; // Street level
-
-    // Keys for storing activity state in the Bundle.
-    protected final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
-    protected final static String KEY_LOCATION = "location";
-    protected final static String KEY_LAST_UPDATED_TIME_STRING = "last-updated-time-string";
-    protected static final String TAG = "MyLocationDemoActivity";
-
-    private GoogleMap mMap;
-
     /**
      * Provides the entry point to Google Play services.
      */
     protected GoogleApiClient mGoogleApiClient;
-
     /**
      * Stores parameters for requests to the FusedLocationProviderApi.
      */
     protected LocationRequest mLocationRequest;
-
     /**
      * Stores the types of location services the client is interested in using. Used for checking
      * settings to determine if the device has optimal location settings.
      */
     protected LocationSettingsRequest mLocationSettingsRequest;
-
     /**
      * Represents a geographical location.
      */
     protected Location mCurrentLocation;
-
     /**
      * Tracks the status of the location updates request. Value changes when the user presses the
      * Start Updates and Stop Updates buttons.
      */
     protected Boolean mRequestingLocationUpdates;
-
     /**
      * Time when the location was updated represented as a String.
      */
     protected String mLastUpdateTime;
-    private int initialMap=0;
+    /**
+     * Flag indicating whether a requested permission has been denied after returning in
+     * {@link #onRequestPermissionsResult(int, String[], int[])}.
+     */
+    private boolean mPermissionDenied = false;
+    private GoogleMap mMap;
+    private int initialMap = 0;
+    private ArrayList<Marker> markers = new ArrayList<>();
+    private ArrayList<Circle> circles = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +131,8 @@ public class MyLocationDemoActivity extends AppCompatActivity
         mMap = map;
 
         mMap.setOnMyLocationButtonClickListener(this);
-        mMap.setOnMapClickListener(this);
+        mMap.setOnMapLongClickListener(this);
+        mMap.setOnMarkerClickListener(this);
         enableMyLocation();
     }
 
@@ -158,38 +155,6 @@ public class MyLocationDemoActivity extends AppCompatActivity
         updateUI();
         return true;
     }
-
-    @Override
-    public void onMapClick(LatLng point) {
-        AlertDialog.Builder mBuilder =  new AlertDialog.Builder(MyLocationDemoActivity.this);
-        View mView =  getLayoutInflater().inflate(R.layout.add_map_location_layout, null);
-        final EditText locationName = (EditText) mView.findViewById(R.id.NewLocationName);
-        final EditText latitude = (EditText) mView.findViewById(R.id.Latitude);
-        final EditText longitude = (EditText) mView.findViewById(R.id.Longitude);
-
-        // Complete with coordinates
-        latitude.setText(String.valueOf(point.latitude));
-        longitude.setText(String.valueOf(point.longitude));
-
-        mBuilder.setPositiveButton(R.string.add_location_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                String message = locationName.getText() + " was sucessfully saved with lat = "
-                        +latitude.getText() + " and long = " + longitude.getText() + " !";
-                Toast.makeText(MyLocationDemoActivity.this,message,Toast.LENGTH_LONG).show();
-            }
-        });
-        mBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                Toast.makeText(MyLocationDemoActivity.this,"Cancelled Action!",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mBuilder.setView(mView);
-        AlertDialog dialog = mBuilder.create();
-        dialog.show();
-
-    }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -231,9 +196,9 @@ public class MyLocationDemoActivity extends AppCompatActivity
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         //update to current position
-        if (initialMap == 0){
+        if (initialMap == 0) {
             updateUI();
-            initialMap=1;
+            initialMap = 1;
         }
 
     }
@@ -261,8 +226,9 @@ public class MyLocationDemoActivity extends AppCompatActivity
         }
         updateUI();
     }
+
     @Override
-    public void onConnected( Bundle bundle) {
+    public void onConnected(Bundle bundle) {
         // If the initial location was never previously requested, we use
         // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
         // its value in the Bundle and check for it in onCreate(). We
@@ -316,7 +282,7 @@ public class MyLocationDemoActivity extends AppCompatActivity
                     case LocationSettingsStatusCodes.SUCCESS:
                         Log.i(TAG, "All location settings are satisfied.");
                         if (ActivityCompat.checkSelfPermission(MyLocationDemoActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            PermissionUtils.requestPermission(MyLocationDemoActivity.this, LOCATION_PERMISSION_REQUEST_CODE,Manifest.permission.ACCESS_FINE_LOCATION,true);
+                            PermissionUtils.requestPermission(MyLocationDemoActivity.this, LOCATION_PERMISSION_REQUEST_CODE, Manifest.permission.ACCESS_FINE_LOCATION, true);
                         }
                         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MyLocationDemoActivity.this);
                         break;
@@ -451,6 +417,76 @@ public class MyLocationDemoActivity extends AppCompatActivity
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         mLocationSettingsRequest = builder.build();
+    }
+
+    @Override
+    public void onMapLongClick(final LatLng point) {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MyLocationDemoActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.add_map_location_layout, null);
+        final EditText locationName = (EditText) mView.findViewById(R.id.NewLocationName);
+        final EditText latitude = (EditText) mView.findViewById(R.id.Latitude);
+        final EditText longitude = (EditText) mView.findViewById(R.id.Longitude);
+        final EditText radius = (EditText) mView.findViewById(R.id.radius);
+
+        // Complete with coordinates
+        latitude.setText(String.valueOf(point.latitude));
+        longitude.setText(String.valueOf(point.longitude));
+
+        mBuilder.setPositiveButton(R.string.add_location_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                addMarker(point, String.valueOf(locationName.getText()), String.valueOf(radius.getText()));
+                String message = locationName.getText() + " was sucessfully saved with lat = "
+                        + latitude.getText() + " and long = " + longitude.getText() + " and radius of " + radius.getText() + " m !";
+                Toast.makeText(MyLocationDemoActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
+        mBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Toast.makeText(MyLocationDemoActivity.this, "Cancelled Action!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mBuilder.setView(mView);
+        AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+    }
+
+    public void addMarker(LatLng point, String title, String radius) {
+        String snippet = "Radius(m):" + radius;
+        Marker newMarker = mMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title(title)
+                .snippet(snippet));
+        markers.add(newMarker);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        String[] parts = marker.getSnippet().split(":");
+        Integer radius = Integer.valueOf(parts[1]);
+        // Clicked on marker, create circle with radius defined by user and show title
+        marker.showInfoWindow();
+
+        // If circle exists, remove it
+        for (Circle circle : circles) {
+            if (circle.getCenter().longitude == marker.getPosition().longitude && circle.getCenter().latitude == marker.getPosition().latitude) {
+                circles.remove(circle);
+                circle.remove();
+                return false;
+            }
+        }
+        // If not, create it
+        Circle newCircle = mMap.addCircle(new CircleOptions()
+                .center(marker.getPosition())
+                .radius(radius)
+                .strokeWidth(10)
+                .strokeColor(R.color.colorPrimaryDark)
+                .clickable(false));
+
+        circles.add(newCircle);
+        // maintain zoom to marker
+        return false;
     }
 
 }

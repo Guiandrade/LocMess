@@ -28,6 +28,7 @@ public class GpsLocation {
     json.put("location",this.location);
     json.put("latitude",this.latitude);
     json.put("longitude",this.longitude);
+    json.put("radius",this.radius);
     return json;
   }
 

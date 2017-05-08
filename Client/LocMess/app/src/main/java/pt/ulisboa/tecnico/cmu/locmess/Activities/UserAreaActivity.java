@@ -813,6 +813,8 @@ public class UserAreaActivity extends AppCompatActivity implements
         mBuilder.setPositiveButton(R.string.add_location_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 addMarker(point, String.valueOf(locationName.getText()), String.valueOf(radius.getText()));
+                createLocation(new LocationModel(locationName.getText().toString(),new Coordinates(latitude.getText().toString(),
+                        longitude.getText().toString(),radius.getText().toString())));
                 String message = locationName.getText() + " was sucessfully saved with lat = "
                         + latitude.getText() + " and long = " + longitude.getText() + " and radius of " + radius.getText() + " m !";
                 Toast.makeText(UserAreaActivity.this, message, Toast.LENGTH_LONG).show();
@@ -875,6 +877,7 @@ public class UserAreaActivity extends AppCompatActivity implements
         mMap.setOnMapLongClickListener(this);
         mMap.setOnMarkerClickListener(this);
         enableMyLocation();
+        listLocations();
     }
 
     /**
@@ -1010,5 +1013,123 @@ public class UserAreaActivity extends AppCompatActivity implements
             // Display the missing permission error dialog when the fragments resume.
             mPermissionDenied = true;
         }
+    }
+
+    public void createLocation(LocationModel location){
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(this);
+        String url = "http://" + SERVER_IP + "/locations";
+        JSONObject jsonBody = new JSONObject();
+        if(location.getSSID() == null){
+            try{
+                jsonBody.put("location",location.getName());
+                jsonBody.put("latitude",Double.parseDouble(location.getCoordinates().getLatitude()));
+                jsonBody.put("longitude",Double.parseDouble(location.getCoordinates().getLongitude()));
+                jsonBody.put("radius",Integer.parseInt(location.getCoordinates().getRadius()));
+            }catch (Exception e){
+
+            }
+        }
+        else{
+            try{
+                jsonBody.put("ssid",location.getSSID().split(" ")[1]);
+            }catch (Exception e) {
+
+            }
+        }
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.PUT, url, jsonBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            if(response.get("status").toString().equals("ok")){
+                                // boa puto
+                            }
+                            else{
+                                try{
+                                    Toast.makeText(UserAreaActivity.this, "Status: "+ response.get("status"), Toast.LENGTH_LONG).show();
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try{
+                            Toast.makeText(UserAreaActivity.this, "Error: "+ new String(error.networkResponse.data,"UTF-8"), Toast.LENGTH_LONG).show();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            Toast.makeText(UserAreaActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
+    }
+
+    public ArrayList<LocationModel> listLocations (){
+        final ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        final String token = sharedPreferences.getString("token","");
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(this);
+        String url = "http://" + SERVER_IP + "/locations";
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            if(response.get("status").toString().equals("ok")) {
+                                for (int i = 0; i < response.getJSONArray("locations").length(); i++) {
+                                    JSONObject arr = (JSONObject) response.getJSONArray("locations").get(i);
+                                    if(!arr.has("ssid")){
+                                        addMarker(new LatLng(arr.getDouble("latitude"),arr.getDouble("longitude")),
+                                                arr.get("location").toString(),arr.get("radius").toString());
+                                    }
+                                }
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try{
+                            Toast.makeText(UserAreaActivity.this, "Error: "+ new String(error.networkResponse.data,"UTF-8"), Toast.LENGTH_LONG).show();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            Toast.makeText(UserAreaActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
+        return locations;
     }
 }

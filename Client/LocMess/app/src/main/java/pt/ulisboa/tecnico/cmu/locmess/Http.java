@@ -23,7 +23,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Activities.UserAreaActivity;
 
 public class Http {
 
-    String SERVER_IP = "192.168.1.183:8080";
+    String SERVER_IP = "192.168.1.190:8080";
 
     public String getServerIp(){
         return SERVER_IP;
@@ -34,12 +34,13 @@ public class Http {
         final boolean returnStatus = false;
         RequestQueue queue;
         queue = Volley.newRequestQueue(context);
+        SecurityHandler.allowAllSSL();
         String url = "";
         if (type.equals("login")){
-            url = "http://" + SERVER_IP + "/login";
+            url = "https://" + SERVER_IP + "/login";
         }
         else if (type.equals("register")){
-            url = "http://" + SERVER_IP + "/signup";
+            url = "https://" + SERVER_IP + "/signup";
         }
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
@@ -81,6 +82,7 @@ public class Http {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         try{
+                            error.printStackTrace();
                             Toast.makeText(context, "Error: "+ new String(error.networkResponse.data,"UTF-8"), Toast.LENGTH_LONG).show();
                         }catch (Exception e){
                             e.printStackTrace();

@@ -71,7 +71,7 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SERVER_IP = "192.168.1.183:8080";
+        SERVER_IP = "192.168.1.190:8080";
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
         timer = new Timer();
@@ -94,7 +94,6 @@ public class NotificationService extends Service {
     }
 
     private void getLocation(){
-        Log.d("Service","getLocation");
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this,Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -104,7 +103,9 @@ public class NotificationService extends Service {
             try {
                 location = manager.getLastKnownLocation(bestProvider);
             }
-            catch (SecurityException e){ }
+            catch (SecurityException e){
+
+            }
         }
     }
 
@@ -174,7 +175,8 @@ public class NotificationService extends Service {
         }
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/messages";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/messages";
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("latitude",location.getCoordinates().getLatitude().toString());

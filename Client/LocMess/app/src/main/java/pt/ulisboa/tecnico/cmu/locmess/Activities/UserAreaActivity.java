@@ -70,6 +70,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.PermissionUtils;
 import pt.ulisboa.tecnico.cmu.locmess.NotificationService;
 import pt.ulisboa.tecnico.cmu.locmess.R;
+import pt.ulisboa.tecnico.cmu.locmess.SecurityHandler;
 
 public class UserAreaActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback,
@@ -295,7 +296,8 @@ public class UserAreaActivity extends AppCompatActivity implements
         final String token = sharedPreferences.getString("token", "");
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/locations";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/locations";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
@@ -359,7 +361,8 @@ public class UserAreaActivity extends AppCompatActivity implements
     public void postMessage(Message message) {
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/messages";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/messages";
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("title", message.getTitle());
@@ -465,7 +468,8 @@ public class UserAreaActivity extends AppCompatActivity implements
     public void deletedKeyPairs(JSONObject jsonBody) {
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/removeKey";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/removeKey";
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
@@ -513,7 +517,8 @@ public class UserAreaActivity extends AppCompatActivity implements
     public void addKeys(JSONObject jsonBody) {
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/profile";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/profile";
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.PUT, url, jsonBody, new Response.Listener<JSONObject>() {
@@ -565,7 +570,8 @@ public class UserAreaActivity extends AppCompatActivity implements
         final String token = sharedPreferences.getString("token", "");
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/keys";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/keys";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
             @Override
@@ -624,7 +630,8 @@ public class UserAreaActivity extends AppCompatActivity implements
         final String token = sharedPreferences.getString("token", "");
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/profile";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/profile";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
             @Override
@@ -1018,7 +1025,8 @@ public class UserAreaActivity extends AppCompatActivity implements
     public void createLocation(LocationModel location){
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/locations";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/locations";
         JSONObject jsonBody = new JSONObject();
         if(location.getSSID() == null){
             try{
@@ -1088,7 +1096,8 @@ public class UserAreaActivity extends AppCompatActivity implements
         final String token = sharedPreferences.getString("token","");
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/locations";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/locations";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 

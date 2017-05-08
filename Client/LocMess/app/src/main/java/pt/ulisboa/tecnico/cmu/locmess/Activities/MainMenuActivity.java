@@ -36,6 +36,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
+import pt.ulisboa.tecnico.cmu.locmess.SecurityHandler;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -177,7 +178,8 @@ public class MainMenuActivity extends AppCompatActivity {
     public void createLocation(LocationModel location){
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/locations";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/locations";
         JSONObject jsonBody = new JSONObject();
         if(location.getSSID() == null){
             try{
@@ -244,7 +246,8 @@ public class MainMenuActivity extends AppCompatActivity {
     public void removeLocations(ArrayList<String> locations){
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/deleteLocation";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/deleteLocation";
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("locations",new JSONArray(locations));
@@ -299,7 +302,8 @@ public class MainMenuActivity extends AppCompatActivity {
     public void removeMessages(ArrayList<String> ids){
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/deleteMessages";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/deleteMessages";
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("ids",new JSONArray(ids));
@@ -354,7 +358,8 @@ public class MainMenuActivity extends AppCompatActivity {
     public void postMessage(Message message){
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/messages";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/messages";
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("title",message.getTitle());
@@ -466,7 +471,8 @@ public class MainMenuActivity extends AppCompatActivity {
         final String token = sharedPreferences.getString("token","");
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/locations";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/locations";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
@@ -569,7 +575,8 @@ public class MainMenuActivity extends AppCompatActivity {
         final String token = sharedPreferences.getString("token","");
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "http://" + SERVER_IP + "/userMessages";
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/userMessages";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
             @Override

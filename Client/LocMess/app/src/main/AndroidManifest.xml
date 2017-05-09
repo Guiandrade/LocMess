@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="pt.ulisboa.tecnico.cmu.locmess">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,6 +11,7 @@
 
     <application
         android:allowBackup="true"
+        tools:replace="android:icon"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -32,14 +34,16 @@
         <activity android:name=".Activities.UnpostMessageActivity" />
         <activity android:name=".Activities.UserProfileActivity" />
         <activity android:name=".Activities.SSIDActivity" />
+        <activity android:name=".Activities.ReadMessagesActivity" />
+        <activity android:name=".Activities.MessageActivity"></activity>
 
         <service
             android:name=".Services.NotificationService"
             android:enabled="true"
             android:exported="true" />
+        <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
 
-        <activity android:name=".Activities.ReadMessagesActivity" />
-        <activity android:name=".Activities.MessageActivity"></activity>
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

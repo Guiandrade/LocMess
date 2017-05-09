@@ -5,7 +5,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "pt.ulisboa.tecnico.cmu.locmess"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -20,6 +20,7 @@ android {
 }
 
 dependencies {
+    compile(name:'Termite-WifiP2P-API', ext:'aar')
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -30,4 +31,9 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:10.2.0'
     compile 'com.google.android.gms:play-services-location:10.2.0'
     testCompile 'junit:junit:4.12'
+}
+repositories{
+    flatDir{
+        dirs 'libs'
+    }
 }

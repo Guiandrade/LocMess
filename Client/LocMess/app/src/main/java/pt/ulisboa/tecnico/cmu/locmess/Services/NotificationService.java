@@ -15,9 +15,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -57,7 +59,13 @@ public class NotificationService extends Service {
     String token;
     String SERVER_IP;
     private Location location;
+    private static Context context;
 
+    @Override
+    public void onCreate() {
+        context = getApplicationContext();
+        Log.d("NotificationService","Saved Application Context!");
+    }
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
@@ -87,6 +95,8 @@ public class NotificationService extends Service {
         }, 0, 5000);
         return START_STICKY;
     }
+
+
 
     private void getLocation(){
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED
@@ -276,5 +286,9 @@ public class NotificationService extends Service {
     public void onDestroy(){
         super.onDestroy();
         timer.cancel();
+    }
+
+    public static Context getContext(){
+        return context;
     }
 }

@@ -36,7 +36,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
-import pt.ulisboa.tecnico.cmu.locmess.SecurityHandler;
+import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
 
 public class MainMenuActivity extends AppCompatActivity {
 

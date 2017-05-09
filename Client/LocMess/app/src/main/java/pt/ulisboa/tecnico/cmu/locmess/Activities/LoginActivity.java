@@ -11,18 +11,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
-import pt.ulisboa.tecnico.cmu.locmess.Http;
+import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class LoginActivity extends AppCompatActivity {

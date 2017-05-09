@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmu.locmess.Activities;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,16 +13,13 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
-import pt.ulisboa.tecnico.cmu.locmess.MyListViewAdapter;
+import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class UnpostMessageActivity extends AppCompatActivity {

@@ -15,7 +15,7 @@ import android.view.Menu;
 import android.widget.AbsListView.MultiChoiceModeListener;
 
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
-import pt.ulisboa.tecnico.cmu.locmess.MyListViewAdapter;
+import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 

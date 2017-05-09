@@ -67,10 +67,10 @@ import java.util.Set;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
-import pt.ulisboa.tecnico.cmu.locmess.PermissionUtils;
-import pt.ulisboa.tecnico.cmu.locmess.NotificationService;
+import pt.ulisboa.tecnico.cmu.locmess.Utils.PermissionUtils;
+import pt.ulisboa.tecnico.cmu.locmess.Services.NotificationService;
 import pt.ulisboa.tecnico.cmu.locmess.R;
-import pt.ulisboa.tecnico.cmu.locmess.SecurityHandler;
+import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
 
 public class UserAreaActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback,

@@ -34,7 +34,7 @@
         <activity android:name=".Activities.SSIDActivity" />
 
         <service
-            android:name=".NotificationService"
+            android:name=".Services.NotificationService"
             android:enabled="true"
             android:exported="true" />
 

@@ -40,7 +40,7 @@ import java.util.Set;
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
-import pt.ulisboa.tecnico.cmu.locmess.MyListViewAdapter;
+import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class PostMessageActivity extends AppCompatActivity {

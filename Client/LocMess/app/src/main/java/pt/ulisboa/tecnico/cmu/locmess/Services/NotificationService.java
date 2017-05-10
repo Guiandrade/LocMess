@@ -44,6 +44,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.MessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
@@ -54,6 +55,7 @@ import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
 import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.SimWifiP2pBroadcastReceiver;
 import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
 
 
 public class NotificationService extends Service {
@@ -69,18 +71,6 @@ public class NotificationService extends Service {
     @Override
     public void onCreate() {
         context = getApplicationContext();
-        // initialize the Termite API
-        SimWifiP2pSocketManager.Init(getApplicationContext());
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        SimWifiP2pBroadcastReceiver receiver = new SimWifiP2pBroadcastReceiver();
-        registerReceiver(receiver, filter);
-
-        Log.d("NotificationService","Saved Application Context!");
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -94,6 +84,8 @@ public class NotificationService extends Service {
         SERVER_IP = new Http().getServerIp();
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
+
+        final Wifi wifiDirect = new Wifi(NotificationService.this);
         timer = new Timer();
         timer.schedule(new TimerTask()
         {
@@ -108,6 +100,7 @@ public class NotificationService extends Service {
                             String.valueOf(location.getLongitude())));
                 }
                 getNearbyMessages(loc, SSIDs);
+                wifiDirect.getNearbyDevices();
             }
         }, 0, 5000);
         return START_STICKY;
@@ -212,11 +205,11 @@ public class NotificationService extends Service {
                     public void onResponse(JSONObject response) {
                         try{
                             if(response.get("status").toString().equals("ok")){
-                                System.out.println("RESPOSTA : "+response.get("status"));
+                               Log.d("onResponse","RESPOSTA : "+response.get("status"));
                                 JSONArray array = response.getJSONArray("messages");
                                 for(int i=0;i<array.length();i++){
                                     checkMessageCache(array.getJSONObject(i));
-                                    System.out.println("MESSAGE : "+ array.getJSONObject(i).toString());
+                                    Log.d("onResponse","MESSAGE : "+ array.getJSONObject(i).toString());
                                 }
                             }
                             else{

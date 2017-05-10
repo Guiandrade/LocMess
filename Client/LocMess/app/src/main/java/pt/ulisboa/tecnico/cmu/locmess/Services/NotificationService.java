@@ -53,6 +53,8 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
 import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.SimWifiP2pBroadcastReceiver;
+import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
+
 
 public class NotificationService extends Service {
 
@@ -89,7 +91,7 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        SERVER_IP = "192.168.1.197:8080";
+        SERVER_IP = new Http().getServerIp();
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
         timer = new Timer();
@@ -110,8 +112,6 @@ public class NotificationService extends Service {
         }, 0, 5000);
         return START_STICKY;
     }
-
-
 
     private void getLocation(){
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED
@@ -167,7 +167,7 @@ public class NotificationService extends Service {
         }
     }
 
-    private void checkMessage(JSONObject obj){
+    private void checkMessageCache(JSONObject obj){
         try{
             SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
             Set<String> messagesSet = prefs.getStringSet("messages", null);
@@ -215,7 +215,7 @@ public class NotificationService extends Service {
                                 System.out.println("RESPOSTA : "+response.get("status"));
                                 JSONArray array = response.getJSONArray("messages");
                                 for(int i=0;i<array.length();i++){
-                                    checkMessage(array.getJSONObject(i));
+                                    checkMessageCache(array.getJSONObject(i));
                                     System.out.println("MESSAGE : "+ array.getJSONObject(i).toString());
                                 }
                             }
@@ -301,6 +301,7 @@ public class NotificationService extends Service {
     public void onDestroy(){
         super.onDestroy();
         timer.cancel();
+        this.unregisterReceiver(bReciever);
     }
 
     public static Context getContext(){

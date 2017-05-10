@@ -41,7 +41,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
 
 public class Http {
 
-    String SERVER_IP = "192.168.1.197:8080";
+    static String SERVER_IP = "istcmu.tk:8080";
     int REMOVE_LOCATIONS_REQUEST_CODE = 2;
     int POST_MESSAGE_REQUEST_CODE = 3;
     int UNPOST_MESSAGE_REQUEST_CODE = 4;

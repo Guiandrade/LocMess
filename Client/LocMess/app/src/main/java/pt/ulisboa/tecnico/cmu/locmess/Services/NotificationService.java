@@ -43,6 +43,8 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.MessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
@@ -50,6 +52,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.SimWifiP2pBroadcastReceiver;
 
 public class NotificationService extends Service {
 
@@ -64,6 +67,17 @@ public class NotificationService extends Service {
     @Override
     public void onCreate() {
         context = getApplicationContext();
+        // initialize the Termite API
+        SimWifiP2pSocketManager.Init(getApplicationContext());
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+        SimWifiP2pBroadcastReceiver receiver = new SimWifiP2pBroadcastReceiver();
+        registerReceiver(receiver, filter);
+
         Log.d("NotificationService","Saved Application Context!");
     }
     @Override
@@ -74,6 +88,7 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         SERVER_IP = "192.168.1.197:8080";
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");

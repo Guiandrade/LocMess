@@ -74,7 +74,7 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SERVER_IP = "192.168.1.190:8080";
+        SERVER_IP = "192.168.1.197:8080";
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
         timer = new Timer();
@@ -188,7 +188,7 @@ public class NotificationService extends Service {
             jsonBody.put("longitude",location.getCoordinates().getLongitude().toString());
             jsonBody.put("ssids",new JSONArray(ssids));
         }catch (Exception e){
-
+            e.printStackTrace();
         }
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.PUT, url, jsonBody, new Response.Listener<JSONObject>() {

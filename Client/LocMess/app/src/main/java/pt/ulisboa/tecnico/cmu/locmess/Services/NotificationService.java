@@ -186,6 +186,7 @@ public class NotificationService extends Service {
             jsonBody.put("latitude",location.getCoordinates().getLatitude().toString());
             jsonBody.put("longitude",location.getCoordinates().getLongitude().toString());
             jsonBody.put("ssids",new JSONArray(ssids));
+            System.out.println("A ENVIAR: " + jsonBody.toString());
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -525,7 +525,6 @@ public class Http {
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("title",message.getTitle());
-            System.out.println("asjdnaskjdnaksjnd" + message.getLocation().getSSID());
             if(!(message.getLocation().getSSID() == null)) {
                 jsonBody.put("location",message.getLocation().getSSID());
             }

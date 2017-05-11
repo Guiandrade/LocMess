@@ -16,10 +16,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +32,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Activities.PostMessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.RemovableItemListActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.UnpostMessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.UserAreaActivity;
+import pt.ulisboa.tecnico.cmu.locmess.Activities.UserProfileActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
@@ -45,6 +49,7 @@ public class Http {
     int REMOVE_LOCATIONS_REQUEST_CODE = 2;
     int POST_MESSAGE_REQUEST_CODE = 3;
     int UNPOST_MESSAGE_REQUEST_CODE = 4;
+    int USER_PROFILE_REQUEST_CODE = 3;
 
     public String getServerIp(){
         return SERVER_IP;
@@ -510,6 +515,205 @@ public class Http {
                 }
             }
         }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
+    }
+
+    public void getKeys(final Context context, final boolean activity) {
+        final HashMap<String, Set<String>> keys = new HashMap<String, Set<String>>();
+
+        final SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        final String token = sharedPreferences.getString("token", "");
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(context);
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/profile";
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if (response.get("status").toString().equals("ok")) {
+                        Iterator<String> iter = response.keys();
+                        Set<String> messagesSet = new HashSet<String>();
+                        while (iter.hasNext()) {
+                            String key = iter.next();
+                            Set<String> set = new HashSet<String>();
+                            try {
+                                for (int i = 0; i < response.getJSONArray(key).length(); i++) {
+                                    set.add(response.getJSONArray(key).getString(i));
+                                    messagesSet.add(key + " = " + response.getJSONArray(key).getString(i));
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putStringSet("Keys", messagesSet);
+                                    editor.apply();
+                                }
+                                keys.put(key, set);
+                            } catch (JSONException e) {
+                                // Something went wrong!
+                            }
+                        }
+                    } else {
+                        try {
+                            Toast.makeText(context, "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    Toast.makeText(context, "Error: " + new String(error.networkResponse.data, "UTF-8"), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Lost connection...", Toast.LENGTH_LONG).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
+    }
+
+    public void getKeys(final View v, final boolean activity) {
+        final HashMap<String, Set<String>> keys = new HashMap<String, Set<String>>();
+
+        final SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        final String token = sharedPreferences.getString("token", "");
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(v.getContext());
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/profile";
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if (response.get("status").toString().equals("ok")) {
+                        Iterator<String> iter = response.keys();
+                        Set<String> messagesSet = new HashSet<String>();
+                        while (iter.hasNext()) {
+                            String key = iter.next();
+                            Set<String> set = new HashSet<String>();
+                            try {
+                                for (int i = 0; i < response.getJSONArray(key).length(); i++) {
+                                    set.add(response.getJSONArray(key).getString(i));
+                                    messagesSet.add(key + " = " + response.getJSONArray(key).getString(i));
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putStringSet("Keys", messagesSet);
+                                    editor.apply();
+                                }
+                                keys.put(key, set);
+                            } catch (JSONException e) {
+                                // Something went wrong!
+                            }
+                        }
+                        if(activity==true){
+                            getAllKeys(keys,v);
+                        }
+                    } else {
+                        try {
+                            Toast.makeText(v.getContext(), "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    Toast.makeText(v.getContext(), "Error: " + new String(error.networkResponse.data, "UTF-8"), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(v.getContext(), "Lost connection...", Toast.LENGTH_LONG).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
+    }
+
+    public void getAllKeys(final HashMap<String, Set<String>> keys, final View v) {
+        final ArrayList<String> allKeys = new ArrayList<String>();
+
+        SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        final String token = sharedPreferences.getString("token", "");
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(v.getContext());
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/keys";
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if (response.get("status").toString().equals("ok")) {
+                        JSONArray keysJsonArray = response.getJSONArray("keys");
+                        for (int i = 0; i < keysJsonArray.length(); i++) {
+                            allKeys.add(keysJsonArray.getString(i));
+                        }
+
+                        Intent userProfileIntent = new Intent(v.getContext(), UserProfileActivity.class);
+                        userProfileIntent.putExtra("serverIP", SERVER_IP);
+                        userProfileIntent.putExtra("keys", keys);
+                        userProfileIntent.putExtra("allKeys", allKeys);
+                        ((Activity) v.getContext()).startActivityForResult(userProfileIntent, USER_PROFILE_REQUEST_CODE);
+                    } else {
+                        try {
+                            Toast.makeText(v.getContext(), "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                try {
+                    Toast.makeText(v.getContext(), "Error: " + new String(error.networkResponse.data, "UTF-8"), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(v.getContext(), "Lost connection...", Toast.LENGTH_LONG).show();
+                }
+            }
+        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();

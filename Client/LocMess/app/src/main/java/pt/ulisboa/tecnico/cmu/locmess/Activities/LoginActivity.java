@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
-                login(username,password);
+                login(username,password,v);
             }
         });
     }
@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void login(final String username, String password){
+    public void login(final String username, String password, View v){
 
         JSONObject jsonBody = new JSONObject();
 
@@ -89,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
+        new Http().getKeys(v,false);
         new Http().session(jsonBody,this,"login");
     }
 }

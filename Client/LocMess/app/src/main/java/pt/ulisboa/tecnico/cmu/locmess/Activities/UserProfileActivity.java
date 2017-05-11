@@ -36,6 +36,7 @@ import java.util.Set;
 
 import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
 import pt.ulisboa.tecnico.cmu.locmess.R;
+import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 
 public class UserProfileActivity extends AppCompatActivity {
 

@@ -67,6 +67,7 @@ import java.util.Set;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
+import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 import pt.ulisboa.tecnico.cmu.locmess.Utils.PermissionUtils;
 import pt.ulisboa.tecnico.cmu.locmess.Services.NotificationService;
 import pt.ulisboa.tecnico.cmu.locmess.R;
@@ -177,6 +178,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                 SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("token", "");
+                editor.putStringSet("Keys", null);
                 editor.putStringSet("messages", null);  // ISTO E PARA SAIR
                 editor.apply();
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);
@@ -205,7 +207,7 @@ public class UserAreaActivity extends AppCompatActivity implements
         ibUserProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getKeys();
+                new Http().getKeys(v, true);
             }
         });
     }
@@ -478,7 +480,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                     public void onResponse(JSONObject response) {
                         try {
                             if (response.get("status").toString().equals("ok")) {
-                                // boa puto
+                                new Http().getKeys(UserAreaActivity.this,false);
                             } else {
                                 try {
                                     Toast.makeText(UserAreaActivity.this, "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
@@ -527,7 +529,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                     public void onResponse(JSONObject response) {
                         try {
                             if (response.get("status").toString().equals("ok")) {
-                                // boa puto
+                                new Http().getKeys(UserAreaActivity.this,false);
                             } else {
                                 try {
                                     Toast.makeText(UserAreaActivity.this, "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
@@ -552,130 +554,6 @@ public class UserAreaActivity extends AppCompatActivity implements
                         }
                     }
                 }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                //headers.put("Content-Type", "application/json");
-                headers.put("Authorization", "Basic " + token);
-                return headers;
-            }
-        };
-        queue.add(jsObjRequest);
-    }
-
-    public void getAllKeys(final HashMap<String, Set<String>> keys) {
-        final ArrayList<String> allKeys = new ArrayList<String>();
-
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        final String token = sharedPreferences.getString("token", "");
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
-        SecurityHandler.allowAllSSL();
-        String url = "https://" + SERVER_IP + "/keys";
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    if (response.get("status").toString().equals("ok")) {
-                        JSONArray keysJsonArray = response.getJSONArray("keys");
-                        for (int i = 0; i < keysJsonArray.length(); i++) {
-                            allKeys.add(keysJsonArray.getString(i));
-                        }
-
-                        Intent userProfileIntent = new Intent(UserAreaActivity.this, UserProfileActivity.class);
-                        userProfileIntent.putExtra("serverIP", SERVER_IP);
-                        userProfileIntent.putExtra("keys", keys);
-                        userProfileIntent.putExtra("allKeys", allKeys);
-                        startActivityForResult(userProfileIntent, USER_PROFILE_REQUEST_CODE);
-                    } else {
-                        try {
-                            Toast.makeText(UserAreaActivity.this, "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                try {
-                    Toast.makeText(UserAreaActivity.this, "Error: " + new String(error.networkResponse.data, "UTF-8"), Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(UserAreaActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
-                }
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                //headers.put("Content-Type", "application/json");
-                headers.put("Authorization", "Basic " + token);
-                return headers;
-            }
-        };
-        queue.add(jsObjRequest);
-    }
-
-    public void getKeys() {
-        final HashMap<String, Set<String>> keys = new HashMap<String, Set<String>>();
-
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        final String token = sharedPreferences.getString("token", "");
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
-        SecurityHandler.allowAllSSL();
-        String url = "https://" + SERVER_IP + "/profile";
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    if (response.get("status").toString().equals("ok")) {
-                        Iterator<String> iter = response.keys();
-                        while (iter.hasNext()) {
-                            String key = iter.next();
-                            Set<String> set = new HashSet<String>();
-                            try {
-                                for (int i = 0; i < response.getJSONArray(key).length(); i++) {
-                                    set.add(response.getJSONArray(key).getString(i));
-                                }
-                                keys.put(key, set);
-                            } catch (JSONException e) {
-                                // Something went wrong!
-                            }
-                        }
-                        getAllKeys(keys);
-                    } else {
-                        try {
-                            Toast.makeText(UserAreaActivity.this, "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                try {
-                    Toast.makeText(UserAreaActivity.this, "Error: " + new String(error.networkResponse.data, "UTF-8"), Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(UserAreaActivity.this, "Lost connection...", Toast.LENGTH_LONG).show();
-                }
-            }
-        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();

@@ -27,6 +27,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -190,7 +193,16 @@ public class PostMessageActivity extends AppCompatActivity {
                                     finish();
                                 }
                                 else{
-                                    // to do
+                                    JSONObject message = parseMsgToSend(msg);
+                                    SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
+                                    Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+                                    if(messagesSet==null){
+                                        messagesSet = new HashSet<String>();
+                                    }
+                                    messagesSet.add(message.toString());
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    editor.putStringSet("WifiMessages" + prefs.getString("username",""), messagesSet);
+                                    editor.apply();
                                 }
                             }
                         })
@@ -685,5 +697,84 @@ public class PostMessageActivity extends AppCompatActivity {
         int finalDay = cal.get(Calendar.DAY_OF_MONTH);
 
         return "" + finalDay + "/" + finalMonth + "/" + finalYear;
+    }
+
+    private JSONObject parseMsgToSend(Message message){
+        JSONObject jsonBody = new JSONObject();
+        try{
+            jsonBody.put("title",message.getTitle());
+
+            SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+            String idWifiDirect = sharedPref.getString("IdMsg" + sharedPref.getString("username",""),"");
+            SharedPreferences.Editor editor = sharedPref.edit();
+            if(idWifiDirect.equals("")) {
+                editor.putString("IdMsg" + sharedPref.getString("username",""), "0");
+                editor.apply();
+                jsonBody.put("Id",message.getOwner() + " - 0");
+            }
+            else{
+                String newIdWifiDirect = String.valueOf(Integer.parseInt(idWifiDirect)+1);
+                jsonBody.put("Id",message.getOwner() + " - " + newIdWifiDirect);
+                editor.putString("IdMsg" + sharedPref.getString("username",""), newIdWifiDirect);
+                editor.apply();
+            }
+
+            if(!(message.getLocation().getSSID() == null)) {
+                jsonBody.put("location",message.getLocation().getSSID());
+            }
+            else{
+                jsonBody.put("location",message.getLocation().getName());
+            }
+
+            String initHour = "" + message.getTimeWindow().getStartingHour();
+            String initMinute = "" + message.getTimeWindow().getStartingMinute();
+            String initDay = "" + message.getTimeWindow().getStartingDay();
+            String initMonth = "" + message.getTimeWindow().getStartingMonth();
+            String initYear = "" + message.getTimeWindow().getStartingYear();
+            jsonBody.put("initTime",initHour + ":" + initMinute + "-" + initDay + "/" + initMonth + "/" + initYear);
+            String endHour = "" + message.getTimeWindow().getEndingHour();
+            String endMinute = "" + message.getTimeWindow().getEndingMinutes();
+            String endDay = "" + message.getTimeWindow().getEndingDay();
+            String endMonth = "" + message.getTimeWindow().getEndingMonth();
+            String endYear = "" + message.getTimeWindow().getEndingYear();
+            jsonBody.put("endTime",endHour + ":" + endMinute + "-" + endDay + "/" + endMonth + "/" + endYear);
+            jsonBody.put("body",message.getMessage());
+
+            JSONObject json = new JSONObject();
+            for (Map.Entry<String, Set<String>> entry : message.getWhitelistKeyPairs().entrySet()) {
+                try{
+                    String key = entry.getKey();
+                    Set<String> val = entry.getValue();
+                    json.put(key,new JSONArray(val));
+                }catch (Exception e){
+
+                }
+            }
+            try{
+                jsonBody.put("whitelist",json);
+            }catch (Exception e){
+
+            }
+
+            JSONObject json1 = new JSONObject();
+            for (Map.Entry<String, Set<String>> entry : message.getBlacklistKeyPairs().entrySet()) {
+                try{
+                    String key = entry.getKey();
+                    Set<String> val = entry.getValue();
+                    json1.put(key,new JSONArray(val));
+                }catch (Exception e){
+
+                }
+            }
+            try{
+                jsonBody.put("blacklist",json1);
+            }catch (Exception e){
+
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return jsonBody;
     }
 }

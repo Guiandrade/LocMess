@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -704,21 +705,6 @@ public class PostMessageActivity extends AppCompatActivity {
         try{
             jsonBody.put("title",message.getTitle());
 
-            SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-            String idWifiDirect = sharedPref.getString("IdMsg" + sharedPref.getString("username",""),"");
-            SharedPreferences.Editor editor = sharedPref.edit();
-            if(idWifiDirect.equals("")) {
-                editor.putString("IdMsg" + sharedPref.getString("username",""), "0");
-                editor.apply();
-                jsonBody.put("Id",message.getOwner() + " - 0");
-            }
-            else{
-                String newIdWifiDirect = String.valueOf(Integer.parseInt(idWifiDirect)+1);
-                jsonBody.put("Id",message.getOwner() + " - " + newIdWifiDirect);
-                editor.putString("IdMsg" + sharedPref.getString("username",""), newIdWifiDirect);
-                editor.apply();
-            }
-
             if(!(message.getLocation().getSSID() == null)) {
                 jsonBody.put("location",message.getLocation().getSSID());
             }
@@ -771,6 +757,8 @@ public class PostMessageActivity extends AppCompatActivity {
             }catch (Exception e){
 
             }
+
+            jsonBody.put("Id",new String(Base64.encodeToString(jsonBody.toString().getBytes(), Base64.DEFAULT)));
 
         }catch (Exception e){
             e.printStackTrace();

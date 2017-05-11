@@ -64,7 +64,6 @@ public class NotificationService extends Service {
 
     BroadcastReceiver bReciever;
     ArrayList<String> SSIDs = new ArrayList<String>();
-    Timer timer;
     String token;
     String SERVER_IP;
     private Location location;
@@ -305,8 +304,7 @@ public class NotificationService extends Service {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        timer.cancel();
-        this.unregisterReceiver(bReciever);
+        //this.unregisterReceiver(bReciever);
     }
 
     public static Context getContext(){

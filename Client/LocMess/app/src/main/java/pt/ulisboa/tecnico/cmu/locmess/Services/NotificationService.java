@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -43,6 +44,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.MessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
@@ -50,7 +54,11 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.ReceiveMessage;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.SimWifiP2pBroadcastReceiver;
 import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
+
 
 public class NotificationService extends Service {
 
@@ -65,7 +73,6 @@ public class NotificationService extends Service {
     @Override
     public void onCreate() {
         context = getApplicationContext();
-        Log.d("NotificationService","Saved Application Context!");
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -75,15 +82,19 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         SERVER_IP = new Http().getServerIp();
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
+
+        final Wifi wifiDirect = new Wifi(NotificationService.this);
         timer = new Timer();
         timer.schedule(new TimerTask()
         {
             @Override
             public void run()
             {
+                wifiDirect.getNearbyDevices();
                 getLocation();
                 getSSIDs();
                 LocationModel loc = new LocationModel("",new Coordinates("0", "0"));
@@ -197,11 +208,11 @@ public class NotificationService extends Service {
                     public void onResponse(JSONObject response) {
                         try{
                             if(response.get("status").toString().equals("ok")){
-                                System.out.println("RESPOSTA : "+response.get("status"));
+                               Log.d("onResponse","RESPOSTA : "+response.get("status"));
                                 JSONArray array = response.getJSONArray("messages");
                                 for(int i=0;i<array.length();i++){
                                     checkMessageCache(array.getJSONObject(i));
-                                    System.out.println("MESSAGE : "+ array.getJSONObject(i).toString());
+                                    Log.d("onResponse","MESSAGE : "+ array.getJSONObject(i).toString());
                                 }
                             }
                             else{

@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -53,6 +54,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.ReceiveMessage;
 import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.SimWifiP2pBroadcastReceiver;
 import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
@@ -92,6 +94,7 @@ public class NotificationService extends Service {
             @Override
             public void run()
             {
+                wifiDirect.getNearbyDevices();
                 getLocation();
                 getSSIDs();
                 LocationModel loc = new LocationModel("",new Coordinates("0", "0"));
@@ -100,7 +103,6 @@ public class NotificationService extends Service {
                             String.valueOf(location.getLongitude())));
                 }
                 getNearbyMessages(loc, SSIDs);
-                wifiDirect.getNearbyDevices();
             }
         }, 0, 5000);
         return START_STICKY;

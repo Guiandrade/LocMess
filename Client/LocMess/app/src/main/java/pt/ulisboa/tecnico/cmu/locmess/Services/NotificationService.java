@@ -80,21 +80,18 @@ public class NotificationService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    private Runnable backgroundThread = new Runnable() {
+        @Override
+        public void run() {
+            Log.d("NotificationService","backgroundThread");
 
-        SERVER_IP = new Http().getServerIp();
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("token","");
+            Wifi wifiDirect = new Wifi(NotificationService.this);
 
-        final Wifi wifiDirect = new Wifi(NotificationService.this);
-        timer = new Timer();
-        timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                wifiDirect.getNearbyDevices();
+            while(true) {
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception e) {
+                }
                 getLocation();
                 getSSIDs();
                 LocationModel loc = new LocationModel("",new Coordinates("0", "0"));
@@ -103,8 +100,20 @@ public class NotificationService extends Service {
                             String.valueOf(location.getLongitude())));
                 }
                 getNearbyMessages(loc, SSIDs);
+                wifiDirect.getNearbyDevices();
             }
-        }, 0, 5000);
+        }
+    };
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        SERVER_IP = new Http().getServerIp();
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("token","");
+
+        Thread thread = new Thread(backgroundThread);
+        thread.start();
         return START_STICKY;
     }
 

@@ -16,11 +16,11 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 
 public class ReceiveMessage extends AsyncTask<String, String, Void> {
 
-    private int socketPort;
     private SimWifiP2pSocketServer mSrvSocket;
+    private int server_port;
 
     public ReceiveMessage(int port){
-        this.socketPort = port;
+        this.server_port = port;
     }
 
     @Override
@@ -28,7 +28,8 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
         Log.d("ReceiveMessage","doInBackground");
 
         try {
-            mSrvSocket = new SimWifiP2pSocketServer(socketPort);
+            Log.d("ReceiveMessage","Before Socket creation");
+            mSrvSocket = new SimWifiP2pSocketServer(server_port);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,6 +38,7 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
 
             try {
                 SimWifiP2pSocket sock = mSrvSocket.accept();
+                Log.d("ReceiveMessage","Accepted Socket");
                 try {
                     // Read data
                     BufferedReader socketIn = new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -49,6 +51,7 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
                 } catch (IOException e) {
                     Log.d("Error: Reading socket", e.getMessage());
                 } finally {
+                    Log.d("ReceiveMessage","Closed Socket");
                     sock.close();
                 }
             } catch (IOException e) {

@@ -32,7 +32,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
     private SimWifiP2pManager mManager = null;
     private SimWifiP2pManager.Channel mChannel = null;
     private Messenger mService = null;
-    private HashSet<String> groupDevices = new HashSet<>();
+    private HashSet<String> groupDevices;
     private int port = 10001;
 
     public Wifi (NotificationService service){
@@ -64,6 +64,8 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
             mChannel = mManager.initialize(NotificationService.getContext(), Looper.getMainLooper(),null);
             Log.d("Wifi","onServiceConnected");
 
+            new ReceiveMessage(port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
         }
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
@@ -84,14 +86,16 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
     }
 
     public void sendMessage(String ip, int port) {
-        String messageToSend = "This is a message from the device with ip "+ip;
+        String messageToSend = "This is a message from the device with ip "+ip+"\n";
         new SendMessage(ip,port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,messageToSend);
     }
 
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList, SimWifiP2pInfo simWifiP2pInfo) {
-        // TO-DO : Handle group information
         Log.d("Wifi", "OnGroupInfoAvailable!");
+        if(groupDevices==null){
+            groupDevices = new HashSet<>();
+        }
         HashSet<String> newNetworkDevices = new HashSet();
 
         // Look for devices on group
@@ -100,13 +104,13 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
             SimWifiP2pDevice deviceP2p = simWifiP2pDeviceList.getByName(device);
             String deviceIp = deviceP2p.getVirtIp();
             newNetworkDevices.add(deviceIp);
-            Log.d("onGroupInfoAvailable","New device with ip: " + deviceIp + " with name: "+ device);
+            Log.d("onGroupInfoAvailable","Device on network with ip: " + deviceIp + " with name: "+ device);
         }
 
         // Add new devices on group
         for (String ip : newNetworkDevices){
             if (!groupDevices.contains(ip)){
-
+            Log.d("onGroupInfoAvailable","Before sending message to ip "+ip);
                 groupDevices.add(ip);
                 // Send Message to new ip
                 sendMessage(ip,port);

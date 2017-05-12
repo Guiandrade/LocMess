@@ -237,22 +237,4 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
         };
         queue.add(jsObjRequest);
     }
-
-    public Set<JSONObject> getMessagesByIds(Set<String> ids){
-        SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
-        Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
-        Set<JSONObject> msgsToSend = new HashSet<JSONObject>();
-        for(String msg : messagesSet){
-            for(String id : ids){
-                try{
-                    if(new JSONObject(msg).getJSONObject("id").equals(id)){
-                        msgsToSend.add(new JSONObject(msg));
-                    }
-                }catch (Exception e){
-
-                }
-            }
-        }
-        return msgsToSend;
-    }
 }

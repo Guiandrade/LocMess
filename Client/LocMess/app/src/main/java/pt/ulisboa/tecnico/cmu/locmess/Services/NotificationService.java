@@ -177,7 +177,7 @@ public class NotificationService extends Service {
         }
     }
 
-    private void checkMessageCache(JSONObject obj){
+    public void checkMessageCache(JSONObject obj){
         try{
             SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
             String username = prefs.getString("username","");

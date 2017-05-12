@@ -46,6 +46,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
 import pt.ulisboa.tecnico.cmu.locmess.R;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
 
 public class PostMessageActivity extends AppCompatActivity {
 
@@ -204,6 +205,12 @@ public class PostMessageActivity extends AppCompatActivity {
                                     SharedPreferences.Editor editor = prefs.edit();
                                     editor.putStringSet("WifiMessages" + prefs.getString("username",""), messagesSet);
                                     editor.apply();
+                                    try{
+                                        Wifi.getWifiInstance().sendMessageToAll(message.toString(),10001,message.getString("id"));
+                                    }catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    finish();
                                 }
                             }
                         })

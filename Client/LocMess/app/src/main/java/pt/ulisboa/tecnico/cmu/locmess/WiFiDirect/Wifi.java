@@ -111,15 +111,13 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
 
     }
 
-    public void sendMessageToAll(String message,int port){
-        // Adaptar isso para enviar as mensagens só que respeitem as keys do destinatário
+    public void sendMessageToAll(String message,int port, String id){
         for(String ip : groupDevices){
-            new SendMessage(ip,port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,message);
+            sendMyKeys(NotificationService.loc, NotificationService.SSIDs, ip, id);
         }
     }
 
     public void sendMessage(String message,String ip, int port) {
-        // Adaptar isso para enviar as mensagens só que respeitem as keys do destinatário
         new SendMessage(ip,port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,message);
     }
 
@@ -146,7 +144,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
             Log.d("SendMessageNewDevices","Before sending message to ip "+ip);
                 groupDevices.add(ip);
                 // Send Message to new ip
-                sendMyKeys(NotificationService.loc, NotificationService.SSIDs, ip);
+                sendMyKeys(NotificationService.loc, NotificationService.SSIDs, ip, null);
             }
         }
 
@@ -159,7 +157,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
         }
     }
 
-    public void sendMyKeys(LocationModel location, final ArrayList<String> locations, final String ip){
+    public void sendMyKeys(LocationModel location, final ArrayList<String> locations, final String ip, final String id){
         RequestQueue queue;
         queue = Volley.newRequestQueue(NotificationService.getContext());
         SecurityHandler.allowAllSSL();
@@ -193,11 +191,21 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
                                 for(String loc : locations){
                                     for(String msg : messagesSet){
                                         if(new JSONObject(msg).getString("location").equals(loc)){
-                                            JSONObject wifiKeyMessage = new JSONObject();
-                                            wifiKeyMessage.put("whitelist",new JSONObject(msg).getJSONObject("whitelist"));
-                                            wifiKeyMessage.put("blacklist",new JSONObject(msg).getJSONObject("blacklist"));
-                                            wifiKeyMessage.put("id", new JSONObject(msg).getString("id"));
-                                            setKeyMessages.put(wifiKeyMessage);
+                                            if(id==null){
+                                                JSONObject wifiKeyMessage = new JSONObject();
+                                                wifiKeyMessage.put("whitelist",new JSONObject(msg).getJSONObject("whitelist"));
+                                                wifiKeyMessage.put("blacklist",new JSONObject(msg).getJSONObject("blacklist"));
+                                                wifiKeyMessage.put("id", new JSONObject(msg).getString("id"));
+                                                setKeyMessages.put(wifiKeyMessage);
+                                            }
+                                            else if(id!=null && new JSONObject(msg).getString("id").equals(id)){
+                                                JSONObject wifiKeyMessage = new JSONObject();
+                                                wifiKeyMessage.put("whitelist",new JSONObject(msg).getJSONObject("whitelist"));
+                                                wifiKeyMessage.put("blacklist",new JSONObject(msg).getJSONObject("blacklist"));
+                                                wifiKeyMessage.put("id", new JSONObject(msg).getString("id"));
+                                                setKeyMessages.put(wifiKeyMessage);
+                                                break;
+                                            }
                                         }
                                     }
                                 }

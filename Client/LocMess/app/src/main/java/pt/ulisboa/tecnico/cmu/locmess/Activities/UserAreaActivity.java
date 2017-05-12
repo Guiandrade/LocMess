@@ -145,6 +145,8 @@ public class UserAreaActivity extends AppCompatActivity implements
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        new Http().getKeys(this,false);
+
         mRequestingLocationUpdates = true;
         mLastUpdateTime = "";
 
@@ -173,16 +175,16 @@ public class UserAreaActivity extends AppCompatActivity implements
         btLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopService(new Intent(UserAreaActivity.this, NotificationService.class));
                 SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("token", "");
+                editor.putString("username","");
                 editor.putStringSet("Keys", null);
-                editor.putStringSet("messages", null);  // ISTO E PARA SAIR
                 editor.apply();
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);
                 logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(logoutIntent);
-                stopService(new Intent(UserAreaActivity.this, NotificationService.class));
             }
         });
 
@@ -280,6 +282,8 @@ public class UserAreaActivity extends AppCompatActivity implements
                 } catch (Exception e) {
 
                 }
+                System.out.println("CHEGOU AQUIIIIIIIIIIIIIII");
+                new Http().getKeys(this, false);
             }
         }
     }

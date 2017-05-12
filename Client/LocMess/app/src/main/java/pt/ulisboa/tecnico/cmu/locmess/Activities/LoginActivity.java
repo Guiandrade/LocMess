@@ -89,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-        new Http().getKeys(v,false);
         new Http().session(jsonBody,this,"login");
     }
 }

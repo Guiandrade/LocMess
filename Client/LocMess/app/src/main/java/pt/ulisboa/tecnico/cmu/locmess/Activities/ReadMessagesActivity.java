@@ -43,7 +43,8 @@ public class ReadMessagesActivity extends AppCompatActivity {
         ListView readMessagesListView = (ListView) findViewById(R.id.lvReadMessages);
 
         SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
-        Set<String> messagesSet = prefs.getStringSet("messages", null);
+        String username = prefs.getString("username","");
+        Set<String> messagesSet = prefs.getStringSet("messages" + username, null);
         if(!(messagesSet==null)){
             for(String message : messagesSet){
                 try{

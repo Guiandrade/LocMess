@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -68,6 +69,8 @@ public class NotificationService extends Service {
     String SERVER_IP;
     private Location location;
     private static Context context;
+    Thread thread;
+    boolean running = false;
 
     @Override
     public void onCreate() {
@@ -80,13 +83,15 @@ public class NotificationService extends Service {
     }
 
     private Runnable backgroundThread = new Runnable() {
+
         @Override
         public void run() {
+            running = true;
             Log.d("NotificationService","backgroundThread");
 
             Wifi wifiDirect = new Wifi(NotificationService.this);
 
-            while(true) {
+            while(running) {
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {
@@ -99,6 +104,7 @@ public class NotificationService extends Service {
                             String.valueOf(location.getLongitude())));
                 }
                 getNearbyMessages(loc, SSIDs);
+                sendMyKeys(loc,SSIDs);
                 wifiDirect.getNearbyDevices();
             }
         }
@@ -111,7 +117,7 @@ public class NotificationService extends Service {
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
 
-        Thread thread = new Thread(backgroundThread);
+        thread = new Thread(backgroundThread);
         thread.start();
         return START_STICKY;
     }
@@ -173,7 +179,8 @@ public class NotificationService extends Service {
     private void checkMessageCache(JSONObject obj){
         try{
             SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
-            Set<String> messagesSet = prefs.getStringSet("messages", null);
+            String username = prefs.getString("username","");
+            Set<String> messagesSet = prefs.getStringSet("messages" + username, null);
             if(messagesSet==null){
                 messagesSet = new HashSet<String>();
             }
@@ -185,7 +192,7 @@ public class NotificationService extends Service {
             messagesSet.add(obj.toString());
 
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putStringSet("messages", messagesSet);
+            editor.putStringSet("messages"  + username, messagesSet);
             editor.apply();
             launchNotification(obj);
         }
@@ -257,6 +264,205 @@ public class NotificationService extends Service {
         queue.add(jsObjRequest);
     }
 
+    public void sendMyKeys(LocationModel location, final ArrayList<String> locations){
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(this);
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/myLocations";
+        JSONObject jsonBody = new JSONObject();
+        try{
+            jsonBody.put("latitude",location.getCoordinates().getLatitude().toString());
+            jsonBody.put("longitude",location.getCoordinates().getLongitude().toString());
+            System.out.println("A ENVIAR LOC: " + jsonBody.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            if(response.get("status").toString().equals("ok")){
+                                Log.d("onResponse","RESPOSTA : "+response.get("status"));
+                                JSONArray array = response.getJSONArray("locations");
+                                for(int i=0;i<array.length();i++){
+                                    locations.add(array.getString(i));
+                                }
+                                SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
+                                Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+                                Set<JSONObject> setKeyMessages = new HashSet<JSONObject>();
+                                for(String loc : locations){
+                                    for(String msg : messagesSet){
+                                        if(new JSONObject(msg).getString("location").equals(loc)){
+                                            JSONObject wifiKeyMessage = new JSONObject();
+                                            wifiKeyMessage.put("whitelist",new JSONObject(msg).getJSONObject("whitelist"));
+                                            wifiKeyMessage.put("blacklist",new JSONObject(msg).getJSONObject("blacklist"));
+                                            wifiKeyMessage.put("id", new JSONObject(msg).getString("id"));
+                                            setKeyMessages.add(wifiKeyMessage);
+                                        }
+                                    }
+                                }
+                                System.out.println(setKeyMessages);
+                                compareKeys(setKeyMessages);// USAR CLASS DO GUI E FAZER SEND
+                            }
+                            else{
+                                try{
+                                    //Toast.makeText(NotificationService.this, "Status: "+ response.get("status"), Toast.LENGTH_LONG).show();
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try{
+
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
+    }
+
+    public Set<String> compareKeys(Set<JSONObject> keys){
+        Set<String> ids = new HashSet<String>();
+        for(JSONObject msg : keys){
+            try{
+                Set<String> valuesSet = new HashSet<String>();
+
+                JSONObject whitelist = msg.getJSONObject("whitelist");
+                Iterator<String> whitelistKeys = whitelist.keys();
+                HashMap<String,Set<String>> whitelistHash = new HashMap<String,Set<String>>();
+                while(whitelistKeys.hasNext()) {
+                    String key = (String) whitelistKeys.next();
+                    JSONArray values = whitelist.getJSONArray(key);
+                    for(int i=0; i<values.length(); i++) {
+                        String value = values.getString(i);
+                        if (whitelistHash.containsKey(key)) {
+                            whitelistHash.get(key).add(value);
+                        } else {
+                            Set<String> val = new HashSet<String>();
+                            val.add(value);
+                            whitelistHash.put(key, val);
+                        }
+                    }
+                }
+
+                //TESTE
+                System.out.println("WHITELIST");
+                for(Map.Entry<String,Set<String>> set : whitelistHash.entrySet()){
+                    for(String str : set.getValue()){
+                        System.out.println(set.getKey() + " - " + str);
+                    }
+                }
+
+                JSONObject blacklist = msg.getJSONObject("blacklist");
+                Iterator<String> blacklistKeys = blacklist.keys();
+                HashMap<String,Set<String>> blacklistHash = new HashMap<String,Set<String>>();
+                while(blacklistKeys.hasNext()) {
+                    String key = (String) blacklistKeys.next();
+                    JSONArray values = blacklist.getJSONArray(key);
+                    for (int i = 0; i < values.length(); i++) {
+                        valuesSet.add(values.getString(i));
+                    }
+                    blacklistHash.put(key, valuesSet);
+                }
+
+                //TESTE
+                System.out.println("BLACKLIST");
+                for(Map.Entry<String,Set<String>> set : blacklistHash.entrySet()){
+                    for(String str : set.getValue()){
+                        System.out.println(set.getKey() + " - " + str);
+                    }
+                }
+
+                SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
+                Set<String> userKeySet = prefs.getStringSet("Keys", null);
+                HashMap<String,Set<String>> userKeys = new HashMap<String,Set<String>>();
+                if(!(userKeySet==null)){
+                    for(String pair : userKeySet){
+                        String key = pair.split(" = ")[0];
+                        String value = pair.split(" = ")[1];
+                        if(userKeys.containsKey(key)){
+                            userKeys.get(key).add(value);
+                        }
+                        else{
+                            Set<String> val = new HashSet<String>();
+                            val.add(value);
+                            userKeys.put(key,val);
+                        }
+                    }
+                }
+
+                //TESTE
+                System.out.println("USERKEYS");
+                for(Map.Entry<String,Set<String>> set : userKeys.entrySet()){
+                    for(String str : set.getValue()){
+                        System.out.println(set.getKey() + " - " + str);
+                    }
+                }
+
+                if(isInWhiteList(userKeys,whitelistHash) && !isInBackList(userKeys,blacklistHash)){
+                    ids.add(msg.getString("id"));
+                }
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        System.out.println("IDSSSS " + ids);
+        return ids;
+    }
+
+    public boolean isInWhiteList(HashMap<String,Set<String>> userKeys, HashMap<String,Set<String>> whitelist){
+        if(whitelist.size()==0) return true;
+        if(userKeys.size()==0) return false;
+        for(Map.Entry<String,Set<String>> e : whitelist.entrySet()) {
+            String key = e.getKey();
+            if (userKeys.containsKey(key)){
+                Set<String> value = e.getValue();
+                if(!userKeys.get(key).containsAll(value)){
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isInBackList(HashMap<String,Set<String>> userKeys, HashMap<String,Set<String>> blacklist){
+        if(blacklist.size()==0) return false;
+        for(Map.Entry<String,Set<String>> e : userKeys.entrySet()) {
+            String key = e.getKey();
+            if (blacklist.containsKey(key)){
+                Set<String> value = e.getValue();
+                for (String s : value) {
+                    if(blacklist.get(key).contains(s)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public void launchNotification(JSONObject message){
         String username = new String();
         Message mssg = null;
@@ -301,9 +507,14 @@ public class NotificationService extends Service {
         notificationManager.notify(new Random().nextInt(), mBuilder.build());
     }
 
+    public void endThread(){
+        running=false;
+    }
+
     @Override
     public void onDestroy(){
         super.onDestroy();
+        endThread();
         //this.unregisterReceiver(bReciever);
     }
 

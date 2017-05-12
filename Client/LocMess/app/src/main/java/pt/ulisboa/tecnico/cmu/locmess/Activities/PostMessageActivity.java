@@ -147,24 +147,24 @@ public class PostMessageActivity extends AppCompatActivity {
                 HashMap<String, Set<String>> whitelistKeyPairs = new HashMap<String, Set<String>>();
                 HashMap<String, Set<String>> blacklistKeyPairs = new HashMap<String, Set<String>>();
                 for (String entry: keyPairsWhitelist) {
-                    if(whitelistKeyPairs.containsKey(entry.split("=")[0])){
-                        whitelistKeyPairs.get(entry.split(" =")[0]).add(entry.split("= ")[1]);
+                    if(whitelistKeyPairs.containsKey(entry.split(" = ")[0])){
+                        whitelistKeyPairs.get(entry.split(" = ")[0]).add(entry.split(" = ")[1]);
                     }
                     else{
                         Set<String> val = new HashSet<String>();
                         val.add(entry.split("= ")[1]);
-                        whitelistKeyPairs.put(entry.split(" =")[0],val);
+                        whitelistKeyPairs.put(entry.split(" = ")[0],val);
                     }
                 }
 
                 for (String entry: keyPairsBlacklist) {
-                    if(blacklistKeyPairs.containsKey(entry.split(" =")[0])){
-                        blacklistKeyPairs.get(entry.split(" =")[0]).add(entry.split("= ")[1]);
+                    if(blacklistKeyPairs.containsKey(entry.split(" = ")[0])){
+                        blacklistKeyPairs.get(entry.split(" = ")[0]).add(entry.split(" = ")[1]);
                     }
                     else{
                         Set<String> val = new HashSet<String>();
-                        val.add(entry.split("= ")[1]);
-                        blacklistKeyPairs.put(entry.split(" =")[0],val);
+                        val.add(entry.split(" = ")[1]);
+                        blacklistKeyPairs.put(entry.split(" = ")[0],val);
                     }
                 }
                 TimeWindow timeWindow = new TimeWindow(Integer.parseInt(beginTime.split(":")[0]),
@@ -727,13 +727,14 @@ public class PostMessageActivity extends AppCompatActivity {
             jsonBody.put("body",message.getMessage());
 
             JSONObject json = new JSONObject();
+            System.out.println("VAAAAAAL " + message.getWhitelistKeyPairs().entrySet());
             for (Map.Entry<String, Set<String>> entry : message.getWhitelistKeyPairs().entrySet()) {
                 try{
                     String key = entry.getKey();
                     Set<String> val = entry.getValue();
                     json.put(key,new JSONArray(val));
                 }catch (Exception e){
-
+                    e.printStackTrace();
                 }
             }
             try{
@@ -758,7 +759,7 @@ public class PostMessageActivity extends AppCompatActivity {
 
             }
 
-            jsonBody.put("Id",new String(Base64.encodeToString(jsonBody.toString().getBytes(), Base64.DEFAULT)));
+            jsonBody.put("id",new String(Base64.encodeToString(jsonBody.toString().getBytes(), Base64.DEFAULT)));
 
         }catch (Exception e){
             e.printStackTrace();

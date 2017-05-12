@@ -542,6 +542,10 @@ public class Http {
                 try {
                     if (response.get("status").toString().equals("ok")) {
                         Iterator<String> iter = response.keys();
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        Set<String> Keys = new HashSet<String>();
+                        editor.putStringSet("Keys", Keys);
+                        editor.apply();
                         Set<String> messagesSet = new HashSet<String>();
                         while (iter.hasNext()) {
                             String key = iter.next();
@@ -550,7 +554,7 @@ public class Http {
                                 for (int i = 0; i < response.getJSONArray(key).length(); i++) {
                                     set.add(response.getJSONArray(key).getString(i));
                                     messagesSet.add(key + " = " + response.getJSONArray(key).getString(i));
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor = sharedPreferences.edit();
                                     editor.putStringSet("Keys", messagesSet);
                                     editor.apply();
                                 }
@@ -610,6 +614,9 @@ public class Http {
                 try {
                     if (response.get("status").toString().equals("ok")) {
                         Iterator<String> iter = response.keys();
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putStringSet("Keys", null);
+
                         Set<String> messagesSet = new HashSet<String>();
                         while (iter.hasNext()) {
                             String key = iter.next();
@@ -618,7 +625,7 @@ public class Http {
                                 for (int i = 0; i < response.getJSONArray(key).length(); i++) {
                                     set.add(response.getJSONArray(key).getString(i));
                                     messagesSet.add(key + " = " + response.getJSONArray(key).getString(i));
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor = sharedPreferences.edit();
                                     editor.putStringSet("Keys", messagesSet);
                                     editor.apply();
                                 }

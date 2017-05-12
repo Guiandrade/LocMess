@@ -117,6 +117,12 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
         }
     }
 
+    /*public void sendUpdateToAll(){
+        for(String ip : groupDevices){
+            sendMessage("update\n",ip,10001);
+        }
+    }*/
+
     public void sendMessage(String message,String ip, int port) {
         new SendMessage(ip,port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,message);
     }

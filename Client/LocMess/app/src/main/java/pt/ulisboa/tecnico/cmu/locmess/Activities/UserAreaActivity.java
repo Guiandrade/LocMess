@@ -72,6 +72,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Utils.PermissionUtils;
 import pt.ulisboa.tecnico.cmu.locmess.Services.NotificationService;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
 
 public class UserAreaActivity extends AppCompatActivity implements
         GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback,
@@ -282,8 +283,9 @@ public class UserAreaActivity extends AppCompatActivity implements
                 } catch (Exception e) {
 
                 }
-                System.out.println("CHEGOU AQUIIIIIIIIIIIIIII");
-                new Http().getKeys(this, false);
+                if(addedKeyPairs.size()!=0 || deletedKeyPairs.size()!=0){
+                    new Http().getKeys(this, false);
+                }
             }
         }
     }

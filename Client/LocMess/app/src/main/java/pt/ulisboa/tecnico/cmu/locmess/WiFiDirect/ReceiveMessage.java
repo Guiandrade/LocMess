@@ -3,6 +3,8 @@ package pt.ulisboa.tecnico.cmu.locmess.WiFiDirect;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,8 +18,17 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.StrictMode;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +42,9 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
+import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
 import pt.ulisboa.tecnico.cmu.locmess.Services.NotificationService;
+import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 
 /**
  * Created by guiandrade on 10-05-2017.
@@ -41,6 +54,7 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
 
     private SimWifiP2pSocketServer mSrvSocket;
     private int server_port;
+
 
     public ReceiveMessage(int port){
         this.server_port = port;
@@ -61,14 +75,19 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
 
             try {
                 SimWifiP2pSocket sock = mSrvSocket.accept();
-                Log.d("ReceiveMessage","Accepted Socket");
+                //Log.d("ReceiveMessage","Accepted Socket");
                 try {
-                    // Read data
                     BufferedReader socketIn = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                     String str = socketIn.readLine();
-                    Log.d("ReceiveMessage",str);
+                    //Log.d("ReceiveMessage",str);
                     JSONArray ids = new JSONArray();
                     try{
+                        /*if(str.equals("update")){
+                            Log.d("RecieveMessage", "Recieved update");
+
+                            sendMyKeys(NotificationService.loc, NotificationService.SSIDs,sock);
+
+                        }*/
                         JSONObject json = new JSONObject(str);
                         if(json.has("Keys")){
                             JSONArray array = json.getJSONArray("Keys");
@@ -78,7 +97,6 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
                             }
                             ids = compareKeys(setJson);
                             JSONObject jsonObject = new JSONObject();
-                            Log.d("RecieveMessage", "SEND IDS");
                             jsonObject.put("ids",ids);
                             sock.getOutputStream().write((jsonObject.toString()+"\n").getBytes());
                         }
@@ -88,12 +106,14 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
                             json = new JSONObject(str);
                             if(json.has("messages")){
                                 JSONArray array = json.getJSONArray("messages");
-                                Log.d("RecieveMessage", array.toString());
+                                //Log.d("RecieveMessage", array.toString());
                                 for(int i=0; i<array.length();i++){
                                     checkMessageCache(array.getJSONObject(i));
                                 }
                             }
                         }
+                        sock.close();
+
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -101,7 +121,7 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
                 } catch (IOException e) {
                     Log.d("Error: Reading socket", e.getMessage());
                 } finally {
-                    sock.close();
+
                 }
             } catch (IOException e) {
                 Log.d("Error: Socket", e.getMessage());
@@ -110,6 +130,105 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
         }
         return null;
     }
+
+    /*public void sendMyKeys(LocationModel location, final ArrayList<String> locations, final SimWifiP2pSocket sock){
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(NotificationService.getContext());
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + new Http().getServerIp() + "/myLocations";
+        JSONObject jsonBody = new JSONObject();
+        SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
+        final String token = prefs.getString("token", "");
+        try{
+            jsonBody.put("latitude",location.getCoordinates().getLatitude().toString());
+            jsonBody.put("longitude",location.getCoordinates().getLongitude().toString());
+            System.out.println("A ENVIAR LOC: " + jsonBody.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try{
+                            if(response.get("status").toString().equals("ok")){
+                                Log.d("onResponse","RESPOSTA : "+response.get("status"));
+                                JSONArray array = response.getJSONArray("locations");
+                                for(int i=0;i<array.length();i++){
+                                    locations.add(array.getString(i));
+                                }
+                                SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
+                                Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+                                JSONArray setKeyMessages = new JSONArray();
+                                JSONObject json = new JSONObject();
+                                for(String loc : locations){
+                                    for(String msg : messagesSet){
+                                        if(new JSONObject(msg).getString("location").equals(loc)){
+                                            JSONObject wifiKeyMessage = new JSONObject();
+                                            wifiKeyMessage.put("whitelist",new JSONObject(msg).getJSONObject("whitelist"));
+                                            wifiKeyMessage.put("blacklist",new JSONObject(msg).getJSONObject("blacklist"));
+                                            wifiKeyMessage.put("id", new JSONObject(msg).getString("id"));
+                                            setKeyMessages.put(wifiKeyMessage);
+                                        }
+                                    }
+                                }
+                                String message = json.put("Keys",setKeyMessages) + "\n";
+                                sock.getOutputStream().write((message+"\n").getBytes());
+                                Log.d("ReceiveMessage", "Sent keys white and black " + message);
+                                BufferedReader socketIn = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+                                String resp = socketIn.readLine();
+                                Log.d("ReceiveMessage", "Resposta Ids " + resp);
+                                json = new JSONObject(resp);
+                                if(json.has("ids")){
+                                    array = json.getJSONArray("ids");
+                                    if(array.length()!=0){
+                                        Set<String> ids = new HashSet<String>();
+                                        for(int i=0; i<array.length();i++){
+                                            ids.add(array.getString(i));
+                                        }
+                                        JSONObject Resp = new JSONObject();
+                                        Resp.put("messages",getMessagesByIds(ids));
+                                        OutputStream out1 = sock.getOutputStream();
+                                        Log.d("ReceiveMessage", "Mensagens enviadas " + Resp.toString());
+                                        out1.write((Resp + "\n").getBytes());
+                                    }
+                                }
+                                sock.close();
+                            }
+                            else{
+                                try{
+                                    //Toast.makeText(NotificationService.this, "Status: "+ response.get("status"), Toast.LENGTH_LONG).show();
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try{
+
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
+    }*/
 
     public void checkMessageCache(JSONObject obj){
         try{

@@ -85,9 +85,16 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
 
     }
 
-    public void sendMessage(String ip, int port) {
-        String messageToSend = "This is a message from the device with ip "+ip+"\n";
-        new SendMessage(ip,port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,messageToSend);
+    public void sendMessageToAll(String message,int port){
+        // Adaptar isso para enviar as mensagens só que respeitem as keys do destinatário
+        for(String ip : groupDevices){
+            new SendMessage(ip,port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,message);
+        }
+    }
+
+    public void sendMessage(String message,String ip, int port) {
+        // Adaptar isso para enviar as mensagens só que respeitem as keys do destinatário
+        new SendMessage(ip,port).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,message);
     }
 
     @Override
@@ -110,10 +117,11 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
         // Add new devices on group
         for (String ip : newNetworkDevices){
             if (!groupDevices.contains(ip)){
-            Log.d("onGroupInfoAvailable","Before sending message to ip "+ip);
+            Log.d("SendMessageNewDevices","Before sending message to ip "+ip);
                 groupDevices.add(ip);
                 // Send Message to new ip
-                sendMessage(ip,port);
+                String message = "This is a hello message from the device with ip "+ip+"\n";
+                sendMessage(message,ip,port);
             }
         }
 

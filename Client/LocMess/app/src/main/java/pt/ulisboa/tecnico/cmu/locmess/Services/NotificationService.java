@@ -182,14 +182,18 @@ public class NotificationService extends Service {
             SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
             String username = prefs.getString("username","");
             Set<String> messagesSet = prefs.getStringSet("messages" + username, null);
-            if(messagesSet==null){
+            Log.d("CONA", "PASSA 1" );
+            if(messagesSet==null) {
                 messagesSet = new HashSet<String>();
             }
             for (String message: messagesSet) {
+                Log.d("CONA", new JSONObject(message).toString());
                 if (new JSONObject(message).getString("id").equals(obj.getString("id"))){
+                    Log.d("CONA", "PASSA 2" );
                     return;
                 }
             }
+            Log.d("CONA", obj.toString());
             messagesSet.add(obj.toString());
 
             SharedPreferences.Editor editor = prefs.edit();
@@ -197,7 +201,9 @@ public class NotificationService extends Service {
             editor.apply();
             launchNotification(obj);
         }
-        catch (JSONException e){ }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 
     public void getNearbyMessages(LocationModel location, final ArrayList<String> ssids){
@@ -293,7 +299,7 @@ public class NotificationService extends Service {
 
             mssg = new Message(id,title,msg,owner,location,null,null,timeWindow);
         }catch (Exception e){
-
+            e.printStackTrace();
         }
 
         final Intent intent = new Intent(this, MessageActivity.class);

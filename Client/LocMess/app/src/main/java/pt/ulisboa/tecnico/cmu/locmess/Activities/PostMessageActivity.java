@@ -79,7 +79,7 @@ public class PostMessageActivity extends AppCompatActivity {
         }
 
         locations = (ArrayList<LocationModel>) getIntent().getSerializableExtra("locations");
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         username = sharedPreferences.getString("username","");
 
         final EditText etTitle = (EditText) findViewById(R.id.etTitle);
@@ -760,6 +760,7 @@ public class PostMessageActivity extends AppCompatActivity {
             }
 
             jsonBody.put("id",new String(Base64.encodeToString(jsonBody.toString().getBytes(), Base64.DEFAULT)));
+            jsonBody.put("username",username);
 
         }catch (Exception e){
             e.printStackTrace();

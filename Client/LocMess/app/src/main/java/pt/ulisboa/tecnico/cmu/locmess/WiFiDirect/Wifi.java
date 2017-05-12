@@ -29,9 +29,9 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 
 public class Wifi implements SimWifiP2pManager.GroupInfoListener {
 
-    private static Wifi ourInstance = null;
+    private static final Wifi ourInstance = new Wifi();
 
-    static Wifi getWifiInstance() {
+    public static Wifi getWifiInstance() {
         return ourInstance;
     }
 
@@ -41,7 +41,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
     private HashSet<String> groupDevices;
     private int port = 10001;
 
-    public Wifi (NotificationService service){
+    public void setup (NotificationService service){
         // initialize the WDSim API
         SimWifiP2pSocketManager.Init(NotificationService.getContext());
 
@@ -57,7 +57,6 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
         // bind the Termite Service
         Intent intent = new Intent(NotificationService.getContext(), SimWifiP2pService.class);
         service.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        ourInstance = this;
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {

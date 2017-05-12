@@ -63,13 +63,13 @@ import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
 
 public class NotificationService extends Service {
 
-    BroadcastReceiver bReciever;
-    ArrayList<String> SSIDs = new ArrayList<String>();
-    String token;
-    String SERVER_IP;
-    private Location location;
+    private BroadcastReceiver bReciever;
+    private ArrayList<String> SSIDs = new ArrayList<String>();
+    private String token;
+    private String SERVER_IP;
+    private static Location location;
     private static Context context;
-    Thread thread;
+    private Thread thread;
     boolean running = false;
 
     @Override
@@ -268,7 +268,7 @@ public class NotificationService extends Service {
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
         SecurityHandler.allowAllSSL();
-        String url = "https://" + SERVER_IP + "/myLocations";
+        String url = "https://" + new Http().getServerIp() + "/myLocations";
         JSONObject jsonBody = new JSONObject();
         try{
             jsonBody.put("latitude",location.getCoordinates().getLatitude().toString());
@@ -428,6 +428,24 @@ public class NotificationService extends Service {
         }
         System.out.println("IDSSSS " + ids);
         return ids;
+    }
+
+    public Set<JSONObject> getMessagesByIds(Set<String> ids){
+        SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
+        Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+        Set<JSONObject> msgsToSend = new HashSet<JSONObject>();
+        for(String msg : messagesSet){
+            for(String id : ids){
+                try{
+                    if(new JSONObject(msg).getJSONObject("id").equals(id)){
+                        msgsToSend.add(new JSONObject(msg));
+                    }
+                }catch (Exception e){
+
+                }
+            }
+        }
+        return msgsToSend;
     }
 
     public boolean isInWhiteList(HashMap<String,Set<String>> userKeys, HashMap<String,Set<String>> whitelist){

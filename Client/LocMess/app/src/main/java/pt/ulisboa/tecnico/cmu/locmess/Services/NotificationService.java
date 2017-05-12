@@ -89,7 +89,8 @@ public class NotificationService extends Service {
             running = true;
             Log.d("NotificationService","backgroundThread");
 
-            Wifi wifiDirect = new Wifi(NotificationService.this);
+            Wifi wifiDirect = Wifi.getWifiInstance();
+            wifiDirect.setup(NotificationService.this);
 
             while(running) {
                 try {

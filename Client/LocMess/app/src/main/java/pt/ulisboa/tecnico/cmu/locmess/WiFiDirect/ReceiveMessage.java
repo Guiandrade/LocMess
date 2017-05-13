@@ -79,7 +79,7 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
                 try {
                     BufferedReader socketIn = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                     String str = socketIn.readLine();
-                    //Log.d("ReceiveMessage",str);
+                    Log.d("ReceiveMessage",str);
                     JSONArray ids = new JSONArray();
                     try{
                         /*if(str.equals("update")){
@@ -89,27 +89,80 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
 
                         }*/
                         JSONObject json = new JSONObject(str);
-                        if(json.has("Keys")){
-                            JSONArray array = json.getJSONArray("Keys");
+                        if(json.has("KeysUser")){
+                            Log.d("RecieveMessage", "KeysUser");
+                            JSONObject jsonObject = new JSONObject();
+                            JSONArray array = json.getJSONArray("KeysUser");
+                            Log.d("RecieveMessage", "Array User Keys" + array);
                             Set<JSONObject> setJson = new HashSet<JSONObject>();
                             for(int i=0; i<array.length();i++){
                                 setJson.add(array.getJSONObject(i));
                             }
-                            ids = compareKeys(setJson);
-                            JSONObject jsonObject = new JSONObject();
+                            compareKeys(setJson,ids);
+
+                            array = json.getJSONArray("KeysMule");
+                            Log.d("RecieveMessage", "KeysMules " + array);
+                            setJson = new HashSet<JSONObject>();
+                            for(int i=0; i<array.length();i++){
+                                setJson.add(array.getJSONObject(i));
+                            }
+                            compareKeys(setJson,ids);
                             jsonObject.put("ids",ids);
+                            Log.d("RecieveMessage", "Ids " + jsonObject);
+
                             sock.getOutputStream().write((jsonObject.toString()+"\n").getBytes());
                         }
                         if(ids.length()!=0){
                             socketIn = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                             str = socketIn.readLine();
                             json = new JSONObject(str);
-                            if(json.has("messages")){
-                                JSONArray array = json.getJSONArray("messages");
+                            if(json.has("messagesDirect")){
+                                JSONArray array = json.getJSONArray("messagesDirect");
                                 //Log.d("RecieveMessage", array.toString());
                                 for(int i=0; i<array.length();i++){
                                     checkMessageCache(array.getJSONObject(i));
                                 }
+                                SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
+                                final int mules = Integer.parseInt(prefs.getString("mules", ""));
+                                array = json.getJSONArray("messagesMule");
+                                Set<String> setMules = prefs.getStringSet("mules", null);
+                                if(setMules==null){
+                                    setMules = new HashSet<String>();
+                                    for(int i=0;i<array.length();i++){
+                                        if((i)==mules){
+                                            break;
+                                        }
+                                        setMules.add(array.get(i).toString());
+                                    }
+                                }
+                                else{
+                                    JSONArray newArray = new JSONArray();
+                                    if(array.length()>mules){
+                                        for(int i=0;i<mules;i++){
+                                            newArray.put(array.getString(i));
+                                        }
+                                    }
+                                    else{
+                                        newArray = array;
+                                    }
+                                    int element = mules-setMules.size()-newArray.length();
+                                    if(element>=0){
+                                        for(int i=0;i<newArray.length();i++){
+                                            setMules.add(newArray.getString(i));
+                                        }
+                                    }
+                                    else{
+                                        Iterator<String> it = setMules.iterator();
+                                        while(it.hasNext() && element!=0){
+                                            it.remove();
+                                            element++;
+                                        }
+                                        for(int i=0;i<newArray.length();i++){
+                                            setMules.add(newArray.getString(i));
+                                        }
+                                    }
+                                }
+                                Log.d("ReceiveMessage","FIM " + setMules);
                             }
                         }
                         sock.close();
@@ -297,8 +350,7 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
         notificationManager.notify(new Random().nextInt(), mBuilder.build());
     }
 
-    public JSONArray compareKeys(Set<JSONObject> keys){
-        JSONArray ids = new JSONArray();
+    public JSONArray compareKeys(Set<JSONObject> keys, JSONArray ids){
         for(JSONObject msg : keys){
             try{
                 Set<String> valuesSet = new HashSet<String>();

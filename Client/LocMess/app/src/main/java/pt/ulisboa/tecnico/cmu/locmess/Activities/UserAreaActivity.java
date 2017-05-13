@@ -183,6 +183,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                 editor.putString("username","");
                 editor.putString("mules","");
                 editor.putStringSet("Keys", null);
+                editor.putStringSet("muleMessages",null);
                 editor.apply();
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);
                 logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

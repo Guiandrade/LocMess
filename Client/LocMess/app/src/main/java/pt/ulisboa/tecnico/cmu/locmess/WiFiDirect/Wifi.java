@@ -61,6 +61,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
     private Messenger mService = null;
     private HashSet<String> groupDevices;
     private int port = 10001;
+    public static ArrayList<String> localizacao;
 
     public void setup (NotificationService service){
         // initialize the WDSim API
@@ -190,6 +191,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
                                 for(int i=0;i<array.length();i++){
                                     locations.add(array.getString(i));
                                 }
+                                localizacao = locations;
                                 SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
                                 Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
                                 JSONArray setKeyMessages = new JSONArray();
@@ -215,7 +217,38 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
                                         }
                                     }
                                 }
-                                String message = json.put("Keys",setKeyMessages) + "\n";
+                                json.put("KeysUser",setKeyMessages);
+                                Log.d("RecieveMessage", "Um" + setKeyMessages);
+
+                                messagesSet = prefs.getStringSet("muleMessages", null);
+                                setKeyMessages = new JSONArray();
+                                if (messagesSet != null){
+                                    for(String loc : locations){
+                                        for(String msg : messagesSet){
+                                            if(new JSONObject(msg).getString("location").equals(loc)){
+                                                if(id==null){
+                                                    JSONObject wifiKeyMessage = new JSONObject();
+                                                    wifiKeyMessage.put("whitelist",new JSONObject(msg).getJSONObject("whitelist"));
+                                                    wifiKeyMessage.put("blacklist",new JSONObject(msg).getJSONObject("blacklist"));
+                                                    wifiKeyMessage.put("id", new JSONObject(msg).getString("id"));
+                                                    setKeyMessages.put(wifiKeyMessage);
+                                                }
+                                                else if(id!=null && new JSONObject(msg).getString("id").equals(id)){
+                                                    JSONObject wifiKeyMessage = new JSONObject();
+                                                    wifiKeyMessage.put("whitelist",new JSONObject(msg).getJSONObject("whitelist"));
+                                                    wifiKeyMessage.put("blacklist",new JSONObject(msg).getJSONObject("blacklist"));
+                                                    wifiKeyMessage.put("id", new JSONObject(msg).getString("id"));
+                                                    setKeyMessages.put(wifiKeyMessage);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                json.put("KeysMule",setKeyMessages);
+                                Log.d("RecieveMessage", "Dois" + setKeyMessages);
+
+                                String message = json + "\n";
                                 sendMessage(message,ip,port);
                             }
                             else{

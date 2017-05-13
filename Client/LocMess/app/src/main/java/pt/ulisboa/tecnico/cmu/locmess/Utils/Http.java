@@ -87,6 +87,7 @@ public class Http {
                                     editor.putString("mules",jsonBody.getString("mules"));
                                 }
                                 editor.putString("username",jsonBody.getString("username"));
+                                editor.putStringSet("muleMessages",null);
                                 editor.apply();
                                 Intent loginIntent = new Intent(context, UserAreaActivity.class);
                                 loginIntent.putExtra("serverIP", SERVER_IP);

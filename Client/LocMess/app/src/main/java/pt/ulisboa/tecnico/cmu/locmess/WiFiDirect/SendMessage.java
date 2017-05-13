@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -79,7 +80,24 @@ public class SendMessage extends AsyncTask<String, String, Void> {
                     }
                     JSONObject resp = new JSONObject();
                     //Log.d("SendMessage", "SENDOU CARALHO");
-                    resp.put("messages",getMessagesByIds(ids));
+                    ArrayList<String> locations = Wifi.localizacao;
+                    JSONArray msgsToSend = new JSONArray();
+                    SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
+                    Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+                    for(String msg : messagesSet){
+                        try{
+                            Log.d("Send Message", "Locations " + new JSONObject(msg).getString("location"));
+                            Log.d("Send Message", "Verif " + locations.contains(new JSONObject(msg).getString("location")));
+                            if(!(locations.contains(new JSONObject(msg).getString("location")))){
+                                msgsToSend.put(new JSONObject(msg));
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    resp.put("messagesDirect",getMessagesByIds(ids));
+                    resp.put("messageMule",msgsToSend);
+                    Log.d("Send Message", "Message Mule " + msgsToSend);
                     OutputStream out1 = socket.getOutputStream();
                     //Log.d("SendMessage", resp.toString());
                     out1.write((resp + "\n").getBytes());
@@ -198,7 +216,21 @@ public class SendMessage extends AsyncTask<String, String, Void> {
                         msgsToSend.put(new JSONObject(msg));
                     }
                 }catch (Exception e){
-
+                    e.printStackTrace();
+                }
+            }
+        }
+        messagesSet = prefs.getStringSet("muleMessages", null);
+        if(messagesSet!=null){
+            for(String msg : messagesSet){
+                for(String id : ids){
+                    try{
+                        if(new JSONObject(msg).getString("id").equals(id)){
+                            msgsToSend.put(new JSONObject(msg));
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         }

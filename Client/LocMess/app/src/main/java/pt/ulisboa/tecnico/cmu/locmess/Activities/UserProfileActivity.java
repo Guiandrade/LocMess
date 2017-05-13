@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Set;
 
 import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
+import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 
@@ -75,6 +77,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         final TextView tvUsername = (TextView) findViewById(R.id.tvUsername);
         final Button bAddKeyPair = (Button) findViewById(R.id.bAddKeyPair);
+        final Button bChangeMules = (Button) findViewById(R.id.bChangeMules);
 
         tvUsername.setText(username);
         myList = new  ArrayList<String>();
@@ -187,6 +190,25 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onDestroyActionMode(android.view.ActionMode mode) {
 
+            }
+        });
+
+        bChangeMules.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(UserProfileActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.change_mule_layout, null);
+                final EditText newNumbOfMules = (EditText) mView.findViewById(R.id.etChangeMules);
+                SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+                newNumbOfMules.setHint(sharedPref.getString("mules",""));
+                mBuilder.setView(mView);
+                mBuilder.setPositiveButton(R.string.change_mules, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        new Http().changeMule(newNumbOfMules.getText().toString(),v);
+                    }
+                });
+                AlertDialog dialog = mBuilder.create();
+                dialog.show();
             }
         });
 

@@ -80,6 +80,12 @@ public class Http {
                                 SharedPreferences sharedPref = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putString("token",response.getString("token"));
+                                if (type.equals("login")){
+                                    editor.putString("mules",response.getString("mules"));
+                                }
+                                else if (type.equals("register")){
+                                    editor.putString("mules",jsonBody.getString("mules"));
+                                }
                                 editor.putString("username",jsonBody.getString("username"));
                                 editor.apply();
                                 Intent loginIntent = new Intent(context, UserAreaActivity.class);
@@ -895,5 +901,63 @@ public class Http {
 
         }
         return jsonBody;
+    }
+
+    public void changeMule(final String mules, final View v) {
+        RequestQueue queue;
+        final SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        final String token = sharedPreferences.getString("token", "");
+        queue = Volley.newRequestQueue(v.getContext());
+        SecurityHandler.allowAllSSL();
+        String url = "https://" + SERVER_IP + "/changeMule";
+        JSONObject jsonBody = new JSONObject();
+        try{
+            jsonBody.put("mules",mules);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (response.get("status").toString().equals("ok")) {
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("mules",mules);
+                                editor.apply();
+                            } else {
+                                try {
+                                    Toast.makeText(v.getContext(), "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        try {
+                            Toast.makeText(v.getContext(), "Error: " + new String(error.networkResponse.data, "UTF-8"), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(v.getContext(), "Lost connection...", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                //headers.put("Content-Type", "application/json");
+                headers.put("Authorization", "Basic " + token);
+                return headers;
+            }
+        };
+        queue.add(jsObjRequest);
     }
 }

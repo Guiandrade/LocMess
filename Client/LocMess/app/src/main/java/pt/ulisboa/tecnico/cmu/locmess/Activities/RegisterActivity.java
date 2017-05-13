@@ -22,6 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         final EditText etUsername = (EditText) findViewById(R.id.etUsername);
         final EditText etPassword = (EditText) findViewById(R.id.etPassword);
+        final EditText etMules = (EditText) findViewById(R.id.etMules);
         final Button bRegister = (Button) findViewById(R.id.bRegister);
 
         //Display back button on top
@@ -35,19 +36,21 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
-                register(username,password,v);
+                int numMules = Integer.parseInt(etMules.getText().toString());
+                register(username,password,numMules,v);
             }
         });
 
     }
 
-    public void register(final String username, String password, View v){
+    public void register(final String username, String password, int numMules, View v){
 
         JSONObject jsonBody = new JSONObject();
 
         try{
             jsonBody.put("username",username);
             jsonBody.put("password",password);
+            jsonBody.put("mules",numMules);
         }catch (Exception e){
 
         }

@@ -3,6 +3,7 @@
 
     <!--    Add Location Dialog     -->
     <string name="add_location_ok">Add Location</string>
+    <string name="change_mules">Change Mules</string>
     <string name="cancel">Cancel</string>
 
     <!--    Permissions    -->

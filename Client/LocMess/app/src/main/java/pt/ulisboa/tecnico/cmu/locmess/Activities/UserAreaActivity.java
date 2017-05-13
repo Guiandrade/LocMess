@@ -181,6 +181,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("token", "");
                 editor.putString("username","");
+                editor.putString("mules","");
                 editor.putStringSet("Keys", null);
                 editor.apply();
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);

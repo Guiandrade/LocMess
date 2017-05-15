@@ -43,7 +43,8 @@ public class ReadMessagesActivity extends AppCompatActivity {
         ListView readMessagesListView = (ListView) findViewById(R.id.lvReadMessages);
 
         SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
-        Set<String> messagesSet = prefs.getStringSet("messages", null);
+        String username = prefs.getString("username","");
+        Set<String> messagesSet = prefs.getStringSet("messages" + username, null);
         if(!(messagesSet==null)){
             for(String message : messagesSet){
                 try{
@@ -72,7 +73,7 @@ public class ReadMessagesActivity extends AppCompatActivity {
                     messages.add(mssg);
                 }
                 catch (Exception e){
-
+                    e.printStackTrace();
                 }
             }
         }
@@ -85,12 +86,16 @@ public class ReadMessagesActivity extends AppCompatActivity {
         for(Message msg : messages){
             HashMap<String, String> resultsMap = new HashMap<>();
             resultsMap.put("First Line", msg.getTitle());
+            String id = msg.getId();
+            if(msg.getId().length()>10){
+                id = msg.getId().substring(35,40);
+            }
             String coordinates = "Loc: " + msg.getLocation().getName() + ", Eding Date/Time: " +
                     msg.getTimeWindow().getEndingDay() + "/" +
                     msg.getTimeWindow().getEndingMonth() + "/" +
                     msg.getTimeWindow().getEndingYear() + " " +
                     msg.getTimeWindow().getEndingHour() + ":" +
-                    msg.getTimeWindow().getEndingMinutes() + ", Id: " + msg.getId();
+                    msg.getTimeWindow().getEndingMinutes() + ", Id: " + id;
             resultsMap.put("Second Line", coordinates);
             listItems.add(resultsMap);
         }
@@ -102,9 +107,13 @@ public class ReadMessagesActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapter, View v, int position, long arg)
             {
                 HashMap<String,String> value = (HashMap<String,String>) adapter.getItemAtPosition(position);
-                String id = value.get("Second Line").split(" Id: ")[1];
+                String Id = value.get("Second Line").split(" Id: ")[1];
                 for(Message msg : messages){
-                    if(msg.getId().equals(id)){
+                    String id = msg.getId();
+                    if(msg.getId().length()>10){
+                        id = msg.getId().substring(35,40);
+                    }
+                    if(id.equals(Id)){
                         Intent messageIntent = new Intent(ReadMessagesActivity.this, MessageActivity.class);
                         messageIntent.putExtra("Message", msg);
                         startActivity(messageIntent);

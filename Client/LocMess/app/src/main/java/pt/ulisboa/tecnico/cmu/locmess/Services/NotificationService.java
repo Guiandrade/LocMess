@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -36,6 +37,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -43,6 +45,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.ulisboa.tecnico.cmu.locmess.Activities.MessageActivity;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
@@ -50,22 +55,27 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.ReceiveMessage;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.SimWifiP2pBroadcastReceiver;
 import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
+
 
 public class NotificationService extends Service {
 
-    BroadcastReceiver bReciever;
-    ArrayList<String> SSIDs = new ArrayList<String>();
-    Timer timer;
-    String token;
-    String SERVER_IP;
+    private BroadcastReceiver bReciever;
+    public static ArrayList<String> SSIDs = new ArrayList<String>();
+    private String token;
+    private String SERVER_IP;
     private Location location;
+    public static LocationModel loc;
     private static Context context;
+    private Thread thread;
+    boolean running = false;
 
     @Override
     public void onCreate() {
         context = getApplicationContext();
-        Log.d("NotificationService","Saved Application Context!");
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -73,27 +83,43 @@ public class NotificationService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        SERVER_IP = new Http().getServerIp();
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        token = sharedPreferences.getString("token","");
-        timer = new Timer();
-        timer.schedule(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
+    private Runnable backgroundThread = new Runnable() {
+
+        @Override
+        public void run() {
+            running = true;
+            Log.d("NotificationService","backgroundThread");
+
+            Wifi wifiDirect = Wifi.getWifiInstance();
+            wifiDirect.setup(NotificationService.this);
+
+            while(running) {
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception e) {
+                }
                 getLocation();
                 getSSIDs();
-                LocationModel loc = new LocationModel("",new Coordinates("0", "0"));
+                loc = new LocationModel("",new Coordinates("0", "0"));
                 if(!(location==null)){
                     loc = new LocationModel("",new Coordinates(String.valueOf(location.getLatitude()),
                             String.valueOf(location.getLongitude())));
                 }
                 getNearbyMessages(loc, SSIDs);
+                wifiDirect.getNearbyDevices();
             }
-        }, 0, 5000);
+        }
+    };
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        SERVER_IP = new Http().getServerIp();
+        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        token = sharedPreferences.getString("token","");
+
+        thread = new Thread(backgroundThread);
+        thread.start();
         return START_STICKY;
     }
 
@@ -151,26 +177,33 @@ public class NotificationService extends Service {
         }
     }
 
-    private void checkMessageCache(JSONObject obj){
+    public void checkMessageCache(JSONObject obj){
         try{
             SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
-            Set<String> messagesSet = prefs.getStringSet("messages", null);
-            if(messagesSet==null){
+            String username = prefs.getString("username","");
+            Set<String> messagesSet = prefs.getStringSet("messages" + username, null);
+            Log.d("CONA", "PASSA 1" );
+            if(messagesSet==null) {
                 messagesSet = new HashSet<String>();
             }
             for (String message: messagesSet) {
+                Log.d("CONA", new JSONObject(message).toString());
                 if (new JSONObject(message).getString("id").equals(obj.getString("id"))){
+                    Log.d("CONA", "PASSA 2" );
                     return;
                 }
             }
+            Log.d("CONA", obj.toString());
             messagesSet.add(obj.toString());
 
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putStringSet("messages", messagesSet);
+            editor.putStringSet("messages"  + username, messagesSet);
             editor.apply();
             launchNotification(obj);
         }
-        catch (JSONException e){ }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 
     public void getNearbyMessages(LocationModel location, final ArrayList<String> ssids){
@@ -186,6 +219,7 @@ public class NotificationService extends Service {
             jsonBody.put("latitude",location.getCoordinates().getLatitude().toString());
             jsonBody.put("longitude",location.getCoordinates().getLongitude().toString());
             jsonBody.put("ssids",new JSONArray(ssids));
+            System.out.println("A ENVIAR: " + jsonBody.toString());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -196,11 +230,11 @@ public class NotificationService extends Service {
                     public void onResponse(JSONObject response) {
                         try{
                             if(response.get("status").toString().equals("ok")){
-                                System.out.println("RESPOSTA : "+response.get("status"));
+                               Log.d("onResponse","RESPOSTA : "+response.get("status"));
                                 JSONArray array = response.getJSONArray("messages");
                                 for(int i=0;i<array.length();i++){
                                     checkMessageCache(array.getJSONObject(i));
-                                    System.out.println("MESSAGE : "+ array.getJSONObject(i).toString());
+                                    Log.d("onResponse","MESSAGE : "+ array.getJSONObject(i).toString());
                                 }
                             }
                             else{
@@ -265,7 +299,7 @@ public class NotificationService extends Service {
 
             mssg = new Message(id,title,msg,owner,location,null,null,timeWindow);
         }catch (Exception e){
-
+            e.printStackTrace();
         }
 
         final Intent intent = new Intent(this, MessageActivity.class);
@@ -281,11 +315,15 @@ public class NotificationService extends Service {
         notificationManager.notify(new Random().nextInt(), mBuilder.build());
     }
 
+    public void endThread(){
+        running=false;
+    }
+
     @Override
     public void onDestroy(){
         super.onDestroy();
-        timer.cancel();
-        this.unregisterReceiver(bReciever);
+        endThread();
+        //this.unregisterReceiver(bReciever);
     }
 
     public static Context getContext(){

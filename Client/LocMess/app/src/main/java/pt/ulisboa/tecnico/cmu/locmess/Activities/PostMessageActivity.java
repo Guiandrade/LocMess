@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +28,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,6 +46,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
 import pt.ulisboa.tecnico.cmu.locmess.R;
+import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
 
 public class PostMessageActivity extends AppCompatActivity {
 
@@ -75,7 +80,7 @@ public class PostMessageActivity extends AppCompatActivity {
         }
 
         locations = (ArrayList<LocationModel>) getIntent().getSerializableExtra("locations");
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         username = sharedPreferences.getString("username","");
 
         final EditText etTitle = (EditText) findViewById(R.id.etTitle);
@@ -143,24 +148,24 @@ public class PostMessageActivity extends AppCompatActivity {
                 HashMap<String, Set<String>> whitelistKeyPairs = new HashMap<String, Set<String>>();
                 HashMap<String, Set<String>> blacklistKeyPairs = new HashMap<String, Set<String>>();
                 for (String entry: keyPairsWhitelist) {
-                    if(whitelistKeyPairs.containsKey(entry.split("=")[0])){
-                        whitelistKeyPairs.get(entry.split(" =")[0]).add(entry.split("= ")[1]);
+                    if(whitelistKeyPairs.containsKey(entry.split(" = ")[0])){
+                        whitelistKeyPairs.get(entry.split(" = ")[0]).add(entry.split(" = ")[1]);
                     }
                     else{
                         Set<String> val = new HashSet<String>();
                         val.add(entry.split("= ")[1]);
-                        whitelistKeyPairs.put(entry.split(" =")[0],val);
+                        whitelistKeyPairs.put(entry.split(" = ")[0],val);
                     }
                 }
 
                 for (String entry: keyPairsBlacklist) {
-                    if(blacklistKeyPairs.containsKey(entry.split(" =")[0])){
-                        blacklistKeyPairs.get(entry.split(" =")[0]).add(entry.split("= ")[1]);
+                    if(blacklistKeyPairs.containsKey(entry.split(" = ")[0])){
+                        blacklistKeyPairs.get(entry.split(" = ")[0]).add(entry.split(" = ")[1]);
                     }
                     else{
                         Set<String> val = new HashSet<String>();
-                        val.add(entry.split("= ")[1]);
-                        blacklistKeyPairs.put(entry.split(" =")[0],val);
+                        val.add(entry.split(" = ")[1]);
+                        blacklistKeyPairs.put(entry.split(" = ")[0],val);
                     }
                 }
                 TimeWindow timeWindow = new TimeWindow(Integer.parseInt(beginTime.split(":")[0]),
@@ -190,7 +195,22 @@ public class PostMessageActivity extends AppCompatActivity {
                                     finish();
                                 }
                                 else{
-                                    // to do
+                                    JSONObject message = parseMsgToSend(msg);
+                                    SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
+                                    Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+                                    if(messagesSet==null){
+                                        messagesSet = new HashSet<String>();
+                                    }
+                                    messagesSet.add(message.toString());
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    editor.putStringSet("WifiMessages" + prefs.getString("username",""), messagesSet);
+                                    editor.apply();
+                                    try{
+                                        Wifi.getWifiInstance().sendMessageToAll(message.toString(),10001,message.getString("id"));
+                                    }catch(Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    finish();
                                 }
                             }
                         })
@@ -685,5 +705,73 @@ public class PostMessageActivity extends AppCompatActivity {
         int finalDay = cal.get(Calendar.DAY_OF_MONTH);
 
         return "" + finalDay + "/" + finalMonth + "/" + finalYear;
+    }
+
+    private JSONObject parseMsgToSend(Message message){
+        JSONObject jsonBody = new JSONObject();
+        try{
+            jsonBody.put("title",message.getTitle());
+
+            if(!(message.getLocation().getSSID() == null)) {
+                jsonBody.put("location",message.getLocation().getSSID());
+            }
+            else{
+                jsonBody.put("location",message.getLocation().getName());
+            }
+
+            String initHour = "" + message.getTimeWindow().getStartingHour();
+            String initMinute = "" + message.getTimeWindow().getStartingMinute();
+            String initDay = "" + message.getTimeWindow().getStartingDay();
+            String initMonth = "" + message.getTimeWindow().getStartingMonth();
+            String initYear = "" + message.getTimeWindow().getStartingYear();
+            jsonBody.put("initTime",initHour + ":" + initMinute + "-" + initDay + "/" + initMonth + "/" + initYear);
+            String endHour = "" + message.getTimeWindow().getEndingHour();
+            String endMinute = "" + message.getTimeWindow().getEndingMinutes();
+            String endDay = "" + message.getTimeWindow().getEndingDay();
+            String endMonth = "" + message.getTimeWindow().getEndingMonth();
+            String endYear = "" + message.getTimeWindow().getEndingYear();
+            jsonBody.put("endTime",endHour + ":" + endMinute + "-" + endDay + "/" + endMonth + "/" + endYear);
+            jsonBody.put("body",message.getMessage());
+
+            JSONObject json = new JSONObject();
+            System.out.println("VAAAAAAL " + message.getWhitelistKeyPairs().entrySet());
+            for (Map.Entry<String, Set<String>> entry : message.getWhitelistKeyPairs().entrySet()) {
+                try{
+                    String key = entry.getKey();
+                    Set<String> val = entry.getValue();
+                    json.put(key,new JSONArray(val));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            try{
+                jsonBody.put("whitelist",json);
+            }catch (Exception e){
+
+            }
+
+            JSONObject json1 = new JSONObject();
+            for (Map.Entry<String, Set<String>> entry : message.getBlacklistKeyPairs().entrySet()) {
+                try{
+                    String key = entry.getKey();
+                    Set<String> val = entry.getValue();
+                    json1.put(key,new JSONArray(val));
+                }catch (Exception e){
+
+                }
+            }
+            try{
+                jsonBody.put("blacklist",json1);
+            }catch (Exception e){
+
+            }
+
+            jsonBody.put("id",new String(Base64.encodeToString(jsonBody.toString().getBytes(), Base64.DEFAULT)));
+            jsonBody.put("username",username);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return jsonBody;
     }
 }

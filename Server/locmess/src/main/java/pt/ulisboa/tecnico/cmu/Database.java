@@ -24,8 +24,9 @@ public class Database {
     String username=req.get("username").toString();
     String password=req.get("password").toString();
     JSONObject res= new JSONObject();
-    if (profiles.login(username, password)){
-
+    String mules=profiles.login(username, password);
+    if (!mules.equals("")){
+      res.put("mules",mules);
       res.put("status","ok");
       return res;
     }
@@ -36,8 +37,9 @@ public class Database {
   public JSONObject signup(JSONObject req){
     String username=req.get("username").toString();
     String password=req.get("password").toString();
+    String mules=req.get("mules").toString();
     JSONObject res= new JSONObject();
-    if (profiles.signup(username, password)){
+    if (profiles.signup(username, password,mules)){
 
       res.put("status","ok");
       return res;
@@ -111,6 +113,22 @@ public class Database {
 
   }
 
+  public JSONObject setMules(JSONObject req){
+    String username=req.get("username").toString();
+    String mules=req.get("mules").toString();
+    JSONObject res= new JSONObject();
+    if(profiles.setMules(username, mules )){
+      System.out.println("mulessss : "+profiles.getMules(username));
+      res.put("status","ok");
+    }else{
+      res.put("status","error ");
+    }
+    return res;
+
+  }
+
+
+
   public JSONObject addLocation(JSONObject req){
     JSONObject res= new JSONObject();
     if(req.has("ssid")){
@@ -174,7 +192,7 @@ public class Database {
       double longitude=Double.parseDouble(req.getString("longitude"));
       location.addAll(locations.getUserLocation(latitude,longitude));
     }
-
+    System.out.println("localizaçoes: "+location);
     HashMap<String,Set<String>> userKeys=profiles.getUserKeys(username);
     for (String l : location) {
       System.out.println("location");
@@ -185,6 +203,21 @@ public class Database {
       }
     }
     res.put("messages",mess);
+    res.put("status","ok");
+    return res;
+  }
+  public  JSONObject getRealLocation(JSONObject req){
+    JSONObject res= new JSONObject();
+    Set<String> location=new HashSet<String>() ;
+
+    String username=req.get("username").toString();
+
+      double latitude=Double.parseDouble(req.getString("latitude"));
+      double longitude=Double.parseDouble(req.getString("longitude"));
+      location.addAll(locations.getUserLocation(latitude,longitude));
+
+    System.out.println("localizaçoes: "+location);
+    res.put("locations",location);
     res.put("status","ok");
     return res;
   }
@@ -233,7 +266,6 @@ public class Database {
              String value = array.getString(i);
              if(list.containsKey(key)){
                list.get(key).add(value);
-               System.out.println("cona");
              }else{
                 Set<String> val = new HashSet<String>();
                 val.add(value);

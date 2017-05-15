@@ -6,11 +6,13 @@ import java.util.HashSet;
 public class User {
   private String username;
   private String password;
+  private String mules;
   private HashMap<String,Set<String>> keys= new HashMap<String,Set<String>>(); //key-value
 
-  public User (String username , String password ) {
+  public User (String username , String password, String mules ) {
     this.username=username;
     this.password=password;
+    this.mules=mules;
   }
   public boolean addKey(String key, String value){
     if (keys.containsKey(key)){
@@ -39,6 +41,12 @@ public class User {
   }
   public String getPassword(){
     return password;
+  }
+  public String getMules(){
+    return this.mules;
+  }
+  public void setMules(String mule){
+    this.mules=mule;
   }
 
 }

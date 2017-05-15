@@ -91,6 +91,7 @@ public class Message {
 
   public boolean isTime(){
     int initHour = Integer.parseInt(this.initTime.split(":")[0]);
+
     int initMinute = Integer.parseInt(this.initTime.split(":")[1].split("-")[0]);
     int initDay = Integer.parseInt(this.initTime.split("/")[0].split("-")[1]);
     int initMonth = Integer.parseInt(this.initTime.split("/")[1]);
@@ -101,9 +102,11 @@ public class Message {
     int endMonth = Integer.parseInt(this.endTime.split("/")[1]);
     int endYear = Integer.parseInt(this.endTime.split("/")[2]);
     Calendar init =  Calendar.getInstance();
-    init.set(initYear,initMonth-1,initDay,initHour,initMinute);
+    init.set(initYear,initMonth-1,initDay,initHour-1,initMinute);
+
     Calendar end =  Calendar.getInstance();
-    end.set(endYear,endMonth-1,endDay,endHour,endMinute);
+    end.set(endYear,endMonth-1,endDay,endHour-1,endMinute);
+
     Calendar now = Calendar.getInstance();
     if(now.after(init) && now.before(end)){
       return true;

@@ -22,8 +22,10 @@ public class Messages {
     for(Map.Entry<String,Message> e : messages.entrySet()) {
       String key = e.getKey();
       Message m=messages.get(key);
-      System.out.println(m.toJson());
+      System.out.println("mensagem da lista: "+m.toJson());
+      System.out.println("localização: "+location);
       if(m.isTime()){
+        System.out.println("is in time");
         if(m.isInLocation(location)){
           System.out.println("is in location");
           //falta o if do tempo TODO

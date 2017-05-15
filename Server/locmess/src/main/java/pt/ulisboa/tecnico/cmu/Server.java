@@ -23,11 +23,14 @@ public class Server{
     routes.Get("/keys","getAllKeys");
     routes.Put("/locations","addLocation");
     routes.Get("/locations","getLocations");
+    routes.Post("/myLocations","getRealLocation");
     routes.Post("/deleteLocation","deleteLocation");
     routes.Post("/messages","createMessage");
     routes.Put("/messages","getMessages");
     routes.Get("/userMessages","getUserMessages");
     routes.Post("/deleteMessages","deleteMessage");
+    routes.Post("/changeMule","setMules");
+
 
 
   }

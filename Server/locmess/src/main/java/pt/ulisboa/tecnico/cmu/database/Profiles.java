@@ -7,34 +7,51 @@ import java.util.Set;
 public class Profiles {
   private HashMap<String,User> users= new HashMap<String,User>();
   private Set<String> allKeys = new HashSet<String>();
-  public boolean login(String username,String password){
+  public String login(String username,String password){
     System.out.println(users.size());
     if (users.containsKey(username)){
       System.out.println( "username existe");
       if(users.get(username).getPassword().equals(password)) {
+
         System.out.println("password passou");
-        return true;
+        return users.get(username).getMules();
       }
       System.out.println("password falhou");
     }
     System.out.println("user falhou");
-    return false;
+    return "";
   }
 
-  public boolean signup(String username,String password){
+  public boolean signup(String username,String password,String mules){
     System.out.println("if");
     if (users.containsKey(username)){
       System.out.println( "username existe");
       return false;
     }
     System.out.println( "username nao existe");
-    User user=new User(username,password);
+    User user=new User(username,password,mules);
     users.put(username, user);
     return true;
   }
 
   public Set getAllKeys(){
     return allKeys;
+  }
+
+  public boolean setMules(String username, String mules){
+    if (users.containsKey(username)){
+       users.get(username).setMules(mules);
+       return true;
+    }
+    return false;
+  }
+
+  public String getMules(String username){
+    if (users.containsKey(username)){
+
+       return users.get(username).getMules();
+    }
+    return "";
   }
 
   public HashMap getUserKeys(String username){

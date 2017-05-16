@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:hint="Message"
+        android:hint="@string/message_caps"
         android:layout_marginTop="17dp"
         android:layout_below="@+id/etTitle"
         android:layout_alignParentLeft="true"
@@ -32,7 +32,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:hint="Title" />
+        android:hint="@string/title3" />
 
     <Spinner
         android:id="@+id/sSelectLocation"
@@ -45,7 +45,7 @@
 
     <TextView
         android:id="@+id/tvBlacklist"
-        android:text="- - - - - - - - - - - - -  Blacklist Policy  - - - - - - - - - - - - -"
+        android:text="@string/blacklist_policy"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="17dp"
@@ -61,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:textSize="10dp"
-        android:text="SET DATE"
+        android:text="@string/set_date"
         android:layout_below="@+id/tvTimeBegin"
         android:layout_alignLeft="@+id/tvTimeBegin"
         android:layout_alignStart="@+id/tvTimeBegin" />
@@ -70,7 +70,7 @@
         android:id="@+id/bSetTimeBegin"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:text="SET TIME"
+        android:text="@string/set_time"
         android:textSize="10dp"
         android:layout_marginLeft="17dp"
         android:layout_marginStart="17dp"
@@ -84,7 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="45dp"
         android:layout_marginTop="13dp"
-        android:text="Add/edit key pairs"
+        android:text="@string/add_edit_key_pairs"
         android:textSize="10dp"
         android:layout_below="@+id/tvBlacklist"
         android:layout_alignLeft="@+id/bKeyPairsWhiteList"
@@ -94,7 +94,7 @@
         android:id="@+id/tvTimeBegin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="@string/textview"
         android:textAlignment="center"
         android:layout_below="@+id/bSetTimeBegin"
         android:layout_alignLeft="@+id/bSetTimeBegin"
@@ -107,7 +107,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="TextView"
+        android:text="@string/textview"
         android:layout_alignLeft="@+id/bSetDateBegin"
         android:layout_alignStart="@+id/bSetDateBegin"
         android:layout_below="@+id/bSetDateBegin"
@@ -118,14 +118,14 @@
         android:id="@+id/bPostMessage"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:text="Post Message"
+        android:text="@string/post_message"
         android:layout_marginBottom="11dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/tvWhitelist"
-        android:text="- - - - - - - - - - - - -  Whitelist Policy  - - - - - - - - - - - - -"
+        android:text="@string/whitelist_policy"
         android:textAlignment="center"
         android:textColor="@android:color/black"
         android:textSize="17dp"
@@ -141,7 +141,7 @@
         android:layout_width="wrap_content"
         android:layout_height="45dp"
         android:textSize="10dp"
-        android:text="Add/edit key pairs"
+        android:text="@string/add_edit_key_pairs"
         android:layout_below="@+id/tvWhitelist"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp" />
@@ -151,7 +151,7 @@
         android:textSize="10dp"
         android:layout_height="40dp"
         android:layout_width="wrap_content"
-        android:text="Set Date"
+        android:text="@string/set_date"
         android:layout_below="@+id/tvTimeEnd"
         android:layout_alignLeft="@+id/bSetTimeEnd"
         android:layout_alignStart="@+id/bSetTimeEnd" />
@@ -160,7 +160,7 @@
         android:id="@+id/bSetTimeEnd"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:text="Set Time"
+        android:text="@string/set_time"
         android:textSize="10dp"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
@@ -177,7 +177,7 @@
         android:layout_alignLeft="@+id/bSetDateEnd"
         android:layout_alignStart="@+id/bSetDateEnd"
         android:layout_below="@+id/bSetTimeEnd"
-        android:text="TextView"
+        android:text="@string/textview"
         android:layout_alignRight="@+id/bSetDateEnd"
         android:layout_alignEnd="@+id/bSetDateEnd" />
 

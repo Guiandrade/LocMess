@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_title_dialog">25sp</dimen>
+    <dimen name="layout_width_create_location">213dp</dimen>
+    <dimen name="layout_height_create_location">48dp</dimen>
+    <dimen name="layout_marginTop_create_location">198dp</dimen>
+    <dimen name="layout_width_create_location2">0dp</dimen>
+    <dimen name="layout_height_create_location2">40dp</dimen>
+    <dimen name="layout_margin_create_location">2dp</dimen>
+    <dimen name="layout_marginTop_create_location2">16dp</dimen>
+    <dimen name="layout_marginTop_create_location3">56dp</dimen>
+    <dimen name="layout_marginTop_create_location4">96dp</dimen>
 </resources>

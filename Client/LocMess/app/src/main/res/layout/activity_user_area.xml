@@ -69,7 +69,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="17dp"
-        android:text="Logout"
+        android:text="@string/logout"
         android:textSize="12dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"

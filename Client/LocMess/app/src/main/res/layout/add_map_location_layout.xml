@@ -42,7 +42,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Insert Location Name"
+            android:hint="@string/insert_location_name"
             android:inputType="text|textPersonName" />
     </LinearLayout>
 
@@ -59,11 +59,11 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:enabled="false"
-            android:hint="Insert Location Name"
+            android:hint="insert_location_name"
             android:inputType="text|textPersonName"
             android:layout_marginRight="5dp"
             android:layout_marginLeft="10dp"
-            android:text="Latitude"
+            android:text="@string/latitude"
             android:textColor="@color/colorPrimaryDark"/>
 
         <EditText
@@ -93,7 +93,7 @@
             android:inputType="text|textPersonName"
             android:layout_marginRight="5dp"
             android:layout_marginLeft="10dp"
-            android:text="Longitude"
+            android:text="@string/longitude"
             android:textColor="@color/colorPrimaryDark"/>
 
         <EditText
@@ -124,7 +124,7 @@
             android:enabled="false"
             android:hint="@string/insert_location_name"
             android:inputType="number"
-            android:text="Radius (m)"
+            android:text="@string/radius_m"
             android:textColor="@color/colorPrimaryDark" />
 
         <EditText

@@ -205,6 +205,7 @@ public class PostMessageActivity extends AppCompatActivity {
                                     SharedPreferences.Editor editor = prefs.edit();
                                     editor.putStringSet("WifiMessages" + prefs.getString("username",""), messagesSet);
                                     editor.apply();
+                                    editor.commit();
                                     try{
                                         Wifi.getWifiInstance().sendMessageToAll(message.toString(),10001,message.getString("id"));
                                     }catch(Exception e){

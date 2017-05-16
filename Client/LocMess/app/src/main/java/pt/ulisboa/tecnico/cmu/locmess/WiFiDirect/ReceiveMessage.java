@@ -123,46 +123,73 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
                                     checkMessageCache(array.getJSONObject(i));
                                 }
                                 SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
                                 final int mules = Integer.parseInt(prefs.getString("mules", ""));
-                                array = json.getJSONArray("messagesMule");
-                                Set<String> setMules = prefs.getStringSet("mules", null);
+                                Log.d("RecieveMessage", "json message " + json.toString());
+                                array = json.getJSONArray("messageMule");
+                                Set<String> setMules = prefs.getStringSet("muleMessages", null);
+                                Log.d("RecieveMessage", "SETMULES  " + setMules);
+
                                 if(setMules==null){
+                                    Log.d("RecieveMessage", "SETMULES NULL ");
                                     setMules = new HashSet<String>();
                                     for(int i=0;i<array.length();i++){
                                         if((i)==mules){
+                                            Log.d("RecieveMessage", "Iterator " + i);
                                             break;
                                         }
                                         setMules.add(array.get(i).toString());
                                     }
                                 }
                                 else{
+                                    Log.d("RecieveMessage", "Array de mesnagens de mules " + array);
                                     JSONArray newArray = new JSONArray();
                                     if(array.length()>mules){
+                                        Log.d("RecieveMessage", "Mules a mais ");
                                         for(int i=0;i<mules;i++){
                                             newArray.put(array.getString(i));
                                         }
                                     }
                                     else{
+                                        Log.d("RecieveMessage", "Mules a menos ");
                                         newArray = array;
                                     }
                                     int element = mules-setMules.size()-newArray.length();
+                                    Log.d("RecieveMessage", "numero de espaco preciso: " +element);
+
                                     if(element>=0){
+
+                                        Log.d("RecieveMessage", "tem espaço para por ");
+                                        Log.d("RecieveMessage", "tem espaço para por:  " +newArray);
                                         for(int i=0;i<newArray.length();i++){
                                             setMules.add(newArray.getString(i));
                                         }
                                     }
                                     else{
-                                        Iterator<String> it = setMules.iterator();
-                                        while(it.hasNext() && element!=0){
-                                            it.remove();
-                                            element++;
-                                        }
+                                        Log.d("RecieveMessage", "nao tem espaço, tem de se retirar elementos ");
+                                        Set<String> setAuxMules=new HashSet<>();
                                         for(int i=0;i<newArray.length();i++){
-                                            setMules.add(newArray.getString(i));
+                                            setAuxMules.add(newArray.getString(i));
                                         }
+                                        Log.d("RecieveMessage", "mules novos adicionados "+setAuxMules);
+                                        Log.d("RecieveMessage", "mules antigos "+setMules);
+
+                                        for(String s : setMules){
+                                            Log.d("RecieveMessage", "mensagem adicionada da cache: "+s);
+                                            if (setAuxMules.size()==mules){
+                                                break;
+                                            }
+                                            element++;
+                                            setAuxMules.add(s);
+
+                                        }
+                                        Log.d("RecieveMessage", "tamanho do set "+setAuxMules.size());
+                                        setMules=setAuxMules;
                                     }
                                 }
-                                Log.d("ReceiveMessage","FIM " + setMules);
+                                Log.d("RecieveMessage","FIM " + setMules);
+                                editor.putStringSet("muleMessages",setMules);
+                                editor.apply();
                             }
                         }
                         sock.close();

@@ -136,9 +136,11 @@ public class UserAreaActivity extends AppCompatActivity implements
     private int initialMap = 0;
     private ArrayList<Marker> markers = new ArrayList<>();
     private ArrayList<Circle> circles = new ArrayList<>();
+    private Http http;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        http=new Http(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_area);
 
@@ -146,7 +148,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        new Http().getKeys(this,false);
+        http.getKeys(this,false);
 
         mRequestingLocationUpdates = true;
         mLastUpdateTime = "";
@@ -203,14 +205,14 @@ public class UserAreaActivity extends AppCompatActivity implements
         btPostMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Http().listLocations("post", v);
+                http.listLocations("post", v);
             }
         });
 
         ibUserProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Http().getKeys(v, true);
+               http.getKeys(v, true);
             }
         });
     }
@@ -239,7 +241,7 @@ public class UserAreaActivity extends AppCompatActivity implements
         else if (requestCode == POST_MESSAGE_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 Message message = (Message) data.getSerializableExtra("messagePosted");
-                new Http().postMessage(message,this);
+                http.postMessage(message,this);
             }
         } else if (requestCode == USER_PROFILE_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
@@ -259,7 +261,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                 }
                 try {
                     res.put("keys", json);
-                    new Http().addKeys(res,this);
+                    http.addKeys(res,this);
                 } catch (Exception e) {
 
                 }
@@ -281,12 +283,12 @@ public class UserAreaActivity extends AppCompatActivity implements
                 }
                 try {
                     res1.put("keys", json1);
-                    new Http().deletedKeyPairs(res1,this);
+                    http.deletedKeyPairs(res1,this);
                 } catch (Exception e) {
 
                 }
                 if(addedKeyPairs.size()!=0 || deletedKeyPairs.size()!=0){
-                    new Http().getKeys(this, false);
+                    http.getKeys(this, false);
                 }
             }
         }
@@ -638,7 +640,7 @@ public class UserAreaActivity extends AppCompatActivity implements
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
         SecurityHandler.allowAllSSL();
-        String url = "https://" + new Http().getServerIp() + "/locations";
+        String url = "https://" +  http.getServerIp() + "/locations";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
@@ -679,7 +681,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        http.addQueue(jsObjRequest);
         return locations;
     }
 
@@ -687,7 +689,7 @@ public class UserAreaActivity extends AppCompatActivity implements
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
         SecurityHandler.allowAllSSL();
-        String url = "https://" + new Http().getServerIp() + "/locations";
+        String url = "https://" +  http.getServerIp() + "/locations";
         JSONObject jsonBody = new JSONObject();
         if(location.getSSID() == null){
             try{
@@ -748,6 +750,6 @@ public class UserAreaActivity extends AppCompatActivity implements
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        http.addQueue(jsObjRequest);
     }
 }

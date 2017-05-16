@@ -18,9 +18,11 @@ import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class LoginActivity extends AppCompatActivity {
+    private Http http;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        http= new Http(this.getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         this.setTitle("LocMess - Login");
@@ -35,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         String token = sharedPreferences.getString("token","");
         if(!(token.equals(""))){
             Intent loginIntent = new Intent(LoginActivity.this, UserAreaActivity.class);
-            loginIntent.putExtra("serverIP", new Http().getServerIp());
+            loginIntent.putExtra("serverIP", http.getServerIp());
             startActivity(loginIntent);
         }
 
@@ -89,6 +91,6 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-        new Http().session(jsonBody,this,"login");
+        http.session(jsonBody,this,"login");
     }
 }

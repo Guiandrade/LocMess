@@ -55,7 +55,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         }
 
-        new Http().session(jsonBody,this,"register");
+        new Http(getApplicationContext()).session(jsonBody,this,"register");
     }
 
     @Override

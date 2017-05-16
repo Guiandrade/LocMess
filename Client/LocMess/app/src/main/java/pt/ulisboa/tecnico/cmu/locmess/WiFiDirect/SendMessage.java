@@ -73,7 +73,7 @@ public class SendMessage extends AsyncTask<String, String, Void> {
             if(json.has("ids")){
                 //Log.d("SendMessage",json.toString());
                 JSONArray array = json.getJSONArray("ids");
-                if(array.length()!=0){
+
                     Set<String> ids = new HashSet<String>();
                     for(int i=0; i<array.length();i++){
                         ids.add(array.getString(i));
@@ -84,6 +84,10 @@ public class SendMessage extends AsyncTask<String, String, Void> {
                     JSONArray msgsToSend = new JSONArray();
                     SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
                     Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+                    Log.d("Send Message", "messages set " +messagesSet);
+                    if(messagesSet==null){
+                        messagesSet=new HashSet<>();
+                    }
                     for(String msg : messagesSet){
                         try{
                             Log.d("Send Message", "Locations " + new JSONObject(msg).getString("location"));
@@ -94,14 +98,16 @@ public class SendMessage extends AsyncTask<String, String, Void> {
                         }catch (Exception e){
                             e.printStackTrace();
                         }
-                    }
-                    resp.put("messagesDirect",getMessagesByIds(ids));
-                    resp.put("messageMule",msgsToSend);
-                    Log.d("Send Message", "Message Mule " + msgsToSend);
-                    OutputStream out1 = socket.getOutputStream();
-                    //Log.d("SendMessage", resp.toString());
-                    out1.write((resp + "\n").getBytes());
                 }
+                resp.put("messagesDirect",getMessagesByIds(ids));
+                resp.put("messageMule",msgsToSend);
+                Log.d("Send Message", "Message Mule " + getMessagesByIds(ids));
+                Log.d("Send Message", "Message Mule " + msgsToSend);
+                OutputStream out1 = socket.getOutputStream();
+                //Log.d("SendMessage", resp.toString());
+                out1.write((resp + "\n").getBytes());
+
+
             }
             /*JSONArray ids = new JSONArray();
             if(json.has("Keys")){
@@ -209,6 +215,9 @@ public class SendMessage extends AsyncTask<String, String, Void> {
         SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
         Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
         JSONArray msgsToSend = new JSONArray();
+        if (messagesSet==null){
+            messagesSet=new HashSet<>();
+        }
         for(String msg : messagesSet){
             for(String id : ids){
                 try{

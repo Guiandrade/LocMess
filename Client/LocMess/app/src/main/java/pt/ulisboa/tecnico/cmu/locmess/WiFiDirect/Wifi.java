@@ -50,18 +50,28 @@ import pt.ulisboa.tecnico.cmu.locmess.Utils.Http;
 
 public class Wifi implements SimWifiP2pManager.GroupInfoListener {
 
-    private static final Wifi ourInstance = new Wifi();
-
-    public static Wifi getWifiInstance() {
-        return ourInstance;
-    }
-
+    private static Wifi ourInstance = null;
     private SimWifiP2pManager mManager = null;
     private SimWifiP2pManager.Channel mChannel = null;
     private Messenger mService = null;
     private HashSet<String> groupDevices;
     private int port = 10001;
     public static ArrayList<String> localizacao;
+    private Http http;
+    private Wifi(){
+        http= new Http(NotificationService.getContext());
+    }
+
+
+    public static Wifi getWifiInstance() {
+        if(ourInstance==null){
+            ourInstance= new Wifi();
+        }
+
+        return ourInstance;
+    }
+
+
 
     public void setup (NotificationService service){
         // initialize the WDSim API
@@ -135,16 +145,21 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
             groupDevices = new HashSet<>();
         }
         HashSet<String> newNetworkDevices = new HashSet();
-
+        Log.d("devices debug","-----------------------------------------------" );
         // Look for devices on group
         for (String device  : simWifiP2pInfo.getDevicesInNetwork()){
             // Add new device with it's IP
+
             SimWifiP2pDevice deviceP2p = simWifiP2pDeviceList.getByName(device);
             String deviceIp = deviceP2p.getVirtIp();
+            Log.d("devices debug","Devices search " + deviceIp);
             newNetworkDevices.add(deviceIp);
             Log.d("onGroupInfoAvailable","Device on network with ip: " + deviceIp + " with name: "+ device);
         }
 
+        Log.d("devices debug","Devices on network " + newNetworkDevices);
+        Log.d("devices debug","Devices on network " + groupDevices);
+        Log.d("devices debug","-----------------------------------------------" );
         // Add new devices on group
         for (String ip : newNetworkDevices){
             if (!groupDevices.contains(ip)){
@@ -165,10 +180,8 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
     }
 
     public void sendMyKeys(LocationModel location, final ArrayList<String> locations, final String ip, final String id){
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(NotificationService.getContext());
         SecurityHandler.allowAllSSL();
-        String url = "https://" + new Http().getServerIp() + "/myLocations";
+        String url = "https://" + http.getServerIp() + "/myLocations";
         JSONObject jsonBody = new JSONObject();
         SharedPreferences prefs = NotificationService.getContext().getSharedPreferences("userInfo", NotificationService.getContext().MODE_PRIVATE);
         final String token = prefs.getString("token", "");
@@ -196,6 +209,9 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
                                 Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
                                 JSONArray setKeyMessages = new JSONArray();
                                 JSONObject json = new JSONObject();
+                                if(messagesSet==null){
+                                    messagesSet= new HashSet<String>();
+                                }
                                 for(String loc : locations){
                                     for(String msg : messagesSet){
                                         if(new JSONObject(msg).getString("location").equals(loc)){
@@ -282,6 +298,6 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        http.addQueue(jsObjRequest);
     }
 }

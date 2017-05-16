@@ -72,10 +72,12 @@ public class NotificationService extends Service {
     private static Context context;
     private Thread thread;
     boolean running = false;
+    Http http;
 
     @Override
     public void onCreate() {
         context = getApplicationContext();
+        http=new Http(getApplicationContext());
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -114,7 +116,7 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        SERVER_IP = new Http().getServerIp();
+        SERVER_IP = http.getServerIp();
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token","");
 
@@ -210,8 +212,7 @@ public class NotificationService extends Service {
         for(String ssid: ssids){
             System.out.println("A VER A NET: "+ ssid);
         }
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
+
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/messages";
         JSONObject jsonBody = new JSONObject();
@@ -268,7 +269,7 @@ public class NotificationService extends Service {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        http.addQueue(jsObjRequest);
     }
 
     public void launchNotification(JSONObject message){
@@ -321,6 +322,7 @@ public class NotificationService extends Service {
 
     @Override
     public void onDestroy(){
+        http.destroyQueue();
         super.onDestroy();
         endThread();
         //this.unregisterReceiver(bReciever);

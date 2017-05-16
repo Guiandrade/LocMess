@@ -204,7 +204,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 mBuilder.setView(mView);
                 mBuilder.setPositiveButton(R.string.change_mules, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        new Http().changeMule(newNumbOfMules.getText().toString(),v);
+                        new Http(getApplicationContext()).changeMule(newNumbOfMules.getText().toString(),v);
                     }
                 });
                 AlertDialog dialog = mBuilder.create();

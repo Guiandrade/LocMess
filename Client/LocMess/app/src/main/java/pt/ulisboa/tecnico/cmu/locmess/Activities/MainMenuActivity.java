@@ -49,9 +49,12 @@ public class MainMenuActivity extends AppCompatActivity {
     int UNPOST_MESSAGE_REQUEST_CODE = 4;
     ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
     ArrayList<Message> messages = new ArrayList<Message>();
+    private Http http;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        http= new Http(this.getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -75,7 +78,7 @@ public class MainMenuActivity extends AppCompatActivity {
         bListLocations.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Http().listLocations("list",v);
+                http.listLocations("list",v);
             }
         });
 
@@ -107,21 +110,21 @@ public class MainMenuActivity extends AppCompatActivity {
         bPostMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Http().listLocations("post",v);
+               http.listLocations("post",v);
             }
         });
 
         bUnpostMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Http().removeMessages(v);
+                http.removeMessages(v);
             }
         });
 
         bRemoveLocations.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Http().listLocations("remove",v);
+                http.listLocations("remove",v);
             }
         });
 
@@ -146,7 +149,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 LocationModel location = (LocationModel) data.getSerializableExtra("locationCreated");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
-                new Http().createLocation(location,this);
+                http.createLocation(location,this);
             }
         }
 
@@ -154,7 +157,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 ArrayList<String> locations = (ArrayList<String>) data.getSerializableExtra("locationsRemoved");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
-                new Http().removeLocations(locations,this);
+                http.removeLocations(locations,this);
             }
         }
 
@@ -162,7 +165,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 Message message = (Message) data.getSerializableExtra("messagePosted");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
-                new Http().postMessage(message,this);
+                http.postMessage(message,this);
             }
         }
 
@@ -170,7 +173,7 @@ public class MainMenuActivity extends AppCompatActivity {
             if(resultCode == Activity.RESULT_OK){
                 ArrayList<String> ids = (ArrayList<String>) data.getSerializableExtra("ids");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
-                new Http().removeMessages(ids,this);
+                http.removeMessages(ids,this);
             }
         }
     }

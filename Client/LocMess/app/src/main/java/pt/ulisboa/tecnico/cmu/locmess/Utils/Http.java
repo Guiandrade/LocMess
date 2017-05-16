@@ -45,12 +45,19 @@ import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
  */
 
 public class Http {
-
     static String SERVER_IP = "istcmu.tk:8080";
     int REMOVE_LOCATIONS_REQUEST_CODE = 2;
     int POST_MESSAGE_REQUEST_CODE = 3;
     int UNPOST_MESSAGE_REQUEST_CODE = 4;
     int USER_PROFILE_REQUEST_CODE = 5;
+    private RequestQueue queue;
+
+    public Http(Context context) {
+        this.queue = Volley.newRequestQueue(context);
+
+    }
+
+
 
     public String getServerIp(){
         return SERVER_IP;
@@ -59,8 +66,7 @@ public class Http {
     public void session(final JSONObject jsonBody, final Context context, final String type){
 
         final boolean returnStatus = false;
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(context);
+
         SecurityHandler.allowAllSSL();
         String url = "";
         if (type.equals("login")){
@@ -124,7 +130,7 @@ public class Http {
                         }
                     }
                 });
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void createLocation(LocationModel location, final Context context){
@@ -132,8 +138,6 @@ public class Http {
         SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token","");
 
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(context);
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/locations";
         JSONObject jsonBody = new JSONObject();
@@ -196,7 +200,7 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void removeLocations(ArrayList<String> locations, final Context context){
@@ -204,8 +208,7 @@ public class Http {
         SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token","");
 
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(context);
+
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/deleteLocation";
         JSONObject jsonBody = new JSONObject();
@@ -256,16 +259,13 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void removeMessages(ArrayList<String> ids, final Context context){
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token","");
-
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(context);
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/deleteMessages";
         JSONObject jsonBody = new JSONObject();
@@ -316,16 +316,13 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void postMessage(Message message, final Context context){
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token","");
-
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(context);
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/messages";
         JSONObject jsonBody = parseMsgToSend(message);
@@ -370,15 +367,13 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void listLocations (final String str, final View v){
         final ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
         SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token","");
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(v.getContext());
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/locations";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
@@ -452,15 +447,13 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void removeMessages(final View v){
         final ArrayList<Message> messages = new ArrayList<Message>();
         SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token","");
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(v.getContext());
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/userMessages";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -530,7 +523,7 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void getKeys(final Context context, final boolean activity) {
@@ -538,8 +531,6 @@ public class Http {
 
         final SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token", "");
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(context);
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/profile";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -602,7 +593,7 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void getKeys(final View v, final boolean activity) {
@@ -610,8 +601,6 @@ public class Http {
 
         final SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token", "");
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(v.getContext());
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/profile";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -676,7 +665,7 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void getAllKeys(final HashMap<String, Set<String>> keys, final View v) {
@@ -684,8 +673,6 @@ public class Http {
 
         SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token", "");
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(v.getContext());
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/keys";
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -736,14 +723,12 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void deletedKeyPairs(JSONObject jsonBody, final Context context) {
-        RequestQueue queue;
         SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token", "");
-        queue = Volley.newRequestQueue(context);
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/removeKey";
 
@@ -787,14 +772,12 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     public void addKeys(JSONObject jsonBody, final Context context) {
-        RequestQueue queue;
         SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token", "");
-        queue = Volley.newRequestQueue(context);
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/profile";
 
@@ -805,7 +788,7 @@ public class Http {
                     public void onResponse(JSONObject response) {
                         try {
                             if (response.get("status").toString().equals("ok")) {
-                                new Http().getKeys(context,false);
+                                getKeys(context,false);
                             } else {
                                 try {
                                     Toast.makeText(context, "Status: " + response.get("status"), Toast.LENGTH_LONG).show();
@@ -838,7 +821,7 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
     }
 
     private JSONObject parseMsgToSend(Message message){
@@ -905,10 +888,8 @@ public class Http {
     }
 
     public void changeMule(final String mules, final View v) {
-        RequestQueue queue;
         final SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         final String token = sharedPreferences.getString("token", "");
-        queue = Volley.newRequestQueue(v.getContext());
         SecurityHandler.allowAllSSL();
         String url = "https://" + SERVER_IP + "/changeMule";
         JSONObject jsonBody = new JSONObject();
@@ -959,6 +940,19 @@ public class Http {
                 return headers;
             }
         };
-        queue.add(jsObjRequest);
+        addQueue(jsObjRequest);
+    }
+
+    public void addQueue(JsonObjectRequest request) {
+        this.queue.add(request);
+    }
+
+    public void destroyQueue() {
+        this.queue.cancelAll(new RequestQueue.RequestFilter() {
+            @Override
+            public boolean apply(Request<?> request) {
+                return true;
+            }
+        });
     }
 }

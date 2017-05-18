@@ -403,10 +403,7 @@ public class Http {
                                     v.getContext().startActivity(listLocationsIntent);
                                 }
                                 else if (str.equals("post")){
-                                    Intent postMessageIntent = new Intent(v.getContext(), PostMessageActivity.class);
-                                    postMessageIntent.putExtra("serverIP", SERVER_IP);
-                                    postMessageIntent.putExtra("locations", locations);
-                                    ((Activity) v.getContext()).startActivityForResult(postMessageIntent,POST_MESSAGE_REQUEST_CODE);
+                                    getAllKeys(null,v,locations,"post");
                                 }
                                 else if (str.equals("remove")){
                                     Intent removeLocationsIntent = new Intent(v.getContext(), RemovableItemListActivity.class);
@@ -633,7 +630,7 @@ public class Http {
                             }
                         }
                         if(activity==true){
-                            getAllKeys(keys,v);
+                            getAllKeys(keys,v,null,"Profile");
                         }
                     } else {
                         try {
@@ -670,7 +667,7 @@ public class Http {
         addQueue(jsObjRequest);
     }
 
-    public void getAllKeys(final HashMap<String, Set<String>> keys, final View v) {
+    public void getAllKeys(final HashMap<String, Set<String>> keys, final View v, final ArrayList<LocationModel> locations, final String type) {
         final ArrayList<String> allKeys = new ArrayList<String>();
 
         SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
@@ -688,11 +685,21 @@ public class Http {
                             allKeys.add(keysJsonArray.getString(i));
                         }
 
-                        Intent userProfileIntent = new Intent(v.getContext(), UserProfileActivity.class);
-                        userProfileIntent.putExtra("serverIP", SERVER_IP);
-                        userProfileIntent.putExtra("keys", keys);
-                        userProfileIntent.putExtra("allKeys", allKeys);
-                        ((Activity) v.getContext()).startActivityForResult(userProfileIntent, USER_PROFILE_REQUEST_CODE);
+                        if(type.equals("Profile")){
+                            Intent userProfileIntent = new Intent(v.getContext(), UserProfileActivity.class);
+                            userProfileIntent.putExtra("serverIP", SERVER_IP);
+                            userProfileIntent.putExtra("keys", keys);
+                            userProfileIntent.putExtra("allKeys", allKeys);
+                            ((Activity) v.getContext()).startActivityForResult(userProfileIntent, USER_PROFILE_REQUEST_CODE);
+                        }
+                        else{
+                            Intent postMessageIntent = new Intent(v.getContext(), PostMessageActivity.class);
+                            postMessageIntent.putExtra("serverIP", SERVER_IP);
+                            postMessageIntent.putExtra("locations", locations);
+                            postMessageIntent.putExtra("allKeys", allKeys);
+                            ((Activity) v.getContext()).startActivityForResult(postMessageIntent,POST_MESSAGE_REQUEST_CODE);
+                        }
+
                     } else {
                         try {
                             Toast.makeText(v.getContext(), "Status: " + response.get("status"), Toast.LENGTH_LONG).show();

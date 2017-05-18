@@ -18,6 +18,7 @@ import android.widget.ListView;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,9 @@ public class UnpostMessageActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("userInfo",MODE_PRIVATE);
         Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+        if(messagesSet==null){
+            messagesSet=new HashSet<String>();
+        }
         for(String s : messagesSet){
             try {
                 JSONObject arr = new JSONObject(s);

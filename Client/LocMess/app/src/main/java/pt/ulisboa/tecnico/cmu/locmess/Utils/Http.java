@@ -166,7 +166,7 @@ public class Http {
                     public void onResponse(JSONObject response) {
                         try{
                             if(response.get("status").toString().equals("ok")){
-                                // boa
+                                Toast.makeText(context, "Location created successfully", Toast.LENGTH_LONG).show();
                             }
                             else{
                                 try{
@@ -225,7 +225,7 @@ public class Http {
                     public void onResponse(JSONObject response) {
                         try{
                             if(response.get("status").toString().equals("ok")){
-                                // boa puto
+                                //
                             }
                             else{
                                 try{
@@ -282,7 +282,7 @@ public class Http {
                     public void onResponse(JSONObject response) {
                         try{
                             if(response.get("status").toString().equals("ok")){
-                                // boa puto
+                                //good
                             }
                             else{
                                 try{
@@ -333,7 +333,7 @@ public class Http {
                     public void onResponse(JSONObject response) {
                         try{
                             if(response.get("status").toString().equals("ok")){
-                                // boa puto
+                                Toast.makeText(context, "Message posted successfully", Toast.LENGTH_LONG).show();
                             }
                             else{
                                 try{

@@ -158,6 +158,9 @@ public class MainMenuActivity extends AppCompatActivity {
                 ArrayList<String> locations = (ArrayList<String>) data.getSerializableExtra("locationsRemoved");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
                 http.removeLocations(locations,this);
+                if(locations.size()!=0){
+                    Toast.makeText(this, "Location(s) removed successfully", Toast.LENGTH_LONG).show();
+                }
             }
         }
 
@@ -174,6 +177,9 @@ public class MainMenuActivity extends AppCompatActivity {
                 ArrayList<String> ids = (ArrayList<String>) data.getSerializableExtra("ids");
                 SERVER_IP = (String) getIntent().getSerializableExtra("serverIP");
                 http.removeMessages(ids,this);
+                if(ids.size()!=0){
+                    Toast.makeText(this, "Message(s) removed successfully", Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

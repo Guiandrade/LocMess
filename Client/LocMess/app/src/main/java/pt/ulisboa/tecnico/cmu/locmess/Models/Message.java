@@ -12,6 +12,7 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String type;
     private String id;
     private String title;
     private String message;
@@ -44,6 +45,24 @@ public class Message implements Serializable {
         this.whitelistKeyPairs = whitelistKeyPairs;
         this.blacklistKeyPairs = blacklistKeyPairs;
         this.timeWindow = timeWindow;
+    }
+
+    public Message(String  type,String id, String title, String message, String owner, LocationModel location,
+                   HashMap<String, Set<String>> whitelistKeyPairs,
+                   HashMap<String, Set<String>> blacklistKeyPairs, TimeWindow timeWindow) {
+        this.type=type;
+        this.id = id;
+        this.title = title;
+        this.message = message;
+        this.owner = owner;
+        this.location = location;
+        this.whitelistKeyPairs = whitelistKeyPairs;
+        this.blacklistKeyPairs = blacklistKeyPairs;
+        this.timeWindow = timeWindow;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getTitle() {

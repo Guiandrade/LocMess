@@ -1,8 +1,10 @@
 package pt.ulisboa.tecnico.cmu.locmess.Activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,19 +15,26 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
+import pt.ulisboa.tecnico.cmu.locmess.Models.LocationModel;
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Adapters.MyListViewAdapter;
+import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.R;
 
 public class UnpostMessageActivity extends AppCompatActivity {
 
     ArrayList<Message> messages = new ArrayList<Message>();
     ArrayList<String> idsToRemove = new ArrayList<String>();
+    ArrayList<String> wifiIdsToRemove = new ArrayList<String>();
     ListView listView;
     Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     MyListViewAdapter adapter;
@@ -36,9 +45,41 @@ public class UnpostMessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_removable_item_list);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        this.setTitle("Select locations to remove");
+        this.setTitle("Select messages to remove");
 
         messages = (ArrayList<Message>) getIntent().getSerializableExtra("messages");
+
+        SharedPreferences prefs = getSharedPreferences("userInfo",MODE_PRIVATE);
+        Set<String> messagesSet = prefs.getStringSet("WifiMessages" + prefs.getString("username",""), null);
+        for(String s : messagesSet){
+            try {
+                JSONObject arr = new JSONObject(s);
+                LocationModel location = new LocationModel(arr.get("location").toString(), (Coordinates) null);
+                int initHour = Integer.parseInt(arr.get("initTime").toString().split(":")[0]);
+                int initMinute = Integer.parseInt(arr.get("initTime").toString().split(":")[1].split("-")[0]);
+                int initDay = Integer.parseInt(arr.get("initTime").toString().split("/")[0].split("-")[1]);
+                int initMonth = Integer.parseInt(arr.get("initTime").toString().split("/")[1]);
+                int initYear = Integer.parseInt(arr.get("initTime").toString().split("/")[2]);
+                int endHour = Integer.parseInt(arr.get("endTime").toString().split(":")[0]);
+                int endMinute = Integer.parseInt(arr.get("endTime").toString().split(":")[1].split("-")[0]);
+                int endDay = Integer.parseInt(arr.get("endTime").toString().split("/")[0].split("-")[1]);
+                int endMonth = Integer.parseInt(arr.get("endTime").toString().split("/")[1]);
+                int endYear = Integer.parseInt(arr.get("endTime").toString().split("/")[2]);
+                TimeWindow timeWindow = new TimeWindow(initHour, initMinute, initDay, initMonth,
+                        initYear, endHour, endMinute, endDay, endMonth, endYear);
+
+                String id = arr.get("id").toString();
+                if(id.length()>10){
+                    id = id.substring(30,40);
+                }
+                String msg = arr.get("body").toString();
+                String owner = arr.get("username").toString();
+                String title = arr.get("title").toString();
+
+                Message message = new Message("Decentralized", id, title, msg, owner, location, null, null, timeWindow);
+                messages.add(message);
+            } catch(Exception w){}
+        }
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -53,7 +94,7 @@ public class UnpostMessageActivity extends AppCompatActivity {
                     msg.getTimeWindow().getEndingMonth() + "/" +
                     msg.getTimeWindow().getEndingYear() + " " +
                     msg.getTimeWindow().getEndingHour() + ":" +
-                    msg.getTimeWindow().getEndingMinutes() + ", Id: " + msg.getId();
+                    msg.getTimeWindow().getEndingMinutes() + ", Id: " + msg.getId()+", Type: "+ msg.getType();
             myList.add(msg.getTitle() + " = " + coordinates);
         }
 
@@ -134,7 +175,28 @@ public class UnpostMessageActivity extends AppCompatActivity {
                                         String selecteditem = adapter
                                                 .getItem(selected.keyAt(i));
                                         // Remove  selected items following the ids
-                                        idsToRemove.add(selecteditem.split("Id: ")[1]);
+                                        if(selecteditem.split("Type: ")[1].equals("Centralized")){
+                                            System.out.println("centralized");
+                                            System.out.println(selecteditem.split("Id: ")[1]);
+                                            idsToRemove.add(selecteditem.split("Id: ")[1].split(", Type: ")[0]);
+
+                                        }else {
+
+                                            SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+                                            Set<String> messagesSet = sharedPref.getStringSet("WifiMessages" + sharedPref.getString("username",""), null);
+                                            for(String s: messagesSet){
+                                                try{
+                                                if(new JSONObject(s).getString("id").substring(30,40).equals(selecteditem.split("Id: ")[1].split(", Type: ")[0])){
+                                                    messagesSet.remove(s);
+                                                }
+                                                }catch (Exception e){}
+                                            }
+
+                                            SharedPreferences.Editor editor = sharedPref.edit();
+                                            editor.putStringSet("WifiMessages" + sharedPref.getString("username",""),messagesSet);
+                                            editor.apply();
+                                            editor.commit();
+                                        }
                                         adapter.remove(selecteditem);
                                     }
                                 }

@@ -483,9 +483,11 @@ public class Http {
                             String owner = arr.get("username").toString();
                             String title = arr.get("title").toString();
 
-                            Message message = new Message(id,title,msg,owner,location,null,null,timeWindow);
+                            Message message = new Message("Centralized",id,title,msg,owner,location,null,null,timeWindow);
                             messages.add(message);
                         }
+
+
                         Intent unpostMessageIntent = new Intent(v.getContext(), UnpostMessageActivity.class);
                         unpostMessageIntent.putExtra("serverIP", SERVER_IP);
                         unpostMessageIntent.putExtra("messages", messages);

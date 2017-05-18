@@ -140,6 +140,8 @@ public class UserAreaActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        markers= new ArrayList<>();
         http=new Http(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_area);
@@ -219,6 +221,9 @@ public class UserAreaActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("MAPS", ""+markers.size());
+        mMap.clear();
+        onMapReady(mMap);
 
         if (requestCode == MAIN_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
@@ -489,8 +494,9 @@ public class UserAreaActivity extends AppCompatActivity implements
 
     @Override
     public void onMapReady(GoogleMap map) {
-        mMap = map;
+        markers= new ArrayList<>();
 
+        mMap = map;
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMapLongClickListener(this);
         mMap.setOnMarkerClickListener(this);
@@ -595,6 +601,7 @@ public class UserAreaActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        markers= new ArrayList<>();
         mGoogleApiClient.connect();
     }
 

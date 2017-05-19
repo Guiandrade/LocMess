@@ -197,7 +197,7 @@ public class Database {
     for (String l : location) {
       System.out.println("location");
       System.out.println(l);
-      Set<JSONObject> message=messages.getMessages(l,userKeys);
+      Set<JSONObject> message=messages.getMessages(username,l,userKeys);
       if(message.size()!=0){
         mess.addAll(message);
       }

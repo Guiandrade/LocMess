@@ -325,6 +325,7 @@ public class NotificationService extends Service {
         http.destroyQueue();
         super.onDestroy();
         endThread();
+        Log.d("Destroy notification: " , "aqui cona");
         //this.unregisterReceiver(bReciever);
     }
 

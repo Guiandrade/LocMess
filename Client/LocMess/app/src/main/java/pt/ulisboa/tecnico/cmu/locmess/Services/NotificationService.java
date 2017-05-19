@@ -64,6 +64,7 @@ import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
 public class NotificationService extends Service {
 
     private BroadcastReceiver bReciever;
+    public static ArrayList<BroadcastReceiver> broadcastReceivers = new ArrayList<BroadcastReceiver>();
     public static ArrayList<String> SSIDs = new ArrayList<String>();
     private String token;
     private String SERVER_IP;
@@ -94,6 +95,7 @@ public class NotificationService extends Service {
 
             Wifi wifiDirect = Wifi.getWifiInstance();
             wifiDirect.setup(NotificationService.this);
+            broadcastReceivers.add(wifiDirect.unregister());
 
             while(running) {
                 try {
@@ -166,7 +168,7 @@ public class NotificationService extends Service {
                     }
                 }
             };
-
+            broadcastReceivers.add(bReciever);
             this.registerReceiver(bReciever, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
             wifi.startScan();
@@ -322,13 +324,24 @@ public class NotificationService extends Service {
         running=false;
     }
 
+
     @Override
     public void onDestroy(){
         http.destroyQueue();
+
+        for(int i=0;i<broadcastReceivers.size();i++){
+            try{
+                this.unregisterReceiver(broadcastReceivers.get(i));
+            }catch (Exception e){}
+        }
+        Wifi wifiDirect = Wifi.getWifiInstance();
+        this.unbindService(wifiDirect.conn());
         super.onDestroy();
         endThread();
-        //this.unregisterReceiver(bReciever);
+
+
     }
+
 
     public static Context getContext(){
         return context;

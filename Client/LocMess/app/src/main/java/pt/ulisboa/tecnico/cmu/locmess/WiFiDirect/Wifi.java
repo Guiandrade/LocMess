@@ -58,6 +58,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
     private int port = 10001;
     public static ArrayList<String> localizacao;
     private Http http;
+    private SimWifiP2pBroadcastReceiver receiver;
     private Wifi(){
         http= new Http(NotificationService.getContext());
     }
@@ -83,7 +84,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        SimWifiP2pBroadcastReceiver receiver = new SimWifiP2pBroadcastReceiver();
+        receiver = new SimWifiP2pBroadcastReceiver();
         service.registerReceiver(receiver, filter);
 
         // bind the Termite Service
@@ -178,6 +179,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
             }
         }
     }
+
 
     public void sendMyKeys(LocationModel location, final ArrayList<String> locations, final String ip, final String id){
         SecurityHandler.allowAllSSL();
@@ -300,4 +302,13 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
         };
         http.addQueue(jsObjRequest);
     }
+
+    public SimWifiP2pBroadcastReceiver unregister(){
+        return receiver;
+    }
+
+    public ServiceConnection conn(){
+        return mConnection;
+    }
+
 }

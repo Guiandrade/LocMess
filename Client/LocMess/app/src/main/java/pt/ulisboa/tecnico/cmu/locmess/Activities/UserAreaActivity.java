@@ -79,7 +79,6 @@ public class UserAreaActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback, LocationListener,
         GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
         GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener {
-
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     public static final long ZOOM_LEVEL = 18; // Street level
@@ -138,6 +137,8 @@ public class UserAreaActivity extends AppCompatActivity implements
     private ArrayList<Circle> circles = new ArrayList<>();
     private Http http;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -165,8 +166,8 @@ public class UserAreaActivity extends AppCompatActivity implements
         createLocationRequest();
         buildLocationSettingsRequest();
 
-        Intent serviceIntent = new Intent(UserAreaActivity.this, NotificationService.class);
-        startService(serviceIntent);
+
+        startService(new Intent(UserAreaActivity.this, NotificationService.class));
 
         SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         token = sharedPreferences.getString("token", "");

@@ -181,7 +181,10 @@ public class UserAreaActivity extends AppCompatActivity implements
         btLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("Logout Test","stop service");
+
                 stopService(new Intent(UserAreaActivity.this, NotificationService.class));
+                Log.d("Logout Test","Service parado");
                 SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("token", "");
@@ -193,6 +196,8 @@ public class UserAreaActivity extends AppCompatActivity implements
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);
                 logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(logoutIntent);
+                Log.d("Logout Test","mudanca de view");
+
             }
         });
 

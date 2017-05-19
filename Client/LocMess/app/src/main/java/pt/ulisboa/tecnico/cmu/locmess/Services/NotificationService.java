@@ -98,19 +98,27 @@ public class NotificationService extends Service {
             broadcastReceivers.add(wifiDirect.unregister());
 
             while(running) {
+
+
                 try {
                     Thread.sleep(5000);
                 } catch (Exception e) {
                 }
-                getLocation();
-                getSSIDs();
-                loc = new LocationModel("",new Coordinates("0", "0"));
-                if(!(location==null)){
-                    loc = new LocationModel("",new Coordinates(String.valueOf(location.getLatitude()),
-                            String.valueOf(location.getLongitude())));
+
+                SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
+                String username = prefs.getString("username","");
+
+                if(!username.equals("")) {
+                    getLocation();
+                    getSSIDs();
+                    loc = new LocationModel("", new Coordinates("0", "0"));
+                    if (!(location == null)) {
+                        loc = new LocationModel("", new Coordinates(String.valueOf(location.getLatitude()),
+                                String.valueOf(location.getLongitude())));
+                    }
+                    getNearbyMessages(loc, SSIDs);
+                    wifiDirect.getNearbyDevices();
                 }
-                getNearbyMessages(loc, SSIDs);
-                wifiDirect.getNearbyDevices();
             }
         }
     };
@@ -228,6 +236,8 @@ public class NotificationService extends Service {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.PUT, url, jsonBody, new Response.Listener<JSONObject>() {
 

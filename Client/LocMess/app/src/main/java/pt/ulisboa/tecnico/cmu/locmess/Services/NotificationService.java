@@ -184,24 +184,26 @@ public class NotificationService extends Service {
             SharedPreferences prefs = getSharedPreferences("userInfo", MODE_PRIVATE);
             String username = prefs.getString("username","");
             Set<String> messagesSet = prefs.getStringSet("messages" + username, null);
-            Log.d("CONA", "PASSA 1" );
-            if(messagesSet==null) {
-                messagesSet = new HashSet<String>();
-            }
-            for (String message: messagesSet) {
-                Log.d("CONA", new JSONObject(message).toString());
-                if (new JSONObject(message).getString("id").equals(obj.getString("id"))){
-                    Log.d("CONA", "PASSA 2" );
-                    return;
+            if(!username.equals("")){
+                if(messagesSet==null) {
+                    messagesSet = new HashSet<String>();
                 }
-            }
-            Log.d("CONA", obj.toString());
-            messagesSet.add(obj.toString());
+                for (String message: messagesSet) {
 
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putStringSet("messages"  + username, messagesSet);
-            editor.apply();
-            launchNotification(obj);
+                    if (new JSONObject(message).getString("id").equals(obj.getString("id"))){
+
+                        return;
+                    }
+                }
+                messagesSet.add(obj.toString());
+
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putStringSet("messages"  + username, messagesSet);
+                editor.apply();
+                launchNotification(obj);
+
+            }
+
         }
         catch (JSONException e){
             e.printStackTrace();
@@ -325,7 +327,6 @@ public class NotificationService extends Service {
         http.destroyQueue();
         super.onDestroy();
         endThread();
-        Log.d("Destroy notification: " , "aqui cona");
         //this.unregisterReceiver(bReciever);
     }
 

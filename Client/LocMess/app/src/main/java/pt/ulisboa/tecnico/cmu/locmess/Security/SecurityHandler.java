@@ -12,9 +12,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-/**
- * Created by wazamaisers on 08-05-2017.
- */
+
 
 public class SecurityHandler implements X509TrustManager {
 

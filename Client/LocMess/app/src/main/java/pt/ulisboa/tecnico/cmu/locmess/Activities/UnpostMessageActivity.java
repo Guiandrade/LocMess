@@ -180,8 +180,7 @@ public class UnpostMessageActivity extends AppCompatActivity {
                                                 .getItem(selected.keyAt(i));
                                         // Remove  selected items following the ids
                                         if(selecteditem.split("Type: ")[1].equals("Centralized")){
-                                            System.out.println("centralized");
-                                            System.out.println(selecteditem.split("Id: ")[1]);
+
                                             idsToRemove.add(selecteditem.split("Id: ")[1].split(", Type: ")[0]);
 
                                         }else {

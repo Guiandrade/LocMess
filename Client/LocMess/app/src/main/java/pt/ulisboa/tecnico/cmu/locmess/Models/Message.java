@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
 
-/**
- * Created by wazamaisers on 27-03-2017.
- */
 
 public class Message implements Serializable {
 

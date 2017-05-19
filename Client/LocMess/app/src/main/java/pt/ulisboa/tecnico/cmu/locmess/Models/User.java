@@ -6,9 +6,7 @@ import java.util.HashMap;
 
 import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 
-/**
- * Created by wazamaisers on 27-03-2017.
- */
+
 
 public class User implements Serializable {
 

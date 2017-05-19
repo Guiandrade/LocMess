@@ -40,9 +40,7 @@ import pt.ulisboa.tecnico.cmu.locmess.Models.Message;
 import pt.ulisboa.tecnico.cmu.locmess.Models.TimeWindow;
 import pt.ulisboa.tecnico.cmu.locmess.Security.SecurityHandler;
 
-/**
- * Created by wazamaisers on 06-05-2017.
- */
+
 
 public class Http {
     static String SERVER_IP = "istcmu.tk:8080";

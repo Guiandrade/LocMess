@@ -2,9 +2,7 @@ package pt.ulisboa.tecnico.cmu.locmess.Models;
 
 import java.io.Serializable;
 
-/**
- * Created by wazamaisers on 25-03-2017.
- */
+
 
 public class Coordinates implements Serializable{
 

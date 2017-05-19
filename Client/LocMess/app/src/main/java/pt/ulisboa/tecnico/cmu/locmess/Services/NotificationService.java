@@ -91,7 +91,7 @@ public class NotificationService extends Service {
         @Override
         public void run() {
             running = true;
-            Log.d("NotificationService","backgroundThread");
+            //Log.d("NotificationService","backgroundThread");
 
             Wifi wifiDirect = Wifi.getWifiInstance();
             wifiDirect.setup(NotificationService.this);

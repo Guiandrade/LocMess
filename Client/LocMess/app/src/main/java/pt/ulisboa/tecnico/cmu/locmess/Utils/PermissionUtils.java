@@ -1,8 +1,5 @@
 package pt.ulisboa.tecnico.cmu.locmess.Utils;
 
-/**
- * Created by guiandrade on 08-05-2017.
- */
 
 import android.Manifest;
 import android.app.AlertDialog;

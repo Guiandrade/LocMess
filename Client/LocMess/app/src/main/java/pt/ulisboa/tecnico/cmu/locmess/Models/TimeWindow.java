@@ -3,9 +3,7 @@ package pt.ulisboa.tecnico.cmu.locmess.Models;
 import java.io.Serializable;
 import java.util.Calendar;
 
-/**
- * Created by wazamaisers on 27-03-2017.
- */
+
 
 public class TimeWindow implements Serializable {
 

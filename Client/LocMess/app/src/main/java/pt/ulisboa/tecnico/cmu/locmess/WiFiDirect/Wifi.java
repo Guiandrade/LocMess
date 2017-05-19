@@ -236,7 +236,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
                                     }
                                 }
                                 json.put("KeysUser",setKeyMessages);
-                                Log.d("RecieveMessage", "Um" + setKeyMessages);
+                                Log.d("Send Message", "KEYS USER" + setKeyMessages);
 
                                 messagesSet = prefs.getStringSet("muleMessages", null);
                                 setKeyMessages = new JSONArray();
@@ -264,7 +264,7 @@ public class Wifi implements SimWifiP2pManager.GroupInfoListener {
                                     }
                                 }
                                 json.put("KeysMule",setKeyMessages);
-                                Log.d("RecieveMessage", "Dois" + setKeyMessages);
+                                Log.d("Send Message", "KEYS MULES" + setKeyMessages);
 
                                 String message = json + "\n";
                                 sendMessage(message,ip,port);

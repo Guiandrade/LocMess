@@ -4,9 +4,7 @@ import java.io.Serializable;
 
 import pt.ulisboa.tecnico.cmu.locmess.Models.Coordinates;
 
-/**
- * Created by wazamaisers on 25-03-2017.
- */
+
 
 public class LocationModel implements Serializable{
 

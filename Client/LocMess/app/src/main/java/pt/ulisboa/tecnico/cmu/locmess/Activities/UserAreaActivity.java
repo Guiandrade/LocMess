@@ -181,10 +181,10 @@ public class UserAreaActivity extends AppCompatActivity implements
         btLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Logout Test","stop service");
+
 
                 stopService(new Intent(UserAreaActivity.this, NotificationService.class));
-                Log.d("Logout Test","Service parado");
+
                 SharedPreferences sharedPref = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("token", "");
@@ -196,7 +196,7 @@ public class UserAreaActivity extends AppCompatActivity implements
                 Intent logoutIntent = new Intent(UserAreaActivity.this, LoginActivity.class);
                 logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(logoutIntent);
-                Log.d("Logout Test","mudanca de view");
+
 
             }
         });
@@ -227,7 +227,7 @@ public class UserAreaActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("MAPS", ""+markers.size());
+
         mMap.clear();
         onMapReady(mMap);
 
@@ -321,7 +321,7 @@ public class UserAreaActivity extends AppCompatActivity implements
             mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         }
         if (mRequestingLocationUpdates) {
-            Log.i(TAG, "in onConnected(), starting location updates");
+            //Log.i(TAG, "in onConnected(), starting location updates");
             startLocationUpdates();
         }
     }
@@ -333,7 +333,7 @@ public class UserAreaActivity extends AppCompatActivity implements
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
+        //Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
     }
 
     @Override
@@ -353,7 +353,7 @@ public class UserAreaActivity extends AppCompatActivity implements
      * LocationServices API.
      */
     protected synchronized void buildGoogleApiClient() {
-        Log.i(TAG, "Building GoogleApiClient");
+        //Log.i(TAG, "Building GoogleApiClient");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)

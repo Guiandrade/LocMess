@@ -62,16 +62,15 @@ public class ReceiveMessage extends AsyncTask<String, String, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-        Log.d("ReceiveMessage","doInBackground");
+
 
         try {
-            Log.d("ReceiveMessage","Before Socket creation");
+
             mSrvSocket = new SimWifiP2pSocketServer(server_port);
         } catch (IOException e) {
             e.printStackTrace();
         }
         while (!Thread.currentThread().isInterrupted()) {
-            Log.d("ReceiveMessage","inside While");
 
             try {
                 SimWifiP2pSocket sock = mSrvSocket.accept();

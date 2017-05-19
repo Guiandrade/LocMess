@@ -65,7 +65,7 @@
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginStart="78dp"
-        android:text="@string/change_num_of_mules"
+        android:text="Change num \n of mules"
         android:textSize="12dp"
         tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="parent"

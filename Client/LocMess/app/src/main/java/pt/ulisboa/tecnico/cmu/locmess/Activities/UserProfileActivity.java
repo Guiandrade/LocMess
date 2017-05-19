@@ -48,11 +48,7 @@ public class UserProfileActivity extends AppCompatActivity {
     HashMap<String, Set<String>> addedKeyPairs = new HashMap<String, Set<String>>();
     HashMap<String, Set<String>> deletedKeyPairs = new HashMap<String, Set<String>>();
     ArrayList<String> allKeys = new ArrayList<String>();
-    List<String> pairs = new ArrayList<String>();
-    ListView lvKeyPairs;
-    Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     ArrayAdapter<String> adapterAutoComplete;
-    int bColor = Color.TRANSPARENT;
     MyListViewAdapter adapter;
     ListView listView;
     List<String> myList;

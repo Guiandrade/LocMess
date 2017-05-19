@@ -51,11 +51,10 @@ import pt.ulisboa.tecnico.cmu.locmess.WiFiDirect.Wifi;
 public class PostMessageActivity extends AppCompatActivity {
 
     ArrayList<LocationModel> locations = new ArrayList<LocationModel>();
-    ArrayAdapter<String> adapterList;
     ArrayAdapter<String> adapterAutoComplete;
-    Map<String,Boolean> checkedStatus = new LinkedHashMap<String,Boolean>();
     private ArrayList<String> keyPairsWhitelist = new ArrayList<String>();
     private ArrayList<String> keyPairsBlacklist = new ArrayList<String>();
+    ArrayList<String> allKeys = new ArrayList<String>();
     MyListViewAdapter adapterWhite;
     MyListViewAdapter adapterBlack;
     ListView listViewWhite;
@@ -80,6 +79,7 @@ public class PostMessageActivity extends AppCompatActivity {
         }
 
         locations = (ArrayList<LocationModel>) getIntent().getSerializableExtra("locations");
+        allKeys = (ArrayList<String>) getIntent().getSerializableExtra("allKeys");
         final SharedPreferences sharedPreferences = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         username = sharedPreferences.getString("username","");
 
@@ -436,13 +436,8 @@ public class PostMessageActivity extends AppCompatActivity {
 
                     }
                 });
-
-                ArrayList<String> keys = new ArrayList<String>();
-                keys.add("Club");
-                keys.add("Favourite Colour");
-                keys.add("Relationship Status");
-
-                adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, keys);
+                
+                adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, allKeys);
                 acKey.setAdapter(adapterAutoComplete);
 
                 acKey.setOnTouchListener(new View.OnTouchListener(){
@@ -592,12 +587,7 @@ public class PostMessageActivity extends AppCompatActivity {
                     }
                 });
 
-                ArrayList<String> keys = new ArrayList<String>();
-                keys.add("Club");
-                keys.add("Favourite Colour");
-                keys.add("Relationship Status");
-
-                adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, keys);
+                adapterAutoComplete = new ArrayAdapter<String>(v.getContext(), android.R.layout.simple_dropdown_item_1line, allKeys);
                 acKey.setAdapter(adapterAutoComplete);
 
                 acKey.setOnTouchListener(new View.OnTouchListener(){
